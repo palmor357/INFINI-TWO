@@ -1,0 +1,703 @@
+{
+ "app": "infinitwo-estrategia",
+ "version": 1,
+ "name": "ALOT screening · jerarquía propuesta",
+ "creado": "2026-10-22T10:49:30.724220Z",
+ "compensacion": true,
+ "origen": {
+  "archivo": "demo_MO_SCREENING_ALOT.fcs",
+  "eventos": 644115,
+  "canales": [
+   {
+    "canal": "FSC_A",
+    "anticuerpo": ""
+   },
+   {
+    "canal": "FSC_H",
+    "anticuerpo": ""
+   },
+   {
+    "canal": "FSC_W",
+    "anticuerpo": ""
+   },
+   {
+    "canal": "SSC_A",
+    "anticuerpo": ""
+   },
+   {
+    "canal": "SSC_H",
+    "anticuerpo": ""
+   },
+   {
+    "canal": "SSC_W",
+    "anticuerpo": ""
+   },
+   {
+    "canal": "FITC_A",
+    "anticuerpo": "cMPO"
+   },
+   {
+    "canal": "PE_A",
+    "anticuerpo": "cCD79a"
+   },
+   {
+    "canal": "PerCP_Cy5_5_A",
+    "anticuerpo": "CD34"
+   },
+   {
+    "canal": "PE_Cy7_A",
+    "anticuerpo": "CD19"
+   },
+   {
+    "canal": "APC_A",
+    "anticuerpo": "CD7"
+   },
+   {
+    "canal": "APC_H7_A",
+    "anticuerpo": "CD3"
+   },
+   {
+    "canal": "V450_A",
+    "anticuerpo": "cCD3"
+   },
+   {
+    "canal": "V500_A",
+    "anticuerpo": "CD45"
+   },
+   {
+    "canal": "Time",
+    "anticuerpo": ""
+   }
+  ]
+ },
+ "gates": [
+  {
+   "id": 1,
+   "name": "Singletes",
+   "parent": "",
+   "creado": "2026-10-22T10:49:30.724220Z",
+   "count": 504799,
+   "total": 644115,
+   "scope": {
+    "hidden": [],
+    "hiddenUnassigned": false
+   },
+   "regions": [
+    {
+     "graph": "Singletes · FSC-A × FSC-W",
+     "x": "FSC_A",
+     "xStain": "",
+     "y": "FSC_W",
+     "yStain": "",
+     "xs": "linear",
+     "ys": "linear",
+     "kind": "lasso",
+     "poly": [
+      [
+       10000.0,
+       63000.0
+      ],
+      [
+       25000.0,
+       68500.0
+      ],
+      [
+       45000.0,
+       70500.0
+      ],
+      [
+       65000.0,
+       73500.0
+      ],
+      [
+       85000.0,
+       77500.0
+      ],
+      [
+       105000.0,
+       82500.0
+      ],
+      [
+       125000.0,
+       89500.0
+      ],
+      [
+       140000.0,
+       94500.0
+      ],
+      [
+       140000.0,
+       114000.0
+      ],
+      [
+       125000.0,
+       106000.0
+      ],
+      [
+       105000.0,
+       98000.0
+      ],
+      [
+       85000.0,
+       92000.0
+      ],
+      [
+       65000.0,
+       87000.0
+      ],
+      [
+       45000.0,
+       85000.0
+      ],
+      [
+       25000.0,
+       83000.0
+      ],
+      [
+       10000.0,
+       76000.0
+      ]
+     ],
+     "portable": true,
+     "raw": true
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "name": "Singletes/Debris",
+   "parent": "Singletes",
+   "creado": "2026-10-22T10:49:30.724220Z",
+   "count": 7583,
+   "total": 644115,
+   "scope": {
+    "hidden": [],
+    "hiddenUnassigned": true
+   },
+   "regions": [
+    {
+     "graph": "Células/debris · FSC-A × SSC-A",
+     "x": "FSC_A",
+     "xStain": "",
+     "y": "SSC_A",
+     "yStain": "",
+     "xs": "linear",
+     "ys": "linear",
+     "kind": "box",
+     "poly": [
+      [
+       0.0,
+       -828.0
+      ],
+      [
+       28000.0,
+       -828.0
+      ],
+      [
+       28000.0,
+       261315.0
+      ],
+      [
+       0.0,
+       261315.0
+      ]
+     ],
+     "portable": true,
+     "raw": true
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "name": "Singletes/Células",
+   "parent": "Singletes",
+   "creado": "2026-10-22T10:49:30.724220Z",
+   "count": 497188,
+   "total": 644115,
+   "scope": {
+    "hidden": [
+     "Singletes/Debris"
+    ],
+    "hiddenUnassigned": true
+   },
+   "regions": [
+    {
+     "graph": "Células/debris · FSC-A × SSC-A",
+     "x": "FSC_A",
+     "xStain": "",
+     "y": "SSC_A",
+     "yStain": "",
+     "xs": "linear",
+     "ys": "linear",
+     "kind": "box",
+     "poly": [
+      [
+       28000.0,
+       -828.0
+      ],
+      [
+       150000.0,
+       -828.0
+      ],
+      [
+       150000.0,
+       261315.0
+      ],
+      [
+       28000.0,
+       261315.0
+      ]
+     ],
+     "portable": true,
+     "raw": true
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "name": "Singletes/Células/Granulocitos",
+   "parent": "Singletes/Células",
+   "creado": "2026-10-22T10:49:30.724220Z",
+   "count": 58067,
+   "total": 644115,
+   "scope": {
+    "hidden": [
+     "Singletes",
+     "Singletes/Debris"
+    ],
+    "hiddenUnassigned": true
+   },
+   "regions": [
+    {
+     "graph": "CD45 × SSC-A",
+     "x": "V500_A",
+     "xStain": "CD45",
+     "y": "SSC_A",
+     "yStain": "",
+     "xs": "log",
+     "ys": "linear",
+     "kind": "lasso",
+     "poly": [
+      [
+       811.383,
+       45172.0
+      ],
+      [
+       811.383,
+       261315.0
+      ],
+      [
+       8723.89,
+       261315.0
+      ],
+      [
+       8723.89,
+       51172.0
+      ],
+      [
+       4823.26,
+       43172.0
+      ],
+      [
+       1806.65,
+       41172.0
+      ]
+     ],
+     "portable": true,
+     "raw": true
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "name": "Singletes/Células/CD45neg",
+   "parent": "Singletes/Células",
+   "creado": "2026-10-22T10:49:30.724220Z",
+   "count": 46958,
+   "total": 644115,
+   "scope": {
+    "hidden": [
+     "Singletes",
+     "Singletes/Debris",
+     "Singletes/Células/Granulocitos"
+    ],
+    "hiddenUnassigned": true
+   },
+   "regions": [
+    {
+     "graph": "CD45 × SSC-A",
+     "x": "V500_A",
+     "xStain": "CD45",
+     "y": "SSC_A",
+     "yStain": "",
+     "xs": "log",
+     "ys": "linear",
+     "kind": "lasso",
+     "poly": [
+      [
+       -62.7241,
+       -528.0
+      ],
+      [
+       -62.7241,
+       23172.0
+      ],
+      [
+       519.329,
+       27172.0
+      ],
+      [
+       1223.92,
+       24172.0
+      ],
+      [
+       1223.92,
+       -528.0
+      ]
+     ],
+     "portable": true,
+     "raw": true
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "name": "Singletes/Células/Mononucleares",
+   "parent": "Singletes/Células",
+   "creado": "2026-10-22T10:49:30.724220Z",
+   "count": 383385,
+   "total": 644115,
+   "scope": {
+    "hidden": [
+     "Singletes",
+     "Singletes/Debris",
+     "Singletes/Células/Granulocitos",
+     "Singletes/Células/CD45neg"
+    ],
+    "hiddenUnassigned": true
+   },
+   "regions": [
+    {
+     "graph": "CD45 × SSC-A",
+     "x": "V500_A",
+     "xStain": "CD45",
+     "y": "SSC_A",
+     "yStain": "",
+     "xs": "log",
+     "ys": "linear",
+     "kind": "lasso",
+     "poly": [
+      [
+       1806.65,
+       1672.0
+      ],
+      [
+       1806.65,
+       25172.0
+      ],
+      [
+       3792.46,
+       37172.0
+      ],
+      [
+       7754.67,
+       43172.0
+      ],
+      [
+       15660.3,
+       41172.0
+      ],
+      [
+       24930.2,
+       29172.0
+      ],
+      [
+       27995.2,
+       7172.0
+      ],
+      [
+       17594.2,
+       1672.0
+      ]
+     ],
+     "portable": true,
+     "raw": true
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "name": "Singletes/Células/Mononucleares/CD34+",
+   "parent": "Singletes/Células/Mononucleares",
+   "creado": "2026-10-22T10:49:30.724220Z",
+   "count": 181,
+   "total": 644115,
+   "scope": {
+    "hidden": [
+     "Singletes",
+     "Singletes/Debris",
+     "Singletes/Células",
+     "Singletes/Células/Granulocitos",
+     "Singletes/Células/CD45neg"
+    ],
+    "hiddenUnassigned": true
+   },
+   "regions": [
+    {
+     "graph": "CD34 × SSC-A",
+     "x": "PerCP_Cy5_5_A",
+     "xStain": "CD34",
+     "y": "SSC_A",
+     "yStain": "",
+     "xs": "log",
+     "ys": "linear",
+     "kind": "box",
+     "poly": [
+      [
+       5294.06,
+       -828.0
+      ],
+      [
+       396322.0,
+       -828.0
+      ],
+      [
+       396322.0,
+       261315.0
+      ],
+      [
+       5294.06,
+       261315.0
+      ]
+     ],
+     "portable": true,
+     "raw": true
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "name": "Singletes/Células/Mononucleares/Linfocitos T",
+   "parent": "Singletes/Células/Mononucleares",
+   "creado": "2026-10-22T10:49:30.724220Z",
+   "count": 182326,
+   "total": 644115,
+   "scope": {
+    "hidden": [
+     "Singletes",
+     "Singletes/Debris",
+     "Singletes/Células",
+     "Singletes/Células/Granulocitos",
+     "Singletes/Células/CD45neg",
+     "Singletes/Células/Mononucleares/CD34+"
+    ],
+    "hiddenUnassigned": true
+   },
+   "regions": [
+    {
+     "graph": "sCD3 × cCD3",
+     "x": "APC_H7_A",
+     "xStain": "CD3",
+     "y": "V450_A",
+     "yStain": "cCD3",
+     "xs": "log",
+     "ys": "log",
+     "kind": "box",
+     "poly": [
+      [
+       6220.68,
+       898.4
+      ],
+      [
+       500328.0,
+       898.4
+      ],
+      [
+       500328.0,
+       99898.4
+      ],
+      [
+       6220.68,
+       99898.4
+      ]
+     ],
+     "portable": true,
+     "raw": true
+    }
+   ]
+  },
+  {
+   "id": 9,
+   "name": "Singletes/Células/Mononucleares/Linfocitos B",
+   "parent": "Singletes/Células/Mononucleares",
+   "creado": "2026-10-22T10:49:30.724220Z",
+   "count": 185521,
+   "total": 644115,
+   "scope": {
+    "hidden": [
+     "Singletes",
+     "Singletes/Debris",
+     "Singletes/Células",
+     "Singletes/Células/Granulocitos",
+     "Singletes/Células/CD45neg",
+     "Singletes/Células/Mononucleares/CD34+",
+     "Singletes/Células/Mononucleares/Linfocitos T"
+    ],
+    "hiddenUnassigned": true
+   },
+   "regions": [
+    {
+     "graph": "CD19 × cCD79a",
+     "x": "PE_Cy7_A",
+     "xStain": "CD19",
+     "y": "PE_A",
+     "yStain": "cCD79a",
+     "xs": "log",
+     "ys": "log",
+     "kind": "box",
+     "poly": [
+      [
+       4600.67,
+       -130.802
+      ],
+      [
+       500776.0,
+       -130.802
+      ],
+      [
+       500776.0,
+       251026.0
+      ],
+      [
+       4600.67,
+       251026.0
+      ]
+     ],
+     "portable": true,
+     "raw": true
+    }
+   ]
+  },
+  {
+   "id": 10,
+   "name": "Singletes/Células/Mononucleares/NK",
+   "parent": "Singletes/Células/Mononucleares",
+   "creado": "2026-10-22T10:49:30.724220Z",
+   "count": 10783,
+   "total": 644115,
+   "scope": {
+    "hidden": [
+     "Singletes",
+     "Singletes/Debris",
+     "Singletes/Células",
+     "Singletes/Células/Granulocitos",
+     "Singletes/Células/CD45neg",
+     "Singletes/Células/Mononucleares/CD34+",
+     "Singletes/Células/Mononucleares/Linfocitos T",
+     "Singletes/Células/Mononucleares/Linfocitos B"
+    ],
+    "hiddenUnassigned": true
+   },
+   "regions": [
+    {
+     "graph": "sCD3 × CD7",
+     "x": "APC_H7_A",
+     "xStain": "CD3",
+     "y": "APC_A",
+     "yStain": "CD7",
+     "xs": "log",
+     "ys": "log",
+     "kind": "box",
+     "poly": [
+      [
+       -827.158,
+       2442.26
+      ],
+      [
+       4153.09,
+       2442.26
+      ],
+      [
+       4153.09,
+       251119.0
+      ],
+      [
+       -827.158,
+       251119.0
+      ]
+     ],
+     "portable": true,
+     "raw": true
+    }
+   ]
+  },
+  {
+   "id": 11,
+   "name": "Singletes/Células/Mononucleares/Monocitos",
+   "parent": "Singletes/Células/Mononucleares",
+   "creado": "2026-10-22T10:49:30.724220Z",
+   "count": 726,
+   "total": 644115,
+   "scope": {
+    "hidden": [
+     "Singletes",
+     "Singletes/Debris",
+     "Singletes/Células",
+     "Singletes/Células/Granulocitos",
+     "Singletes/Células/CD45neg",
+     "Singletes/Células/Mononucleares/CD34+",
+     "Singletes/Células/Mononucleares/Linfocitos T",
+     "Singletes/Células/Mononucleares/Linfocitos B",
+     "Singletes/Células/Mononucleares/NK"
+    ],
+    "hiddenUnassigned": true
+   },
+   "regions": [
+    {
+     "graph": "cMPO × SSC-A",
+     "x": "FITC_A",
+     "xStain": "cMPO",
+     "y": "SSC_A",
+     "yStain": "",
+     "xs": "log",
+     "ys": "linear",
+     "kind": "box",
+     "poly": [
+      [
+       1345.58,
+       -828.0
+      ],
+      [
+       99933.0,
+       -828.0
+      ],
+      [
+       99933.0,
+       261315.0
+      ],
+      [
+       1345.58,
+       261315.0
+      ]
+     ],
+     "portable": true,
+     "raw": true
+    }
+   ]
+  }
+ ],
+ "colors": {
+  "Singletes": "#b0b8c4",
+  "Singletes/Debris": "#8c8c8c",
+  "Singletes/Células": "#9db7d9",
+  "Singletes/Células/Granulocitos": "#ff7f0e",
+  "Singletes/Células/CD45neg": "#8c564b",
+  "Singletes/Células/Mononucleares": "#aec7e8",
+  "Singletes/Células/Mononucleares/CD34+": "#17becf",
+  "Singletes/Células/Mononucleares/Linfocitos T": "#2ca02c",
+  "Singletes/Células/Mononucleares/Linfocitos B": "#1f77b4",
+  "Singletes/Células/Mononucleares/NK": "#9467bd",
+  "Singletes/Células/Mononucleares/Monocitos": "#d62728"
+ },
+ "nota": "Propuesta de gating para el tubo ALOT (BD FACSCantoII) sobre datos COMPENSADOS con $SPILL. Requiere revisión por un especialista; no es un dispositivo médico ni está validada clínicamente."
+}

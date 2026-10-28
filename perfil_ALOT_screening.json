@@ -1,0 +1,88 @@
+{
+ "app": "infinitwo-perfil",
+ "version": 1,
+ "name": "ALOT screening · 8 gráficos de la estrategia",
+ "creado": "2026-10-22T10:49:30.724220Z",
+ "panels": [
+  {
+   "x": "FSC_A",
+   "xStain": "",
+   "y": "FSC_W",
+   "yStain": "",
+   "xs": "linear",
+   "ys": "linear",
+   "mode": "scatter"
+  },
+  {
+   "x": "FSC_A",
+   "xStain": "",
+   "y": "SSC_A",
+   "yStain": "",
+   "xs": "linear",
+   "ys": "linear",
+   "mode": "scatter"
+  },
+  {
+   "x": "V500_A",
+   "xStain": "CD45",
+   "y": "SSC_A",
+   "yStain": "",
+   "xs": "log",
+   "ys": "linear",
+   "mode": "scatter"
+  },
+  {
+   "x": "APC_H7_A",
+   "xStain": "CD3",
+   "y": "V450_A",
+   "yStain": "cCD3",
+   "xs": "log",
+   "ys": "log",
+   "mode": "scatter"
+  },
+  {
+   "x": "PE_Cy7_A",
+   "xStain": "CD19",
+   "y": "PE_A",
+   "yStain": "cCD79a",
+   "xs": "log",
+   "ys": "log",
+   "mode": "scatter"
+  },
+  {
+   "x": "APC_H7_A",
+   "xStain": "CD3",
+   "y": "APC_A",
+   "yStain": "CD7",
+   "xs": "log",
+   "ys": "log",
+   "mode": "scatter"
+  },
+  {
+   "x": "FITC_A",
+   "xStain": "cMPO",
+   "y": "SSC_A",
+   "yStain": "",
+   "xs": "log",
+   "ys": "linear",
+   "mode": "scatter"
+  },
+  {
+   "x": "PerCP_Cy5_5_A",
+   "xStain": "CD34",
+   "y": "SSC_A",
+   "yStain": "",
+   "xs": "log",
+   "ys": "linear",
+   "mode": "scatter"
+  }
+ ],
+ "color": {
+  "by": "population",
+  "channel": "",
+  "channelStain": "",
+  "base": "#1f77b4",
+  "showGates": true
+ },
+ "embN": 5000
+}
