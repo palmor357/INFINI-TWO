@@ -863,6 +863,7 @@ function renderDialogoInfiniTwo() {
   if (!J.muestra) avisos.push('<div class="inf-aviso amb">El archivo no trae N° de muestra: no se pudo comprobar que corresponda a este paciente.</div>');
   if (a.muestreo) avisos.push(`<div class="inf-aviso amb">INFINI-TWO analizó <b>${_fmtEv(a.eventosAnalizados)} de ${_fmtEv(a.eventosArchivo)}</b> eventos (una muestra al azar): los % son aproximados. Para el informe conviene exportar con el archivo cargado en «Total».</div>`);
   if (a.estrategiaModificada) avisos.push('<div class="inf-aviso amb">Los gates se modificaron después de aplicar la estrategia: el resultado ya no equivale a la estrategia guardada.</div>');
+  if (a.compensacionEditada) avisos.push('<div class="inf-aviso amb"><b>Compensación editada manualmente:</b> este análisis se hizo con una matriz de compensación modificada por el usuario' + (a.compensacionDetalle && a.compensacionDetalle.sinCompensacion ? ' (sin compensación)' : '') + '. El modelo de IA se entrenó con la matriz original del citómetro: interpreta el resultado con cautela. Quedará indicado en el informe.</div>');
   const filas = nuc.map((p, i) => {
     const d = destinoPredeterminadoInfiniTwo(p);
     const opts = ['<option value="">— no importar —</option>', ...TIPOS_CELULARES.map((n, k) => `<option value="f${k}"${d === 'f' + k ? ' selected' : ''}>${n}</option>`), `<option value="custom"${d === 'custom' ? ' selected' : ''}>➕ Tipo personalizado («${p.nombre}»)</option>`].join('');
@@ -871,7 +872,7 @@ function renderDialogoInfiniTwo() {
   document.getElementById('inf-contenido').innerHTML = `
     <div style="font-size:0.74rem;color:#475569;line-height:1.5">
       Muestra: <b>${J.muestra || '—'}</b> · Archivo: ${J.archivo || '—'}<br>
-      Estrategia: <b>${a.estrategia || 'gates dibujados a mano'}</b> · ${a.compensacion ? 'datos compensados' : 'datos sin compensar'}${a.instrumento ? ' · ' + a.instrumento : ''}<br>
+      Estrategia: <b>${a.estrategia || 'gates dibujados a mano'}</b> · ${a.compensacionEditada ? '<b>compensación EDITADA manualmente</b>' : (a.compensacion ? 'datos compensados' : 'datos sin compensar')}${a.instrumento ? ' · ' + a.instrumento : ''}<br>
       Base de los porcentajes: <b>células nucleadas, n = ${_fmtEv(a.celulasNucleadas)}</b> (sin restos ni dobletes${fuera.length ? '; excluidas: ' + fuera.map(p => p.nombre).join(', ') : ''}).
     </div>
     ${avisos.join('')}
@@ -910,7 +911,7 @@ function aplicarImportacionInfiniTwo() {
   actualizarVisibilidadTiposCelulares();
   gatingInfiniTwoActual = {
     version: 1, origen: 'INFINI-TWO', importado: new Date().toISOString(), muestra: J.muestra || '', archivo: J.archivo || '',
-    estrategia: a.estrategia || '', estrategiaModificada: !!a.estrategiaModificada, compensacion: !!a.compensacion, instrumento: a.instrumento || '',
+    estrategia: a.estrategia || '', estrategiaModificada: !!a.estrategiaModificada, compensacion: !!a.compensacion, compensacionEditada: !!a.compensacionEditada, instrumento: a.instrumento || '',
     eventosAnalizados: a.eventosAnalizados, eventosArchivo: a.eventosArchivo, muestreo: !!a.muestreo,
     baseNucleadas: a.celulasNucleadas, criterio: a.baseDePorcentajes || 'células nucleadas (sin restos ni dobletes)',
     poblaciones: nuc.filter((p, i) => asignadas.has(i)).map(p => ({ nombre: p.nombre, eventos: p.eventos, pct: p.pctNucleadas })),
@@ -928,7 +929,7 @@ function renderGatingInfiniTwo() {
   const partes = [
     `Estrategia: <b>${g.estrategia || 'gates dibujados a mano'}</b>${g.estrategiaModificada ? ' (modificada tras aplicarla)' : ''}`,
     `Eventos analizados: <b>${_fmtEv(g.eventosAnalizados)}</b>${g.eventosArchivo ? ' de ' + _fmtEv(g.eventosArchivo) : ''}${g.muestreo ? ' (muestra aleatoria)' : ''}`,
-    g.compensacion ? 'Datos compensados' : 'Datos sin compensar',
+    g.compensacionEditada ? '<b>Compensación editada manualmente</b>' : (g.compensacion ? 'Datos compensados' : 'Datos sin compensar'),
     `Porcentajes sobre células nucleadas (n = ${_fmtEv(g.baseNucleadas)}; sin restos ni dobletes)`
   ];
   document.getElementById('gating-it-meta').innerHTML = partes.join(' · ');
