@@ -1,0 +1,2470 @@
+<!DOCTYPE html>
+<!--
+  INFINI-TWO · Informe de inmunofenotipo (edición genérica)
+  Autor: Cristopher Palma Espinoza (@palmor357) · https://github.com/palmor357/INFINI-TWO
+  Licencia: GNU General Public License v3.0 · https://www.gnu.org/licenses/gpl-3.0.html
+  Condiciones: conservar los avisos de licencia y copyright, indicar los cambios, poner a disposición el código fuente
+  completo y mantener la misma licencia en las obras derivadas. Se distribuye SIN GARANTÍA.
+-->
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Informe de inmunofenotipo estandarizado</title>
+<!-- CKEditor 5 (alojado localmente, sin depender de una CDN externa) — solo
+     se usa en el campo Descripción, para negrita/cursiva/tamaño de fuente y
+     tablas personalizadas. -->
+<style>
+.mini-ed{border:1px solid #cbd5e1;border-radius:8px;background:#fff;overflow:hidden}
+.mini-ed-bar{display:flex;gap:4px;flex-wrap:wrap;padding:5px 6px;background:#f1f5f9;border-bottom:1px solid #cbd5e1}
+.mini-ed-bar button{border:1px solid #cbd5e1;background:#fff;border-radius:5px;padding:2px 9px;font:600 12px Inter,system-ui,sans-serif;cursor:pointer;color:#0f172a}
+.mini-ed-bar button:hover{background:#e0e7ff}
+.mini-ed-bar .sep{width:1px;background:#cbd5e1;margin:2px 3px}
+.mini-ed-area{min-height:110px;padding:8px 10px;font:13px/1.5 Inter,system-ui,sans-serif;outline:none;color:#0f172a}
+.mini-ed-area:empty:before{content:attr(data-ph);color:#94a3b8}
+.mini-ed-area table{border-collapse:collapse;margin:6px 0}.mini-ed-area td,.mini-ed-area th{border:1px solid #94a3b8;padding:3px 8px;min-width:60px}
+/* El panel de anticuerpos dependía del diseñador de paneles del hospital: en esta edición se oculta. */
+#panel-lateral > .panel-anticuerpos-header:not(.poblaciones-header-lateral), #panel-sin-datos, #panel-anticuerpos-lista, .barra-protocolo{display:none !important}
+@media print{.firma-lista textarea::placeholder{color:transparent}}
+/* El panel flotante «Poblaciones y Fenotipo» no debe tapar la hoja en ventanas medianas (p. ej. el modal de INFINI-TWO). */
+@media screen and (max-width:1800px){body{padding-right:334px !important}}
+@media screen and (max-width:900px){body{padding-right:18px !important}.panel-lateral{position:static !important;width:auto !important;max-height:none !important;margin-bottom:12px}}
+.menu-inf{position:relative}
+.menu-inf-lista{display:none;position:absolute;right:0;top:calc(100% + 8px);min-width:260px;background:#fff;border:1px solid #cbd5e1;border-radius:10px;box-shadow:0 8px 24px rgba(15,23,42,.28);padding:6px;z-index:60}
+.menu-inf-lista.open{display:block}
+.menu-inf-lista button{display:block;width:100%;text-align:left;background:none;border:0;padding:8px 12px;border-radius:6px;font:600 .78rem Inter,system-ui,sans-serif;color:#0f172a;cursor:pointer}
+.menu-inf-lista button:hover{background:#e0e7ff}
+.menu-inf-lista hr{border:0;border-top:1px solid #e2e8f0;margin:5px 4px}
+#menu-inf-btn{font-size:.95rem;padding:5px 12px}
+.aviso-inf{position:fixed;right:16px;bottom:16px;background:#0f172a;color:#fff;padding:9px 14px;border-radius:8px;font:600 12.5px Inter,system-ui,sans-serif;z-index:9999;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+.cfg-campo{display:flex;flex-direction:column;gap:3px;margin-bottom:9px;font-size:.78rem;color:#334155}.cfg-campo label{font-weight:700;color:#0f172a}.cfg-campo input[type=text],.cfg-campo textarea{border:1px solid #cbd5e1;border-radius:6px;padding:6px 8px;font:inherit}
+.cfg-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.cfg-logo{display:flex;align-items:center;gap:8px}.cfg-logo img{height:38px;max-width:120px;object-fit:contain;border:1px dashed #cbd5e1;border-radius:4px;padding:2px;background:#fff}
+</style>
+<script>
+/* Editor de texto enriquecido mínimo (sin dependencias). Imita la parte de la API de CKEditor que usa el informe:
+   ClassicEditor.create(el, cfg) → { getData, setData, execute('insertText'), model.document.on('change:data') } */
+window.CKEDITOR = (function () {
+  const P = function () {};
+  const ClassicEditor = { create: async function (el, cfg) {
+    cfg = cfg || {};
+    const wrap = document.createElement('div'); wrap.className = 'mini-ed';
+    const bar = document.createElement('div'); bar.className = 'mini-ed-bar';
+    const area = document.createElement('div'); area.className = 'mini-ed-area'; area.contentEditable = 'true'; area.dataset.ph = cfg.placeholder || '';
+    const cbs = [];
+    const cambio = () => cbs.forEach(f => { try { f(); } catch (e) { console.error(e); } });
+    const cmd = (c, v) => { area.focus(); document.execCommand('styleWithCSS', false, true); document.execCommand(c, false, v); cambio(); };
+    [['↶', () => cmd('undo'), 'Deshacer'], ['↷', () => cmd('redo'), 'Rehacer'], '|',
+     ['N', () => cmd('bold'), 'Negrita'], ['K', () => cmd('italic'), 'Cursiva'], '|',
+     ['A−', () => cmd('fontSize', 2), 'Texto más pequeño'], ['A', () => cmd('fontSize', 3), 'Tamaño normal'], ['A+', () => cmd('fontSize', 5), 'Texto más grande'], '|',
+     ['▦ Tabla', () => cmd('insertHTML', '<table><tr><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td>&nbsp;</td><td>&nbsp;</td></tr></table><p></p>'), 'Insertar tabla de 2×2']
+    ].forEach(b => { if (b === '|') { const s = document.createElement('span'); s.className = 'sep'; bar.appendChild(s); return; }
+      const x = document.createElement('button'); x.type = 'button'; x.textContent = b[0]; x.title = b[2]; x.addEventListener('mousedown', e => e.preventDefault()); x.addEventListener('click', b[1]); bar.appendChild(x); });
+    area.addEventListener('input', cambio);
+    area.addEventListener('paste', e => { e.preventDefault(); const tx = (e.clipboardData || window.clipboardData).getData('text/plain'); document.execCommand('insertText', false, tx); });
+    wrap.appendChild(bar); wrap.appendChild(area); el.appendChild(wrap);
+    return {
+      getData: () => { const h = area.innerHTML.trim(); return (h === '<br>' || h === '<div><br></div>') ? '' : h; },
+      setData: (h) => { area.innerHTML = h || ''; cambio(); },
+      execute: (c, o) => { if (c === 'insertText') { area.focus(); document.execCommand('insertText', false, (o && o.text) || ''); cambio(); } },
+      model: { document: { on: (ev, f) => { if (ev === 'change:data') cbs.push(f); } } }
+    };
+  } };
+  return { ClassicEditor, Essentials: P, Paragraph: P, Bold: P, Italic: P, FontSize: P, Table: P, TableToolbar: P, TableCellProperties: P, TableProperties: P };
+})();
+</script>
+<style>
+:root{
+  --azul-oscuro:#0f172a;
+  --azul-medio:#1e293b;
+  --azul-acento:#2563eb;
+  --azul-claro:#38bdf8;
+  --gris-borde:#cbd5e1;
+  --gris-fondo:#f1f5f9;
+  --gris-texto:#475569;
+  --verde:#059669;
+  --rojo:#dc2626;
+  --ambar:#d97706;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif;}
+body{background:#e2e8f0;color:#1e293b;padding:18px;font-size:0.82rem;}
+
+/* ============ BARRA DE HERRAMIENTAS (no imprime) ============ */
+.toolbar{
+  max-width:1180px;margin:0 auto 14px auto;
+  background:var(--azul-oscuro);color:#fff;border-radius:10px;
+  padding:10px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+}
+.toolbar h1{font-size:0.95rem;font-weight:700;margin-right:auto;}
+.toolbar .badge{color:var(--azul-claro);font-weight:600;font-size:0.72rem;}
+.toolbar label{font-size:0.72rem;font-weight:600;color:#cbd5e1;}
+.toolbar select{
+  padding:6px 10px;border-radius:6px;border:none;font-size:0.78rem;font-weight:600;
+  background:#fff;color:var(--azul-oscuro);outline:none;cursor:pointer;
+}
+.btn{
+  background:var(--azul-acento);color:#fff;border:none;padding:7px 14px;border-radius:6px;
+  font-size:0.75rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;
+  transition:background .15s;text-decoration:none;
+}
+.btn:hover{background:#1d4ed8;}
+.btn.verde{background:var(--verde);}
+.btn.verde:hover{background:#047857;}
+.btn.gris{background:#475569;}
+.btn.gris:hover{background:#334155;}
+.btn.ambar{background:var(--ambar);}
+.btn.ambar:hover{background:#b45309;}
+
+/* ============ HOJA / REPORTE ============ */
+.hoja{
+  max-width:1180px;margin:0 auto 24px auto;background:#fff;
+  border:1px solid var(--gris-borde);border-radius:10px;padding:26px 30px;
+  box-shadow:0 1px 3px rgba(0,0,0,0.08);
+}
+.encabezado-hospital{display:flex;align-items:flex-start;gap:14px;text-align:center;border-bottom:3px solid var(--azul-oscuro);padding-bottom:8px;margin-bottom:12px;}
+.encabezado-hospital .logo-institucional{height:60px;width:auto;flex:0 0 auto;object-fit:contain;margin-top:2px;}
+.encabezado-hospital .encabezado-texto{flex:1 1 auto;min-width:0;}
+.encabezado-hospital h2{font-size:1.05rem;font-weight:800;color:var(--azul-oscuro);letter-spacing:0.3px;}
+.encabezado-hospital .sub{font-size:0.78rem;color:var(--gris-texto);font-weight:500;margin-top:2px;}
+.encabezado-hospital .titulo-informe{font-size:0.92rem;font-weight:800;color:var(--azul-acento);margin-top:6px;letter-spacing:0.1px;}
+
+/* ---- Datos paciente ---- */
+.datos-paciente{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:10px 20px;
+  border:1px solid var(--gris-borde);border-radius:8px;
+  padding:14px 16px 10px;margin-bottom:12px;
+}
+.campo{display:flex;flex-direction:column;gap:3px;}
+.campo.wide{grid-column:span 2;}
+.campo label{font-size:0.62rem;font-weight:700;color:var(--gris-texto);text-transform:uppercase;letter-spacing:0.3px;}
+.campo input, .campo select{
+  border:none;border-bottom:1px solid var(--gris-borde);border-radius:0;padding:3px 2px;font-size:0.8rem;
+  background:transparent;color:var(--azul-oscuro);font-weight:500;
+}
+.campo input:focus, .campo select:focus{outline:none;border-bottom:2px solid var(--azul-acento);}
+
+/* ---- Barra protocolo / selector edad ---- */
+.barra-protocolo{
+  background:var(--azul-oscuro);color:#fff;border-radius:8px;padding:9px 16px;
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px;
+}
+.barra-protocolo .prot-titulo{font-size:0.82rem;font-weight:700;}
+.barra-protocolo .prot-sub{font-size:0.68rem;color:var(--azul-claro);font-weight:600;}
+
+/* ---- Tabla resultados (reusada por Tipos Celulares) ---- */
+.tabla-wrapper{border:1px solid var(--gris-borde);border-radius:8px;overflow:hidden;margin-bottom:14px;}
+table.tabla-resultados{width:100%;border-collapse:collapse;}
+table.tabla-resultados thead th{
+  background:var(--azul-medio);color:#fff;font-size:0.62rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:0.2px;padding:7px 5px;text-align:center;
+  border:1px solid #334155;
+}
+table.tabla-resultados thead th.th-poblacion{text-align:left;padding-left:12px;}
+table.tabla-resultados thead tr.grupo th{background:var(--azul-oscuro);font-size:0.66rem;}
+table.tabla-resultados tbody td{
+  border:1px solid #e2e8f0;padding:3px 5px;font-size:0.72rem;text-align:center;vertical-align:middle;
+}
+table.tabla-resultados tbody tr:nth-child(even){background:#f8fafc;}
+td.nombre-pob{text-align:left;font-weight:600;color:var(--azul-oscuro);white-space:nowrap;}
+td.nombre-pob.nivel-0{font-weight:700;background:#eef2ff;}
+td.nombre-pob.nivel-1{padding-left:18px;font-weight:600;}
+td.nombre-pob.nivel-2{padding-left:32px;font-weight:400;color:var(--gris-texto);font-size:0.68rem;}
+tr.nivel-0-row td{border-top:1.5px solid #94a3b8;}
+
+input.res-input{
+  width:64px;border:1px solid var(--gris-borde);border-radius:4px;padding:3px 4px;
+  font-size:0.74rem;text-align:center;font-weight:700;color:var(--azul-oscuro);
+}
+input.res-input:focus{outline:2px solid var(--azul-acento);outline-offset:-1px;}
+input.res-input.fuera-rango{background:#fee2e2;border-color:var(--rojo);color:var(--rojo);}
+input.res-input.en-rango{background:#ecfdf5;border-color:var(--verde);color:var(--verde);}
+td.ref-cell{color:var(--gris-texto);font-size:0.68rem;white-space:nowrap;}
+td.ref-cell.sin-ref{color:#cbd5e1;font-style:italic;}
+td.sep-col{width:6px;background:#e2e8f0;padding:0;border-left:2px solid var(--gris-borde);border-right:2px solid var(--gris-borde);}
+
+/* ---- Tipos Celulares (grilla de 15 poblaciones fijas, 3 por fila) ---- */
+.tc-titulo{background:var(--azul-medio);color:#fff;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;padding:7px 12px;}
+.tc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;}
+.tc-item{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:6px 12px;border-bottom:1px solid #eef1f5;border-right:1px solid #eef1f5;
+}
+.tc-item:nth-child(3n){border-right:none;}
+.tc-item label{font-size:0.72rem;font-weight:600;color:var(--azul-oscuro);}
+.tc-item input.res-input{width:52px;flex:none;}
+
+/* ---- Barra lateral de Anticuerpos (herramienta de trabajo — NO se imprime) ---- */
+/* Se renombró conceptualmente el antiguo "Panel de Anticuerpos": ahora es una
+   barra lateral flotante de referencia/trabajo. Lo que SÍ se imprime es la
+   sección "Poblaciones y Fenotipo" (ver más abajo), armada a partir de esta barra. */
+.panel-lateral{
+  position:fixed;top:90px;right:14px;width:300px;max-height:calc(100vh - 110px);
+  overflow-y:auto;background:#fff;border:1px solid var(--gris-borde);border-radius:10px;
+  box-shadow:0 4px 16px rgba(15,23,42,0.12);z-index:40;
+}
+.panel-anticuerpos-header{padding:10px 14px 4px;}
+.poblaciones-header-lateral{border-top:3px solid var(--gris-fondo);margin-top:6px;padding-top:12px;}
+.panel-anticuerpos-header h3{font-size:0.85rem;font-weight:800;color:var(--azul-oscuro);}
+.panel-anticuerpos-hint{font-size:0.62rem;color:var(--gris-texto);display:block;padding:0 14px 6px;}
+.panel-sin-datos{padding:18px 14px;color:var(--gris-texto);font-size:0.78rem;text-align:center;font-style:italic;}
+.panel-anticuerpos-lista{padding:6px 14px 12px;}
+.fila-anticuerpo{
+  display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:6px 4px;border-bottom:1px solid #eef1f5;
+}
+.fila-anticuerpo:last-child{border-bottom:none;}
+.fila-anticuerpo .ac-nombre{flex:1 1 100%;font-weight:700;color:var(--azul-oscuro);font-size:0.78rem;}
+.fila-anticuerpo .ac-tubos{display:block;font-weight:400;color:var(--gris-texto);font-size:0.62rem;}
+.fila-anticuerpo select.ac-intensidad{
+  padding:4px 6px;border-radius:5px;border:1px solid var(--gris-borde);font-size:0.76rem;font-weight:700;
+  background:#fff;color:var(--azul-oscuro);
+}
+.fila-anticuerpo input.ac-porcentaje{
+  width:52px;border:1px solid var(--gris-borde);border-radius:5px;padding:4px 5px;
+  font-size:0.76rem;text-align:center;color:var(--azul-oscuro);
+}
+.fila-anticuerpo .ac-mover{
+  background:#eef2f7;border:1px solid var(--gris-borde);border-radius:5px;padding:4px 6px;
+  font-size:0.64rem;font-weight:700;color:var(--gris-texto);cursor:pointer;white-space:nowrap;
+}
+.fila-anticuerpo .ac-mover:hover{background:#e2e8f0;}
+.fila-anticuerpo .ac-insertar{
+  background:var(--azul-acento);border:1px solid var(--azul-acento);border-radius:5px;padding:4px 8px;
+  font-size:0.64rem;font-weight:700;color:#fff;cursor:pointer;white-space:nowrap;
+}
+.fila-anticuerpo .ac-insertar:hover{background:#1d4ed8;}
+.fila-anticuerpo .ac-insertar:disabled{background:#cbd5e1;border-color:#cbd5e1;cursor:not-allowed;}
+.fila-anticuerpo.grupo-positivo .ac-nombre{color:var(--rojo);}
+.fila-anticuerpo.grupo-negativo .ac-nombre{color:var(--verde);}
+
+/* ---- Poblaciones y Fenotipo (esto SÍ se imprime — reemplaza al antiguo
+   "Panel de Anticuerpos" en el reporte impreso) ---- */
+.poblaciones-lista{padding:8px 14px;}
+.poblacion-item{border:1px solid var(--gris-borde);border-radius:8px;padding:8px 10px;margin-bottom:10px;}
+.poblacion-item:last-child{margin-bottom:0;}
+.poblacion-cabecera{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+input.poblacion-nombre{
+  flex:1 1 auto;border:none;border-bottom:1px solid var(--gris-borde);padding:3px 2px;
+  font-size:0.8rem;font-weight:700;color:var(--azul-oscuro);background:transparent;
+}
+input.poblacion-nombre:focus{outline:none;border-bottom:2px solid var(--azul-acento);}
+input.poblacion-pct{
+  flex:none;width:52px;border:none;border-bottom:1px solid var(--gris-borde);padding:3px 2px;
+  font-size:0.78rem;font-weight:700;color:var(--azul-oscuro);background:transparent;text-align:center;
+}
+input.poblacion-pct::placeholder{color:#cbd5e1;}
+input.poblacion-pct:focus{outline:none;border-bottom:2px solid var(--azul-acento);}
+.poblacion-quitar{
+  flex:none;background:none;border:none;color:var(--rojo);font-size:0.7rem;font-weight:700;cursor:pointer;
+}
+textarea.poblacion-texto{
+  width:100%;min-height:56px;border:1px solid var(--gris-borde);border-radius:6px;padding:6px 8px;
+  font-size:0.76rem;resize:vertical;color:#1e293b;line-height:1.4;
+}
+textarea.poblacion-texto:focus{outline:2px solid var(--azul-acento);outline-offset:-1px;}
+textarea.poblacion-texto.poblacion-activa{border-color:var(--azul-acento);}
+.btn-agregar-poblacion{
+  margin:0 14px 10px;background:var(--gris-fondo);border:1px dashed var(--gris-borde);border-radius:6px;
+  padding:7px 10px;font-size:0.72rem;font-weight:700;color:var(--gris-texto);cursor:pointer;width:calc(100% - 28px);
+}
+.btn-agregar-poblacion:hover{background:#e2e8f0;}
+.btn-agregar-tc{
+  margin:8px 12px 12px;background:var(--gris-fondo);border:1px dashed var(--gris-borde);border-radius:6px;
+  padding:6px 10px;font-size:0.7rem;font-weight:700;color:var(--gris-texto);cursor:pointer;width:calc(100% - 24px);
+}
+.btn-agregar-tc:hover{background:#e2e8f0;}
+.tc-item.tc-personalizado{background:#fbfdff;}
+.tc-item.tc-personalizado input.tc-nombre-custom{
+  border:none;border-bottom:1px solid var(--gris-borde);background:transparent;font-size:0.72rem;
+  font-weight:600;color:var(--azul-oscuro);width:100%;padding:1px 0;
+}
+.tc-item.tc-personalizado input.tc-nombre-custom:focus{outline:none;border-bottom:2px solid var(--azul-acento);}
+.tc-item .tc-quitar{
+  background:none;border:none;color:#cbd5e1;cursor:pointer;font-size:0.9rem;line-height:1;padding:0 2px;margin-left:2px;
+}
+.tc-item .tc-quitar:hover{color:var(--rojo);}
+.poblacion-negativos{padding:8px 14px 12px;font-size:0.76rem;color:var(--azul-oscuro);border-top:1px solid var(--gris-borde);}
+.poblacion-negativos strong{font-weight:800;}
+.poblacion-negativos .valor{color:var(--gris-texto);}
+.poblaciones-vacio{padding:16px 14px;color:var(--gris-texto);font-size:0.76rem;text-align:center;font-style:italic;}
+
+/* Mirror de solo-lectura que se imprime en lugar del <textarea> — un
+   <textarea> con overflow no reparte su contenido entre hojas al imprimir,
+   por eso el texto real se imprime desde un <div> normal (que sí fluye y
+   se corta bien entre páginas), sincronizado en cada tecla. */
+.print-only{display:none;}
+.obs-print-mirror{white-space:pre-wrap;font-size:0.76rem;line-height:1.4;color:#1e293b;}
+/* #descripcion-mirror ahora recibe HTML real de CKEditor (párrafos y
+   tablas ya vienen con su propia separación vía <p>/<table>) — no
+   necesita pre-wrap como los de Conclusión/Nota (que siguen siendo texto
+   plano). Estilo de tabla consistente con el resto del informe. */
+#descripcion-mirror{white-space:normal;}
+#descripcion-mirror p{margin:0 0 8px;}
+#descripcion-mirror p:last-child{margin-bottom:0;}
+#descripcion-mirror table{border-collapse:collapse;margin:8px 0;}
+#descripcion-mirror table td, #descripcion-mirror table th{
+  border:1px solid var(--gris-borde);padding:4px 8px;font-size:0.74rem;
+}
+#descripcion-mirror table th{background:var(--gris-fondo);font-weight:700;}
+#descripcion-mirror figure{margin:8px 0;}
+
+/* ---- Observaciones (Descripción / Conclusión / Nota) / firmas ---- */
+.observaciones{margin-bottom:14px;}
+
+.observaciones label{font-size:0.72rem;font-weight:700;color:var(--azul-oscuro);display:block;margin-bottom:4px;}
+.observaciones textarea{
+  width:100%;min-height:70px;border:1px solid var(--gris-borde);border-radius:6px;
+  padding:8px 10px;font-size:0.76rem;resize:vertical;color:#1e293b;line-height:1.4;
+}
+.observaciones textarea:focus{outline:2px solid var(--azul-acento);outline-offset:-1px;}
+.obs-toolbar{margin-top:5px;}
+.obs-toolbar button{
+  background:var(--azul-medio);color:#fff;border:none;padding:5px 10px;border-radius:5px;
+  font-size:0.66rem;font-weight:700;cursor:pointer;
+}
+.obs-toolbar button:hover{background:#334155;}
+
+.firmas{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:22px;}
+.firma-box{text-align:center;}
+.firma-linea{border-top:1.5px solid var(--azul-oscuro);padding-top:5px;margin-top:36px;}
+.firma-box input{
+  width:100%;text-align:center;border:none;border-bottom:1px dashed var(--gris-borde);
+  font-size:0.78rem;font-weight:700;color:var(--azul-oscuro);padding:2px;margin-top:26px;
+}
+.firma-box .cargo{font-size:0.66rem;color:var(--gris-texto);margin-top:2px;}
+.firma-box .cargo input{font-size:0.66rem;font-weight:500;color:var(--gris-texto);border:none;margin-top:2px;}
+.firma-lista{text-align:left;border:1px solid var(--gris-borde);border-radius:8px;padding:10px 12px;}
+.firma-lista-titulo{font-size:0.72rem;font-weight:700;color:var(--azul-oscuro);margin-bottom:6px;}
+.firma-lista textarea{
+  width:100%;border:none;resize:vertical;font-size:0.78rem;font-weight:600;color:var(--azul-oscuro);
+  line-height:1.6;font-family:inherit;background:transparent;
+}
+.firma-lista textarea:focus{outline:none;}
+
+.pie-legal{margin-top:16px;padding-top:10px;border-top:1px solid var(--gris-borde);font-size:0.6rem;color:#94a3b8;line-height:1.5;}
+.pie-pagina{text-align:center;font-size:0.62rem;color:#94a3b8;margin-top:8px;}
+
+/* ============ IMPRESIÓN ============ */
+@media print{
+  body{background:#fff;padding:0;font-size:9.5px;}
+  .toolbar{display:none;}
+  .hoja{
+    box-shadow:none;border:none;max-width:100%;padding:8mm 10mm;margin:0;
+    display:flex;flex-direction:column;min-height:100vh;
+  }
+  .hoja .contenido-flex{flex:1;} /* para que el contenido ocupe el espacio */
+  .campo input, .campo select{border:none;border-bottom:1px solid #94a3b8;border-radius:0;padding:2px 2px;background:transparent;}
+  .observaciones textarea{border:1px solid #94a3b8;}
+  input.res-input{border:1px solid #94a3b8;}
+  input.res-input.fuera-rango{background:#fde8e8 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  input.res-input.en-rango{background:#e7f8f1 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  table.tabla-resultados thead th{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  td.nombre-pob.nivel-0{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .barra-protocolo{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .encabezado-hospital{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+
+  /* La barra lateral de anticuerpos es una herramienta de trabajo — nunca
+     se imprime. Lo que se imprime es "Poblaciones y Fenotipo". */
+  .no-print, .panel-lateral{display:none !important;}
+  /* CKEditor envuelve #descripcion-txt en su propia estructura (barra de
+     herramientas + área editable) — hay que ocultar ese contenedor
+     completo, la clase .no-print quedó en el div interno nomás. */
+  .ck-editor{display:none !important;}
+  .print-only{display:block !important;}
+
+  /* Los <textarea> editables no imprimen su valor (no reparten contenido
+     entre hojas) — se reemplazan por su mirror de solo-lectura (.print-only). */
+  .observaciones textarea, textarea.poblacion-texto{display:none !important;} /* conclusión y nota siguen siendo <textarea>; descripción ahora es un <div> con .no-print */
+  .poblacion-quitar, .poblacion-nombre{border:none !important;}
+  input.poblacion-nombre{background:transparent;}
+
+  /* Precargado desde diseno.html · N anticuerpo(s)... — es información de
+     trabajo para el tecnólogo, de más en el reporte impreso. */
+  #panel-origen-sub{display:none;}
+
+  /* OCULTAR FILAS SIN DATOS EN LA IMPRESIÓN */
+  .fila-sin-datos { display: none !important; }
+
+  /* Tipos Celulares: si NINGUNA población tiene valor, la tabla entera
+     desaparece (no solo las filas vacías). */
+  .tc-wrapper-vacio { display: none !important; }
+
+  /* OCULTAR OBSERVACIONES / POBLACIÓN SI EL CAMPO ESTÁ VACÍO */
+  .observaciones-vacio { display: none !important; }
+  .poblacion-vacia { display: none !important; }
+
+  /* Si el reporte cae a 2 hojas (tabla muy larga, bajo el piso de reducción),
+     que ninguna fila se corte a la mitad entre una página y la otra, y que
+     el bloque de firmas tampoco quede partido. */
+  #tc-grid .tc-item.fila-sin-datos{break-inside:avoid;page-break-inside:avoid;}
+  .firmas{break-inside:avoid;page-break-inside:avoid;}
+  
+  /* El placeholder no se imprime (por si acaso) */
+  .observaciones textarea::placeholder { color: transparent; }
+
+  /* El pie de página (firmas + pie legal) se mantiene abajo */
+  .pie-reporte {
+    flex-shrink: 0;
+    margin-top: auto; /* empuja hacia abajo */
+    padding-top: 10px;
+    border-top: 1px solid #ccc;
+  }
+
+  .contenido-flex {
+    flex: 1;
+  }
+
+  @page{size:A4 portrait;margin:10mm;}
+}
+/* ---------- Modal de historial de versiones anteriores ---------- */
+.hist-overlay{
+  position:fixed;inset:0;background:rgba(20,18,14,.55);
+  display:none;align-items:flex-start;justify-content:center;
+  padding:40px 16px;overflow-y:auto;z-index:1000;
+}
+.hist-overlay.open{display:flex;}
+.hist-panel{
+  background:#fff;border-radius:8px;max-width:560px;width:100%;
+  box-shadow:0 8px 30px rgba(0,0,0,.25);overflow:hidden;
+}
+.hist-header{
+  background:var(--azul-oscuro);color:#fff;
+  padding:14px 18px;font-weight:700;font-size:1rem;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.hist-header button{
+  background:none;border:none;color:#fff;font-size:1.1rem;cursor:pointer;
+  opacity:.85;line-height:1;
+}
+.hist-header button:hover{opacity:1;}
+.hist-lista{max-height:60vh;overflow-y:auto;}
+.hist-item{
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:12px 18px;border-bottom:1px solid #eee;
+}
+.hist-item:last-child{border-bottom:none;}
+.hist-item-info{font-size:.85rem;color:#333;}
+.hist-item-fecha{font-weight:700;}
+.hist-item-obs{color:#777;font-size:.78rem;margin-top:2px;max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.hist-item button{
+  flex:none;background:#e8eef5;border:1px solid #c7d3e0;border-radius:4px;
+  padding:6px 12px;font-size:.8rem;cursor:pointer;font-weight:600;
+}
+.hist-item button:hover{background:#d9e3ee;}
+.hist-vacio{padding:24px 18px;color:#777;font-size:.9rem;text-align:center;}
+.hist-item{flex-wrap:wrap;}
+.hist-item-botones{display:flex;gap:6px;flex:none;}
+.hist-item-botones button.secundario{background:#f4f4f4;border-color:#ddd;color:#444;}
+.hist-item-botones button.secundario:hover{background:#eaeaea;}
+.hist-preview{
+  flex-basis:100%;display:none;background:#f8f9fb;border:1px solid #e3e6eb;
+  border-radius:6px;padding:12px 14px;margin-top:10px;font-size:.8rem;color:#333;
+}
+.hist-preview.open{display:block;}
+.hist-preview h4{font-size:.72rem;text-transform:uppercase;letter-spacing:.03em;color:#666;margin:10px 0 4px;}
+.hist-preview h4:first-child{margin-top:0;}
+.hist-preview-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2px 14px;}
+.hist-preview-grid div span{color:#888;margin-right:4px;}
+.hist-preview table{width:100%;border-collapse:collapse;margin-top:2px;}
+.hist-preview table th,.hist-preview table td{
+  text-align:left;padding:3px 6px;border-bottom:1px solid #e8e8e8;font-size:.76rem;
+}
+.hist-preview table th{color:#777;font-weight:600;}
+.hist-preview .hist-preview-obs{white-space:pre-wrap;background:#fff;border:1px solid #e8e8e8;border-radius:4px;padding:6px 8px;margin-top:2px;}
+.hist-preview .hist-preview-vacio{color:#999;font-style:italic;}
+
+/* ============ BOTÓN DE MICRÓFONO (dictado por voz) ============ */
+.mic-wrap{position:relative;}
+.mic-wrap textarea{padding-right:34px;}
+.btn-mic{
+  position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;
+  border:1px solid var(--gris-borde);background:#fff;color:var(--azul-acento);
+  font-size:0.78rem;line-height:1;cursor:pointer;padding:0;z-index:2;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;
+}
+.btn-mic:hover{background:var(--gris-fondo);}
+.btn-mic.grabando{background:var(--rojo);color:#fff;border-color:var(--rojo);animation:mic-pulso 1.1s infinite;}
+.btn-mic:disabled{opacity:.3;cursor:not-allowed;}
+@keyframes mic-pulso{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,.45);}50%{box-shadow:0 0 0 6px rgba(220,38,38,0);}}
+
+/* ---- Análisis por gating (INFINI-TWO) ---- */
+.gating-wrapper{border:1px solid var(--gris-borde);border-radius:8px;overflow:hidden;margin-bottom:14px;}
+.gating-vacio{display:none !important;}
+.gating-wrapper .tc-titulo{display:flex;align-items:center;justify-content:space-between;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.gating-quitar{background:transparent;border:none;color:#fff;opacity:.7;cursor:pointer;font-size:0.8rem;}
+.gating-quitar:hover{opacity:1;}
+.gating-meta{padding:6px 12px;font-size:0.68rem;color:var(--gris-texto);border-bottom:1px solid #eef1f5;line-height:1.45;}
+.gating-grid{display:grid;grid-template-columns:repeat(3,1fr);}
+.gating-item{display:flex;align-items:baseline;justify-content:space-between;gap:6px;padding:4px 12px;border-bottom:1px solid #eef1f5;border-right:1px solid #eef1f5;font-size:0.72rem;}
+.gating-item:nth-child(3n){border-right:none;}
+.gating-item .g-n{font-weight:600;color:var(--azul-oscuro);}
+.gating-item .g-e{color:#94a3b8;font-size:0.62rem;margin-left:4px;font-weight:400;}
+.gating-item .g-p{font-weight:700;white-space:nowrap;}
+.gating-nota{padding:5px 12px;font-size:0.62rem;color:#64748b;font-style:italic;}
+@media print{.gating-item{break-inside:avoid;page-break-inside:avoid;}.gating-wrapper{break-inside:avoid;page-break-inside:avoid;}}
+/* diálogo de importación */
+.inf-tabla{width:100%;border-collapse:collapse;font-size:0.74rem;margin:8px 0;}
+.inf-tabla th{background:#eef3fb;text-align:left;padding:5px 8px;font-size:0.7rem;}
+.inf-tabla td{padding:4px 8px;border-bottom:1px solid #eef1f5;}
+.inf-tabla td.num{text-align:right;white-space:nowrap;}
+.inf-tabla select{padding:3px 6px;font-size:0.72rem;border:1px solid var(--gris-borde);border-radius:4px;max-width:210px;}
+.inf-aviso{padding:7px 10px;border-radius:6px;font-size:0.72rem;margin:6px 0;line-height:1.4;}
+.inf-aviso.amb{background:#fffbe6;border:1px solid #e0b93a;color:#7a4b00;}
+.inf-aviso.rojo{background:#fdecea;border:1px solid #f1a9a0;color:#8e1f2b;}
+.inf-aviso.azul{background:#eef6ff;border:1px solid #bcd6f5;color:#1e3a5f;}
+</style>
+<style>
+.sello-fila{display:flex;gap:10px;margin-top:8px}
+.sello-slot{position:relative;flex:1;min-height:62px;display:flex;align-items:center;justify-content:center;border:1px dashed #cbd5e1;border-radius:8px;background:#f8fafc;cursor:pointer;color:#64748b;font-size:.7rem;font-weight:600}
+.sello-slot:hover{border-color:#2563eb;color:#2563eb}
+.sello-slot.con-img{border-color:transparent;background:transparent;cursor:default}
+.sello-slot img{max-width:100%;max-height:76px;object-fit:contain;display:block}
+.sello-slot.con-img .sello-ph{display:none}
+.sello-x{display:none;position:absolute;top:0;right:0;border:0;background:#fee2e2;color:#b91c1c;border-radius:50%;width:20px;height:20px;line-height:18px;font-size:.65rem;cursor:pointer;padding:0}
+.sello-slot.con-img:hover .sello-x{display:block}
+.cfg-sellos{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cfg-sello-grupo{border:1px solid #e2e8f0;border-radius:8px;padding:8px 10px}
+.cfg-sello-tit{font-weight:700;font-size:.74rem;margin-bottom:6px;color:#0f172a}
+.cfg-sello-grupo .cfg-logo{margin-bottom:6px;font-size:.72rem}
+.cfg-sello-grupo .cfg-logo input[type=file]{max-width:150px;font-size:.66rem}
+.cfg-sello-grupo .cfg-logo span{width:44px;font-weight:600}
+@media print{.sello-slot:not(.con-img){display:none}.sello-slot.con-img{border:none;background:transparent}.sello-fila{margin-top:4px}}
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <h1>🧬 Editor de Informe · Inmunofenotipo Estandarizado</h1>
+  <span class="badge">Citometría de Flujo</span>
+  <button class="btn" id="btn-traer" onclick="traerAnalisisInfiniTwo()" title="Lleva al informe las poblaciones del análisis de INFINI-TWO">🧬 Traer análisis de INFINI-TWO</button>
+  <button class="btn gris" id="btn-ayuda" onclick="ayudaInforme()" title="Ayuda del informe">📖 Ayuda</button>
+  <input type="file" id="inf-file" accept=".json,application/json" hidden>
+  <div class="menu-inf" id="menu-inf">
+    <button class="btn gris" id="menu-inf-btn" type="button" aria-haspopup="menu" aria-expanded="false" title="Opciones del informe">⚙</button>
+    <div class="menu-inf-lista" id="menu-inf-lista" role="menu">
+      <button type="button" role="menuitem" onclick="limpiarResultados()">🗑️ Limpiar resultados</button>
+      <button type="button" role="menuitem" onclick="abrirImportarInfiniTwo()" title="Carga el archivo N°muestra.json exportado por INFINI-TWO">🧬 Importar desde archivo…</button>
+      <hr>
+      <button type="button" role="menuitem" onclick="guardarReporteBoton()" title="Guarda una copia en este navegador (también se guarda al imprimir)">💾 Guardar</button>
+      <button type="button" role="menuitem" onclick="cargarReporteBoton()" title="Carga el reporte guardado con el N° de muestra escrito">📂 Cargar reporte</button>
+      <button type="button" role="menuitem" onclick="mostrarHistorialVersiones()">🕐 Versiones anteriores</button>
+      <hr>
+      <button type="button" role="menuitem" onclick="imprimirReporte()">🖨️ Imprimir / Guardar PDF</button>
+      <hr>
+      <button type="button" role="menuitem" onclick="abrirConfigInforme()" title="Nombre del hospital, logos, firmas y pie de página">⚙ Configuración del informe…</button>
+    </div>
+  </div>
+</div>
+
+<!-- Ventana lateral de trabajo: Anticuerpos del panel + Poblaciones y
+     Fenotipo — NINGUNA de las dos secciones se imprime. Lo que se imprime
+     es el campo "Descripción" (más abajo, dentro de la hoja), que se
+     autocompleta con este contenido justo antes de guardar. -->
+<div class="panel-lateral no-print" id="panel-lateral">
+  <div class="panel-anticuerpos-header">
+    <h3>Anticuerpos del panel</h3>
+    <span class="panel-anticuerpos-hint">Precargado desde diseno.html · haz clic en "Insertar" para llevar un resultado a la población activa</span>
+  </div>
+  <div id="panel-sin-datos" class="panel-sin-datos">
+    Escribe el N° de Muestra arriba para precargar los anticuerpos del panel configurado en <strong>diseno.html</strong>.
+  </div>
+  <div id="panel-anticuerpos-lista" class="panel-anticuerpos-lista"></div>
+
+  <div class="panel-anticuerpos-header poblaciones-header-lateral">
+    <h3>Poblaciones y Fenotipo</h3>
+    <span class="panel-anticuerpos-hint">Se redacta aquí — al guardar, se vuelca solo a "Descripción" (esta ventana no se imprime)</span>
+  </div>
+  <div id="poblaciones-vacio" class="poblaciones-vacio">Agrega al menos una población para describir el fenotipo.</div>
+  <div id="poblaciones-lista" class="poblaciones-lista"></div>
+  <button type="button" class="btn-agregar-poblacion" onclick="agregarPoblacion()">+ Agregar población</button>
+  <div class="poblacion-negativos" id="poblacion-negativos-block">
+    <strong>Anticuerpos negativos para estas poblaciones:</strong>
+    <span class="valor" id="poblacion-negativos-texto">—</span>
+  </div>
+</div>
+
+<div class="hoja" id="hoja-informe">
+
+  <div class="encabezado-hospital">
+    <img class="logo-institucional" id="logo-izq" alt="Logo" style="display:none">
+    <div class="encabezado-texto">
+      <h2 id="enc-hospital">HOSPITAL DEMO</h2>
+      <div class="sub" id="enc-sub" style="display:none"></div>
+      <div class="titulo-informe">INFORME CLÍNICO — INMUNOFENOTIPO ESTANDARIZADO</div>
+    </div>
+    <img class="logo-institucional" id="logo-der" alt="Logo" style="display:none">
+  </div>
+
+  <!-- CONTENIDO FLEXIBLE (se expande) -->
+  <div class="contenido-flex" id="contenido-flex">
+    <div class="datos-paciente">
+      <div class="campo wide"><label>Nombre Paciente</label><input type="text" id="nombre-paciente" placeholder="Apellidos, Nombres" value=""></div>
+      <div class="campo"><label>RUT</label><input type="text" id="rut-ficha" value=""></div>
+      <div class="campo"><label>N° Muestra</label><input type="text" id="num-muestra" value=""></div>
+      <div class="campo"><label>Fecha Nacimiento</label><input type="date" id="fecha-nac" value=""></div>
+      <div class="campo"><label>Edad</label><input type="text" id="edad" value=""></div>
+      <div class="campo"><label>Sexo</label>
+        <select id="sexo">
+          <option value="Masculino">Masculino</option>
+          <option value="Femenino">Femenino</option>
+        </select>
+      </div>
+      <div class="campo"><label>Procedencia</label><input type="text" id="procedencia" value=""></div>
+      <div class="campo wide"><label>Médico Solicitante</label><input type="text" id="medico-solicitante" value=""></div>
+      <div class="campo"><label>Tratamiento</label><input type="text" id="tratamiento" value=""></div>
+      <div class="campo"><label>Fecha/Hora Recepción</label><input type="text" id="fecha-recepcion" value=""></div>
+      <div class="campo"><label>Fecha/Hora Informe</label><input type="text" id="fecha-informe" value=""></div>
+      <div class="campo"><label>Tipo de Muestra</label><input type="text" id="tipo-muestra" value=""></div>
+      <div class="campo wide"><label>Diagnóstico</label><input type="text" id="diagnostico-presuntivo" value=""></div>
+    </div>
+
+    <div class="barra-protocolo">
+      <div>
+        <div class="prot-titulo" id="panel-nombre-titulo">PANEL: <span id="panel-nombre-texto">sin panel cargado</span></div>
+        <div class="prot-sub" id="panel-origen-sub">Escribe el N° de Muestra para precargar el panel de anticuerpos usado en diseno.html</div>
+      </div>
+    </div>
+
+    <div class="tabla-wrapper" id="tipos-celulares-wrapper">
+      <div class="tc-titulo">Tipos celulares normales</div>
+      <div class="tc-grid" id="tc-grid"></div>
+      <button type="button" class="btn-agregar-tc no-print" onclick="agregarTipoCelularPersonalizado()">+ Agregar tipo celular</button>
+    </div>
+
+    <!-- Análisis por gating (INFINI-TWO): se llena con «🧬 Importar INFINI-TWO»; vacío = no se imprime -->
+    <div class="gating-wrapper gating-vacio" id="gating-it-wrapper">
+      <div class="tc-titulo"><span>Análisis por gating · INFINI-TWO</span><button type="button" class="gating-quitar no-print" onclick="quitarGatingInfiniTwo()" title="Quitar este bloque del informe">✕</button></div>
+      <div class="gating-meta" id="gating-it-meta"></div>
+      <div class="gating-grid" id="gating-it-grid"></div>
+      <div class="gating-nota" id="gating-it-nota"></div>
+    </div>
+
+    <!-- Descripción / Conclusión / Nota (reemplaza el antiguo campo único
+         "Observaciones / Conclusión Diagnóstica") -->
+    <div class="observaciones" id="descripcion-container">
+      <label>Descripción</label>
+      <div id="descripcion-txt" class="no-print"></div>
+      <div class="obs-print-mirror print-only" id="descripcion-mirror"></div>
+      <div class="obs-toolbar no-print">
+        <button type="button" onclick="generarDescripcion()">🧬 Generar descripción</button>
+      </div>
+    </div>
+    <div class="observaciones" id="conclusion-container">
+      <label>Conclusión</label>
+      <textarea id="conclusion-txt" placeholder="Escriba aquí la conclusión diagnóstica..."></textarea>
+      <div class="obs-print-mirror print-only" id="conclusion-mirror"></div>
+    </div>
+    <div class="observaciones" id="nota-container">
+      <label>Nota</label>
+      <textarea id="nota-txt" placeholder="Notas adicionales (opcional)..."></textarea>
+      <div class="obs-print-mirror print-only" id="nota-mirror"></div>
+    </div>
+  </div>
+
+  <!-- PIE DE PÁGINA (SIEMPRE AL FINAL) -->
+  <div class="pie-reporte">
+    <div class="firmas">
+      <div class="firma-box firma-lista">
+        <div class="firma-lista-titulo">Profesionales responsables:</div>
+        <textarea id="firma1-nombre" rows="3" placeholder="Nombre y cargo de quienes procesaron"></textarea><div class="sello-fila"><input type="file" id="sello-file" accept="image/*" hidden><div class="sello-slot" data-slot="timbre1" title="Clic para agregar el timbre (imagen)"><img alt="Timbre" style="display:none"><span class="sello-ph no-print">+ Timbre</span><button type="button" class="sello-x no-print" title="Quitar">✕</button></div><div class="sello-slot" data-slot="firma1" title="Clic para agregar la firma (imagen)"><img alt="Firma" style="display:none"><span class="sello-ph no-print">+ Firma</span><button type="button" class="sello-x no-print" title="Quitar">✕</button></div></div>
+      </div>
+      <div class="firma-box firma-lista">
+        <div class="firma-lista-titulo">Informado por:</div>
+        <textarea id="firma2-nombre" rows="3" placeholder="Nombre y cargo de quienes informan"></textarea><div class="sello-fila"><div class="sello-slot" data-slot="timbre2" title="Clic para agregar el timbre (imagen)"><img alt="Timbre" style="display:none"><span class="sello-ph no-print">+ Timbre</span><button type="button" class="sello-x no-print" title="Quitar">✕</button></div><div class="sello-slot" data-slot="firma2" title="Clic para agregar la firma (imagen)"><img alt="Firma" style="display:none"><span class="sello-ph no-print">+ Firma</span><button type="button" class="sello-x no-print" title="Quitar">✕</button></div></div>
+      </div>
+    </div>
+
+    <div class="pie-legal" id="pie-legal-txt"></div>
+    <div class="pie-pagina" id="pie-pagina-txt" style="display:none"></div>
+  </div>
+
+</div>
+
+<script>
+// ---- Almacenamiento local (esta edición no usa servidor) ----
+const LS_REPORTES = 'infini_informe_reportes_v1', LS_HIST = 'infini_informe_hist_v1', LS_CFG = 'infini_informe_cfg_v1';
+const _memLS = {};
+function lsGet(k) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : (_memLS[k] || null); } catch (e) { return _memLS[k] || null; } }
+function lsSet(k, v) { _memLS[k] = v; try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
+function avisoInforme(msg) { const d = document.createElement('div'); d.className = 'aviso-inf no-print'; d.textContent = msg; document.body.appendChild(d); setTimeout(() => d.remove(), 2600); }
+// ============================================================
+// DATOS DE REFERENCIA (COMPLETO)
+// ============================================================
+// ============================================================
+// TIPOS CELULARES (15 poblaciones fijas, igual en todos los
+// ejemplos Word/PDF revisados — no varían caso a caso, a
+// diferencia del panel de anticuerpos).
+// ============================================================
+const TIPOS_CELULARES = [
+  "Neutrófilos", "Eritroblastos", "Células mesenquimales",
+  "Eosinófilos", "Basófilos", "Mastocitos",
+  "Células CD34+", "Linfocitos B", "Células dendríticas",
+  "Céls. CD34-/CD117+", "Linfocitos T", "Células plasmáticas",
+  "Monocitos", "Células NK", "Otros:"
+];
+
+let tiposCelularesCustom = []; // [{id, nombre, pct}] — se suman a los 15 fijos
+let _tcCustomIdSeq = 1;
+
+function construirTiposCelulares() {
+  const grid = document.getElementById('tc-grid');
+  grid.innerHTML = '';
+  TIPOS_CELULARES.forEach((nombre, i) => {
+    grid.appendChild(crearItemTC({ tipo: 'fijo', index: i, nombre }));
+  });
+  tiposCelularesCustom.forEach(c => {
+    grid.appendChild(crearItemTC({ tipo: 'custom', id: c.id, nombre: c.nombre, pct: c.pct }));
+  });
+}
+
+function crearItemTC({ tipo, index, id, nombre, pct }) {
+  const item = document.createElement('div');
+  item.className = 'tc-item' + (tipo === 'custom' ? ' tc-personalizado' : '');
+  if (tipo === 'fijo') {
+    item.dataset.index = index;
+  } else {
+    item.dataset.customId = id;
+  }
+
+  let nombreEl;
+  if (tipo === 'fijo') {
+    nombreEl = document.createElement('label');
+    nombreEl.textContent = nombre;
+  } else {
+    nombreEl = document.createElement('input');
+    nombreEl.type = 'text';
+    nombreEl.className = 'tc-nombre-custom';
+    nombreEl.placeholder = 'Nombre del tipo celular...';
+    nombreEl.value = nombre || '';
+    nombreEl.addEventListener('input', () => {
+      const c = tiposCelularesCustom.find(x => x.id === id);
+      if (c) c.nombre = nombreEl.value;
+    });
+  }
+
+  const input = document.createElement('input');
+  input.type = 'number';
+  input.step = '0.1';
+  input.className = 'res-input';
+  input.placeholder = '—';
+  if (tipo === 'fijo') {
+    input.dataset.idx = index;
+  } else {
+    input.value = pct || '';
+    input.addEventListener('input', () => {
+      const c = tiposCelularesCustom.find(x => x.id === id);
+      if (c) c.pct = input.value;
+    });
+  }
+  input.addEventListener('input', () => actualizarVisibilidadTiposCelulares());
+
+  item.appendChild(nombreEl);
+  item.appendChild(input);
+
+  if (tipo === 'custom') {
+    const btnQuitar = document.createElement('button');
+    btnQuitar.type = 'button';
+    btnQuitar.className = 'tc-quitar no-print';
+    btnQuitar.textContent = '✕';
+    btnQuitar.title = 'Quitar este tipo celular';
+    btnQuitar.addEventListener('click', () => {
+      tiposCelularesCustom = tiposCelularesCustom.filter(x => x.id !== id);
+      construirTiposCelulares();
+      actualizarVisibilidadTiposCelulares();
+    });
+    item.appendChild(btnQuitar);
+  }
+
+  return item;
+}
+
+// Botón "+ Agregar tipo celular" — suma una fila con nombre libre, para
+// poblaciones normales que no están en la lista fija de 15.
+function agregarTipoCelularPersonalizado() {
+  const c = { id: 'tc' + (_tcCustomIdSeq++), nombre: '', pct: '' };
+  tiposCelularesCustom.push(c);
+  construirTiposCelulares();
+  actualizarVisibilidadTiposCelulares();
+  const nombreInput = document.querySelector(`#tc-grid .tc-item[data-custom-id="${c.id}"] input.tc-nombre-custom`);
+  if (nombreInput) nombreInput.focus();
+}
+
+// Oculta (solo al imprimir) cada población sin dato — igual concepto que
+// PIDOT, pero a nivel de ítem individual, no de fila de tabla, porque acá
+// cada fila visual tiene 3 poblaciones sin relación entre sí. Se apunta
+// siempre a .res-input (el campo de %) — los ítems personalizados tienen
+// DOS inputs (nombre y %), y el que define si "tiene dato" es el de %.
+function actualizarVisibilidadTiposCelulares() {
+  let algunoConValor = false;
+  document.querySelectorAll('#tc-grid .tc-item').forEach(item => {
+    const input = item.querySelector('input.res-input');
+    if (!input || input.value.trim() === '') {
+      item.classList.add('fila-sin-datos');
+    } else {
+      item.classList.remove('fila-sin-datos');
+      algunoConValor = true;
+    }
+  });
+  // Si NINGÚN tipo celular tiene valor, la tabla entera desaparece al
+  // imprimir (no solo se ocultan las filas vacías una a una).
+  const wrapper = document.getElementById('tipos-celulares-wrapper');
+  if (wrapper) wrapper.classList.toggle('tc-wrapper-vacio', !algunoConValor);
+}
+
+// ============================================================
+// ANÁLISIS POR GATING — INFINI-TWO
+// ============================================================
+// INFINI-TWO («📄 Exportar para informe») genera un JSON con las poblaciones y su % sobre las CÉLULAS NUCLEADAS
+// (sin restos ni dobletes). Aquí se importa: completa "Tipos celulares normales" y deja un bloque imprimible.
+// Compatibilidad con reporte.js: los % de los tipos celulares van en los campos de siempre (tiposCelulares /
+// tiposCelularesCustom) y el detalle del análisis en UN campo nuevo, `gatingInfiniTwo`, dentro de la misma entrada
+// "<N° muestra>::inmunofenotipo". Las entradas antiguas no lo traen y siguen cargando igual (el campo es opcional).
+let gatingInfiniTwoActual = null;
+let _infPendiente = null;   // JSON leído, a la espera de confirmación en el diálogo
+
+const _normInf = s => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+const _fmtEv = n => Number(n).toLocaleString('es-CL');
+function fmtPctInf(v) { const n = Number(v); if (!isFinite(n)) return ''; return n >= 1 ? n.toFixed(1) : n.toFixed(2); }
+
+// población de INFINI-TWO (nombre normalizado) -> tipo celular de este informe; '' = no se asigna sola.
+const MAPA_INFINITWO = {
+  'granulocitos': 'Neutrófilos', 'neutrofilos': 'Neutrófilos',
+  'linfocitos b': 'Linfocitos B', 'b_lym': 'Linfocitos B', 'linfocitos t': 'Linfocitos T', 't_lym': 'Linfocitos T',
+  'nk': 'Células NK', 'celulas nk': 'Células NK', 'monocitos': 'Monocitos', 'cd34+': 'Células CD34+',
+  // nombres de los tipos celulares de EverFlowNet (Traspasar a los gráficos); AML, B-ALL y T-ALL no tienen equivalente: entran como tipo personalizado
+  'mono': 'Monocitos', 'neut': 'Neutrófilos', 'ery': 'Eritroblastos', 'cd34pos_b': 'Células CD34+', 'cd34pos_m': 'Células CD34+',
+  // Residuos de la jerarquía y CD45 negativas: NO se asignan solos. «CD45neg» son eritroblastos en un caso sano, pero en casos con
+  // infiltración han resultado ser población tumoral (CD19+ o cCD3+): lo decide el profesional.
+  'celulas': '', 'mononucleares': '', 'cd45neg': ''
+};
+function destinoPredeterminadoInfiniTwo(pop) {
+  const k = _normInf(pop.nombre);
+  if (Object.prototype.hasOwnProperty.call(MAPA_INFINITWO, k)) {
+    const nom = MAPA_INFINITWO[k]; if (!nom) return '';
+    const i = TIPOS_CELULARES.indexOf(nom); return i >= 0 ? 'f' + i : 'custom';
+  }
+  return 'custom';   // p. ej. T-ALL, LPA, blastos: se agregan como tipo celular personalizado
+}
+
+function abrirImportarInfiniTwo() { document.getElementById('inf-file').click(); }
+document.getElementById('inf-file').addEventListener('change', async e => {
+  const f = e.target.files && e.target.files[0]; e.target.value = ''; if (!f) return;
+  let J; try { J = JSON.parse(await f.text()); } catch (err) { alert('El archivo no es un JSON válido.'); return; }
+  if (!J || J.app !== 'infinitwo-informe' || !Array.isArray(J.poblaciones)) {
+    alert('Este archivo no parece un resultado exportado por INFINI-TWO («📄 Exportar para informe»).'); return;
+  }
+  _infPendiente = J; renderDialogoInfiniTwo(); document.getElementById('inf-overlay').classList.add('open');
+});
+function cerrarImportarInfiniTwo() { document.getElementById('inf-overlay').classList.remove('open'); _infPendiente = null; }
+
+function renderDialogoInfiniTwo() {
+  const J = _infPendiente, a = J.analisis || {}, mi = document.getElementById('num-muestra').value.trim();
+  const nuc = J.poblaciones.filter(p => p.nucleada), fuera = J.poblaciones.filter(p => !p.nucleada);
+  const avisos = [];
+  if (J.muestra && mi && J.muestra.trim() !== mi) avisos.push(`<div class="inf-aviso rojo"><b>El N° de muestra no coincide:</b> el archivo de INFINI-TWO es «${J.muestra}» y este informe es «${mi}». Verifica que sea el paciente correcto antes de aplicar.</div>`);
+  else if (J.muestra && !mi) avisos.push(`<div class="inf-aviso azul">Este informe no tiene N° de muestra: al aplicar se usará «${J.muestra}» (y se cargará su reporte guardado, si existe).</div>`);
+  if (!J.muestra) avisos.push('<div class="inf-aviso amb">El archivo no trae N° de muestra: no se pudo comprobar que corresponda a este paciente.</div>');
+  if (a.muestreo) avisos.push(`<div class="inf-aviso amb">INFINI-TWO analizó <b>${_fmtEv(a.eventosAnalizados)} de ${_fmtEv(a.eventosArchivo)}</b> eventos (una muestra al azar): los % son aproximados. Para el informe conviene exportar con el archivo cargado en «Total».</div>`);
+  if (a.estrategiaModificada) avisos.push('<div class="inf-aviso amb">Los gates se modificaron después de aplicar la estrategia: el resultado ya no equivale a la estrategia guardada.</div>');
+  const filas = nuc.map((p, i) => {
+    const d = destinoPredeterminadoInfiniTwo(p);
+    const opts = ['<option value="">— no importar —</option>', ...TIPOS_CELULARES.map((n, k) => `<option value="f${k}"${d === 'f' + k ? ' selected' : ''}>${n}</option>`), `<option value="custom"${d === 'custom' ? ' selected' : ''}>➕ Tipo personalizado («${p.nombre}»)</option>`].join('');
+    return `<tr><td>${p.nombre}</td><td class="num">${_fmtEv(p.eventos)}</td><td class="num"><b>${fmtPctInf(p.pctNucleadas).replace('.', ',')} %</b></td><td><select data-i="${i}">${opts}</select></td></tr>`;
+  }).join('');
+  document.getElementById('inf-contenido').innerHTML = `
+    <div style="font-size:0.74rem;color:#475569;line-height:1.5">
+      Muestra: <b>${J.muestra || '—'}</b> · Archivo: ${J.archivo || '—'}<br>
+      Estrategia: <b>${a.estrategia || 'gates dibujados a mano'}</b> · ${a.compensacion ? 'datos compensados' : 'datos sin compensar'}${a.instrumento ? ' · ' + a.instrumento : ''}<br>
+      Base de los porcentajes: <b>células nucleadas, n = ${_fmtEv(a.celulasNucleadas)}</b> (sin restos ni dobletes${fuera.length ? '; excluidas: ' + fuera.map(p => p.nombre).join(', ') : ''}).
+    </div>
+    ${avisos.join('')}
+    <table class="inf-tabla"><thead><tr><th>Población (INFINI-TWO)</th><th style="text-align:right">Eventos</th><th style="text-align:right">% nucleadas</th><th>Destino en el informe</th></tr></thead><tbody>${filas}</tbody></table>
+    <div class="inf-aviso azul">Solo se sobrescriben los tipos celulares que asignes; si dos poblaciones van al mismo tipo, se suman. <b>«CD45neg»</b> no se asigna sola: en casos con infiltración suele ser población tumoral y no eritroblastos.</div>`;
+  const btn = document.getElementById('inf-aplicar');
+  btn.textContent = (J.muestra && mi && J.muestra.trim() !== mi) ? 'Aplicar de todos modos' : 'Aplicar al informe';
+  btn.className = (J.muestra && mi && J.muestra.trim() !== mi) ? 'btn rojo' : 'btn verde';
+}
+
+function aplicarImportacionInfiniTwo() {
+  const J = _infPendiente; if (!J) return;
+  const nuc = J.poblaciones.filter(p => p.nucleada), a = J.analisis || {};
+  // si el informe aún no tiene N° de muestra, se usa el del archivo y se carga primero su reporte guardado (si existe)
+  const campoMuestra = document.getElementById('num-muestra');
+  if (!campoMuestra.value.trim() && J.muestra) { campoMuestra.value = J.muestra; try { cargarPorNumMuestraActual(); } catch (e) { /* sin reporte previo */ } }
+  const fijos = {}, customs = [], asignadas = new Set();
+  document.querySelectorAll('#inf-overlay select[data-i]').forEach(sel => {
+    const p = nuc[+sel.dataset.i], v = sel.value; if (!p || !v) return;
+    asignadas.add(+sel.dataset.i);
+    if (v === 'custom') customs.push({ nombre: p.nombre, pct: p.pctNucleadas });
+    else { const i = +v.slice(1); fijos[i] = (fijos[i] || 0) + p.pctNucleadas; }
+  });
+  const sinAsignar = nuc.filter((p, i) => !asignadas.has(i));
+  const pctOtras = sinAsignar.reduce((acc, p) => acc + (p.pctNucleadas || 0), 0);
+  // construirTiposCelulares() reconstruye la grilla: se conserva lo ya escrito en los tipos fijos
+  const previos = {};
+  document.querySelectorAll('#tc-grid .tc-item[data-index]').forEach(it => { previos[it.dataset.index] = it.querySelector('input.res-input').value; });
+  customs.forEach(c => {
+    const f = tiposCelularesCustom.find(x => _normInf(x.nombre) === _normInf(c.nombre)), v = fmtPctInf(c.pct);
+    if (f) f.pct = v; else tiposCelularesCustom.push({ id: 'tc' + (_tcCustomIdSeq++), nombre: c.nombre, pct: v });
+  });
+  construirTiposCelulares();
+  Object.entries(previos).forEach(([i, v]) => { const inp = document.querySelector(`#tc-grid .tc-item[data-index="${i}"] input.res-input`); if (inp && v !== '') inp.value = v; });
+  Object.entries(fijos).forEach(([i, v]) => { const inp = document.querySelector(`#tc-grid .tc-item[data-index="${i}"] input.res-input`); if (inp) inp.value = fmtPctInf(v); });
+  actualizarVisibilidadTiposCelulares();
+  gatingInfiniTwoActual = {
+    version: 1, origen: 'INFINI-TWO', importado: new Date().toISOString(), muestra: J.muestra || '', archivo: J.archivo || '',
+    estrategia: a.estrategia || '', estrategiaModificada: !!a.estrategiaModificada, compensacion: !!a.compensacion, instrumento: a.instrumento || '',
+    eventosAnalizados: a.eventosAnalizados, eventosArchivo: a.eventosArchivo, muestreo: !!a.muestreo,
+    baseNucleadas: a.celulasNucleadas, criterio: a.baseDePorcentajes || 'células nucleadas (sin restos ni dobletes)',
+    poblaciones: nuc.filter((p, i) => asignadas.has(i)).map(p => ({ nombre: p.nombre, eventos: p.eventos, pct: p.pctNucleadas })),
+    // lo que el profesional no asignó a ningún tipo (residuos de la jerarquía, CD45neg…): se resume para que los % sigan sumando 100
+    otras: sinAsignar.length ? { nombres: sinAsignar.map(p => p.nombre), eventos: sinAsignar.reduce((acc, p) => acc + p.eventos, 0), pct: +pctOtras.toFixed(2) } : null
+  };
+  renderGatingInfiniTwo();
+  cerrarImportarInfiniTwo();
+}
+
+function renderGatingInfiniTwo() {
+  const w = document.getElementById('gating-it-wrapper'), g = gatingInfiniTwoActual;
+  if (!g || !Array.isArray(g.poblaciones) || !(g.poblaciones.length || g.otras)) { w.classList.add('gating-vacio'); return; }
+  w.classList.remove('gating-vacio');
+  const partes = [
+    `Estrategia: <b>${g.estrategia || 'gates dibujados a mano'}</b>${g.estrategiaModificada ? ' (modificada tras aplicarla)' : ''}`,
+    `Eventos analizados: <b>${_fmtEv(g.eventosAnalizados)}</b>${g.eventosArchivo ? ' de ' + _fmtEv(g.eventosArchivo) : ''}${g.muestreo ? ' (muestra aleatoria)' : ''}`,
+    g.compensacion ? 'Datos compensados' : 'Datos sin compensar',
+    `Porcentajes sobre células nucleadas (n = ${_fmtEv(g.baseNucleadas)}; sin restos ni dobletes)`
+  ];
+  document.getElementById('gating-it-meta').innerHTML = partes.join(' · ');
+  const orden = g.poblaciones.slice().sort((x, y) => (y.pct || 0) - (x.pct || 0));
+  const item = (n, e, pct, extra) => `<div class="gating-item"><span><span class="g-n"${extra ? ' style="font-weight:500;color:#64748b"' : ''}>${n}</span><span class="g-e">(${e})</span></span><span class="g-p">${fmtPctInf(pct).replace('.', ',')} %</span></div>`;
+  document.getElementById('gating-it-grid').innerHTML = orden.map(p => item(p.nombre, _fmtEv(p.eventos), p.pct, false)).join('') +
+    (g.otras && g.otras.pct >= 0.01 ? item('Otras células nucleadas (no asignadas)', g.otras.nombres.join(', ') + ' · ' + _fmtEv(g.otras.eventos), g.otras.pct, true) : '');
+  document.getElementById('gating-it-nota').textContent = 'Análisis asistido por INFINI-TWO; resultado sujeto a validación por el profesional informante.';
+}
+function quitarGatingInfiniTwo() {
+  if (!confirm('¿Quitar el bloque «Análisis por gating» del informe? (Los % ya cargados en Tipos celulares no se borran.)')) return;
+  gatingInfiniTwoActual = null; renderGatingInfiniTwo();
+}
+
+function limpiarResultados() {
+  document.querySelectorAll('#tc-grid input.res-input').forEach(inp => { inp.value = ''; });
+  tiposCelularesCustom = [];
+  construirTiposCelulares();
+  actualizarVisibilidadTiposCelulares();
+  gatingInfiniTwoActual = null; renderGatingInfiniTwo();
+  ['descripcion', 'conclusion', 'nota'].forEach(campo => {
+    const ta = document.getElementById(campo + '-txt');
+    if (ta) ta.value = '';
+    actualizarCampoTexto(campo);
+  });
+  panelAnticuerposActual.forEach(a => { a.intensidad = ''; a.porcentaje = ''; a.grupo = null; });
+  poblacionesActuales = [];
+  poblacionActivaId = null;
+  renderizarPanelAnticuerpos();
+  renderizarPoblaciones();
+}
+
+// ============================================================
+// PANEL DE ANTICUERPOS — precargado desde js/panel.js
+// ============================================================
+// js/panel.js define window.PANELES_POR_MUESTRA = { "<N° Muestra>": {
+//   paciente: {...}, panelNombre: "...",
+//   anticuerpos: [ {tubo_id, fluorocromo, anticuerpo, clon, ...}, ... ]
+// } }
+// Un mismo anticuerpo (ej. HLA-DR) puede aparecer en varios tubos —
+// se deduplica por NOMBRE para mostrar una sola fila de resultado,
+// conservando la lista de tubos como nota de trazabilidad.
+
+let _panelCargado = false;
+let panelAnticuerposActual = []; // [{nombre, tubos:[...], intensidad, porcentaje, grupo}]
+let panelNombreActual = '';
+
+function cargarPanelServidorUnaVez() {
+  window.PANELES_POR_MUESTRA = window.PANELES_POR_MUESTRA || {}; _panelCargado = true;
+  return Promise.resolve();
+}
+
+// Combina los anticuerpos de TODOS los paneles de la muestra en una sola
+// lista deduplicada por nombre. Si el mismo anticuerpo aparece en más de
+// un panel/tubo, la nota de trazabilidad lo indica (ej. "LST/T1,
+// Estudio a medida/T2") — si hay un solo panel, se omite su nombre en la
+// nota (basta con el tubo, como antes).
+function deduplicarAnticuerpos(listaPaneles) {
+  const mapa = new Map();
+  const haySoloUnPanel = listaPaneles.length <= 1;
+  listaPaneles.forEach(panel => {
+    const nombrePanel = nombrePanelParaMostrar(panel.panelNombre);
+    (panel.anticuerpos || []).forEach(item => {
+      const nombre = (item.anticuerpo || '').trim();
+      if (!nombre) return;
+      if (!mapa.has(nombre)) {
+        mapa.set(nombre, { nombre, tubos: [], intensidad: '', porcentaje: '', grupo: null });
+      }
+      const tuboId = item.tubo_id || '';
+      const etiqueta = haySoloUnPanel ? tuboId : `${nombrePanel}/${tuboId}`;
+      if (etiqueta && !mapa.get(nombre).tubos.includes(etiqueta)) {
+        mapa.get(nombre).tubos.push(etiqueta);
+      }
+    });
+  });
+  return Array.from(mapa.values());
+}
+
+// Paneles a medida (IN HOUSE / EMR + nombre del paciente) son, en la
+// práctica, cada uno distinto — se resumen a un nombre genérico en el
+// título del reporte en vez de imprimir el nombre completo del panel
+// (que suele incluir datos del paciente tipeados por el tecnólogo).
+function nombrePanelParaMostrar(nombre) {
+  const n = (nombre || '').trim().toUpperCase();
+  if (n.startsWith('IN HOUSE') || n.startsWith('EMR')) return 'Estudio a medida';
+  return nombre || 'sin panel cargado';
+}
+
+// Busca el panel del N° Muestra actual en la copia ya cargada en memoria
+// y precarga la lista de anticuerpos (deduplicada). No pisa resultados ya
+// tipeados si el panel es el mismo que el que ya estaba cargado.
+function cargarPanelPorNumMuestraActual() {
+  const num = document.getElementById('num-muestra').value.trim();
+  const panelInfo = document.getElementById('panel-nombre-texto');
+  const origenInfo = document.getElementById('panel-origen-sub');
+  if (!num) return false;
+
+  const registro = (window.PANELES_POR_MUESTRA || {})[num];
+  if (!registro) {
+    // Diagnóstico: entre comillas para revelar espacios invisibles, y la
+    // lista de claves que sí existen — para comparar de un vistazo en
+    // vez de tener que adivinar por qué no calzó.
+    console.warn(
+      'Panel no encontrado para num-muestra="' + num + '" (largo: ' + num.length + '). ' +
+      'Claves disponibles en panel.js:', Object.keys(window.PANELES_POR_MUESTRA || {})
+    );
+    panelInfo.textContent = 'sin panel cargado';
+    origenInfo.textContent = 'No hay panel guardado en diseno.html para el N° de Muestra "' + num + '".';
+    panelAnticuerposActual = [];
+    panelNombreActual = '';
+    renderizarPanelAnticuerpos();
+    return false;
+  }
+
+  // Compatibilidad: si el valor guardado es un objeto suelto (formato
+  // anterior de un solo panel, sin lista), se envuelve en una lista de 1
+  // elemento antes de seguir.
+  const listaPaneles = Array.isArray(registro) ? registro : [registro];
+
+  // Una muestra puede tener MÁS DE UN panel (LST, ALOT, LLA-B, etc.) —
+  // se combinan todos. Nombres normalizados y sin duplicados (dos paneles
+  // "IN HOUSE ..." distintos se resumen igual a "Estudio a medida" una
+  // sola vez en el título).
+  const nombresNormalizados = [...new Set(listaPaneles.map(p => nombrePanelParaMostrar(p.panelNombre)))];
+  panelNombreActual = nombresNormalizados.join(' + ');
+  panelInfo.textContent = panelNombreActual || 'sin panel cargado';
+
+  const totalAnticuerpos = listaPaneles.reduce((acc, p) => acc + (p.anticuerpos || []).length, 0);
+  const totalTubos = new Set(listaPaneles.flatMap(p => (p.anticuerpos || []).map(a => a.tubo_id))).size;
+  const detallePaneles = listaPaneles.length > 1
+    ? ` en ${listaPaneles.length} panel(es) (${listaPaneles.map(p => nombrePanelParaMostrar(p.panelNombre)).join(', ')})`
+    : '';
+  origenInfo.textContent = 'Precargado desde diseno.html · ' + totalAnticuerpos + ' anticuerpo(s) en ' +
+    totalTubos + ' tubo(s)' + detallePaneles;
+
+  panelAnticuerposActual = deduplicarAnticuerpos(listaPaneles);
+  renderizarPanelAnticuerpos();
+  return true;
+}
+
+// Botón de la toolbar — recarga el panel a demanda (por si se actualizó
+// en diseno.html después de haber abierto este informe).
+async function recargarPanelDesdeDiseno() {
+  await cargarPanelServidorUnaVez();
+  const cargado = cargarPanelPorNumMuestraActual();
+  if (!cargado) {
+    const num = document.getElementById('num-muestra').value.trim();
+    alert(num
+      ? `No hay panel guardado en diseno.html para el N° de Muestra "${num}" todavía.`
+      : 'Escribe primero el N° de Muestra.');
+  }
+}
+
+const INTENSIDADES = ['-', '-/+', '+', '++', '+++'];
+
+function grupoAutomatico(intensidad) {
+  if (!intensidad) return null;
+  return intensidad === '-' ? 'negativo' : 'positivo';
+}
+
+function renderizarPanelAnticuerpos() {
+  const lista = document.getElementById('panel-anticuerpos-lista');
+  const sinDatos = document.getElementById('panel-sin-datos');
+  lista.innerHTML = '';
+
+  if (panelAnticuerposActual.length === 0) {
+    sinDatos.style.display = '';
+    lista.style.display = 'none';
+  } else {
+    sinDatos.style.display = 'none';
+    lista.style.display = '';
+
+    panelAnticuerposActual.forEach((ac, idx) => {
+      const fila = document.createElement('div');
+      const grupoEfectivo = ac.grupo || grupoAutomatico(ac.intensidad);
+      fila.className = 'fila-anticuerpo' + (grupoEfectivo ? ' grupo-' + grupoEfectivo : '');
+
+      const nombreDiv = document.createElement('div');
+      nombreDiv.className = 'ac-nombre';
+      nombreDiv.textContent = ac.nombre;
+      if (ac.tubos.length) {
+        const small = document.createElement('span');
+        small.className = 'ac-tubos';
+        small.textContent = 'Probado en: ' + ac.tubos.join(', ');
+        nombreDiv.appendChild(small);
+      }
+
+      const selIntensidad = document.createElement('select');
+      selIntensidad.className = 'ac-intensidad';
+      const optVacia = document.createElement('option');
+      optVacia.value = '';
+      optVacia.textContent = '—';
+      selIntensidad.appendChild(optVacia);
+      INTENSIDADES.forEach(val => {
+        const opt = document.createElement('option');
+        opt.value = val;
+        opt.textContent = val;
+        if (ac.intensidad === val) opt.selected = true;
+        selIntensidad.appendChild(opt);
+      });
+      selIntensidad.addEventListener('change', () => {
+        ac.intensidad = selIntensidad.value;
+        ac.grupo = null; // vuelve a auto-agrupar según la nueva intensidad
+        renderizarPanelAnticuerpos();
+      });
+
+      const inputPct = document.createElement('input');
+      inputPct.type = 'number';
+      inputPct.step = '1';
+      inputPct.min = '0';
+      inputPct.max = '100';
+      inputPct.className = 'ac-porcentaje';
+      inputPct.placeholder = '%';
+      inputPct.value = ac.porcentaje || '';
+      inputPct.addEventListener('input', () => { ac.porcentaje = inputPct.value; actualizarNegativosPoblaciones(); });
+
+      const btnMover = document.createElement('button');
+      btnMover.type = 'button';
+      btnMover.className = 'ac-mover';
+      btnMover.textContent = grupoEfectivo === 'positivo' ? '→ Negativos' : '→ Positivos';
+      btnMover.title = 'Mover manualmente al otro grupo (el criterio automático es solo un punto de partida)';
+      btnMover.addEventListener('click', () => {
+        ac.grupo = grupoEfectivo === 'positivo' ? 'negativo' : 'positivo';
+        renderizarPanelAnticuerpos();
+      });
+
+      const btnInsertar = document.createElement('button');
+      btnInsertar.type = 'button';
+      btnInsertar.className = 'ac-insertar';
+      btnInsertar.textContent = '↳ Insertar';
+      btnInsertar.title = 'Insertar este resultado en la población activa (la última en la que escribiste)';
+      btnInsertar.disabled = !ac.intensidad;
+      btnInsertar.addEventListener('click', () => insertarAnticuerpoEnPoblacionActiva(ac));
+
+      fila.appendChild(nombreDiv);
+      fila.appendChild(selIntensidad);
+      fila.appendChild(inputPct);
+      fila.appendChild(btnMover);
+      fila.appendChild(btnInsertar);
+      lista.appendChild(fila);
+    });
+  }
+
+  actualizarNegativosPoblaciones();
+}
+
+// Se imprime como texto simple al final de "Poblaciones y Fenotipo": los
+// anticuerpos marcados como negativos ('-') en la barra lateral, para no
+// tener que retipearlos a mano en cada población.
+function actualizarNegativosPoblaciones() {
+  const span = document.getElementById('poblacion-negativos-texto');
+  if (!span) return;
+  const negativos = panelAnticuerposActual.filter(a =>
+    (a.grupo || grupoAutomatico(a.intensidad)) === 'negativo' && a.intensidad
+  );
+  span.textContent = negativos.length ? negativos.map(a => a.nombre).join(', ') : '—';
+}
+
+// ============================================================
+// POBLACIONES Y FENOTIPO — herramienta de redacción asistida.
+// El fenotipo real es prosa clínica (no datos estructurados): cada
+// población tiene nombre libre + un cuadro de texto libre que el
+// tecnólogo redacta, ayudado por el botón "Insertar" de la barra
+// lateral (que agrega el fragmento "CDxx ++ (n%)" en el cursor).
+// ============================================================
+let poblacionesActuales = []; // [{id, nombre, pct, texto}]
+let poblacionActivaId = null;
+let _poblacionIdSeq = 1;
+
+function agregarPoblacion(nombreInicial = '') {
+  const p = { id: 'p' + (_poblacionIdSeq++), nombre: nombreInicial, pct: '', texto: '' };
+  poblacionesActuales.push(p);
+  poblacionActivaId = p.id;
+  renderizarPoblaciones();
+  const ta = document.querySelector(`.poblacion-item[data-id="${p.id}"] textarea.poblacion-texto`);
+  if (ta) ta.focus();
+  return p;
+}
+
+function quitarPoblacion(id) {
+  poblacionesActuales = poblacionesActuales.filter(p => p.id !== id);
+  if (poblacionActivaId === id) {
+    poblacionActivaId = poblacionesActuales.length ? poblacionesActuales[poblacionesActuales.length - 1].id : null;
+  }
+  renderizarPoblaciones();
+}
+
+function renderizarPoblaciones() {
+  const lista = document.getElementById('poblaciones-lista');
+  const vacio = document.getElementById('poblaciones-vacio');
+  if (!lista) return;
+  lista.innerHTML = '';
+  vacio.style.display = poblacionesActuales.length ? 'none' : '';
+
+  poblacionesActuales.forEach(p => {
+    const item = document.createElement('div');
+    item.className = 'poblacion-item';
+    item.dataset.id = p.id;
+
+    const cabecera = document.createElement('div');
+    cabecera.className = 'poblacion-cabecera';
+
+    const inputNombre = document.createElement('input');
+    inputNombre.type = 'text';
+    inputNombre.className = 'poblacion-nombre';
+    inputNombre.placeholder = 'Nombre de la población (ej. P1 indiferenciada)';
+    inputNombre.value = p.nombre;
+    inputNombre.addEventListener('input', () => { p.nombre = inputNombre.value; });
+
+    const inputPct = document.createElement('input');
+    inputPct.type = 'number';
+    inputPct.step = '0.1';
+    inputPct.className = 'poblacion-pct';
+    inputPct.placeholder = '%';
+    inputPct.value = p.pct || '';
+    inputPct.title = '% que representa esta población';
+    inputPct.addEventListener('input', () => { p.pct = inputPct.value; });
+
+    const btnQuitar = document.createElement('button');
+    btnQuitar.type = 'button';
+    btnQuitar.className = 'poblacion-quitar';
+    btnQuitar.textContent = '✕ Quitar';
+    btnQuitar.addEventListener('click', () => quitarPoblacion(p.id));
+
+    cabecera.appendChild(inputNombre);
+    cabecera.appendChild(inputPct);
+    cabecera.appendChild(btnQuitar);
+
+    const textarea = document.createElement('textarea');
+    textarea.className = 'poblacion-texto';
+    textarea.placeholder = 'Redacta aquí — usa "Insertar" arriba para traer un resultado de anticuerpo...';
+    textarea.value = p.texto;
+    textarea.addEventListener('focus', () => { poblacionActivaId = p.id; marcarPoblacionActiva(); });
+    textarea.addEventListener('input', () => {
+      p.texto = textarea.value;
+      item.classList.toggle('poblacion-vacia', !textarea.value.trim());
+    });
+
+    item.appendChild(cabecera);
+    item.appendChild(textarea);
+    lista.appendChild(item);
+    item.classList.toggle('poblacion-vacia', !p.texto.trim());
+  });
+  marcarPoblacionActiva();
+}
+
+function marcarPoblacionActiva() {
+  document.querySelectorAll('.poblacion-item').forEach(item => {
+    const ta = item.querySelector('textarea.poblacion-texto');
+    if (ta) ta.classList.toggle('poblacion-activa', item.dataset.id === poblacionActivaId);
+  });
+}
+
+// Inserta "CDxx ++ (n%)" en el cursor de la población activa. Si no hay
+// ninguna población todavía, crea la primera automáticamente.
+function insertarAnticuerpoEnPoblacionActiva(ac) {
+  if (!ac.intensidad) return;
+  let p = poblacionesActuales.find(x => x.id === poblacionActivaId);
+  if (!p) p = agregarPoblacion();
+
+  const fragmento = ac.nombre + ' ' + ac.intensidad + (ac.porcentaje ? ` (${ac.porcentaje}%)` : '');
+  const textarea = document.querySelector(`.poblacion-item[data-id="${p.id}"] textarea.poblacion-texto`);
+  if (!textarea) return;
+
+  const inicio = textarea.selectionStart ?? textarea.value.length;
+  const fin = textarea.selectionEnd ?? textarea.value.length;
+  const separador = (textarea.value && !/\s$/.test(textarea.value.slice(0, inicio))) ? ', ' : '';
+  const nuevoValor = textarea.value.slice(0, inicio) + separador + fragmento + textarea.value.slice(fin);
+  textarea.value = nuevoValor;
+  p.texto = nuevoValor;
+  const cursor = inicio + separador.length + fragmento.length;
+  textarea.focus();
+  textarea.setSelectionRange(cursor, cursor);
+  textarea.closest('.poblacion-item').classList.toggle('poblacion-vacia', !nuevoValor.trim());
+}
+
+// "Generar descripción": junta el resumen de Tipos Celulares (solo los
+// que tienen valor) + los párrafos de cada población, dentro del campo
+// "Descripción" — el tecnólogo sigue pudiendo editarlo a mano después.
+// Regenera el campo "Descripción" desde cero a partir de Tipos Celulares +
+// Poblaciones y Fenotipo + Anticuerpos negativos — REEMPLAZA el contenido
+// en vez de anexarlo, para que sea seguro llamarla varias veces (ej. cada
+// vez que se guarda) sin ir acumulando texto duplicado.
+//
+// Importante: si el tecnólogo escribió texto adicional a mano directo en
+// "Descripción" (fuera de lo que viene de Tipos Celulares/Poblaciones),
+// esa parte se PIERDE la próxima vez que esto se ejecute — es la
+// contrapartida de que se autogenere solo en cada guardado.
+function generarDescripcion() {
+  const partes = [];
+
+  const tcConValor = [];
+  document.querySelectorAll('#tc-grid .tc-item').forEach(item => {
+    const input = item.querySelector('input.res-input');
+    if (!input || input.value.trim() === '') return;
+    let nombre;
+    if (item.dataset.index !== undefined) {
+      nombre = TIPOS_CELULARES[parseInt(item.dataset.index, 10)];
+    } else {
+      const c = tiposCelularesCustom.find(x => x.id === item.dataset.customId);
+      nombre = c ? c.nombre : '';
+    }
+    if (nombre) tcConValor.push(`${nombre} ${input.value}%`);
+  });
+  if (tcConValor.length) {
+    partes.push('Elementos celulares identificados: ' + tcConValor.join(', ') + '.');
+  }
+
+  poblacionesActuales.forEach(p => {
+    const texto = (p.texto || '').trim();
+    if (!texto) return;
+    const encabezado = [p.nombre, p.pct ? `${p.pct}%` : ''].filter(Boolean).join(' ');
+    partes.push(encabezado ? `${encabezado}: ${texto}` : texto);
+  });
+
+  const negativos = panelAnticuerposActual.filter(a =>
+    (a.grupo || grupoAutomatico(a.intensidad)) === 'negativo' && a.intensidad
+  );
+  if (negativos.length) {
+    partes.push('Anticuerpos negativos para estas poblaciones: ' + negativos.map(a => a.nombre).join(', ') + '.');
+  }
+
+  if (!editorDescripcion) return; // CKEditor todavía no terminó de montarse
+  const html = partes.map(p => `<p>${escapeHtmlLigero(p)}</p>`).join('');
+  editorDescripcion.setData(html);
+  actualizarCampoTexto('descripcion');
+}
+
+// ============================================================
+// EDAD (solo cálculo de años a partir de la fecha de nacimiento —
+// este informe no usa grupos de referencia por edad).
+// ============================================================
+function calcularEdadDesdeFecha(fechaStr) {
+    if (!fechaStr) {
+        document.getElementById('edad').value = '';
+        return;
+    }
+    const nacimiento = new Date(fechaStr);
+    if (isNaN(nacimiento)) {
+        document.getElementById('edad').value = '';
+        return;
+    }
+    const hoy = new Date();
+    let edad = hoy.getFullYear() - nacimiento.getFullYear();
+    const mes = hoy.getMonth() - nacimiento.getMonth();
+    if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
+        edad--;
+    }
+    document.getElementById('edad').value = edad + ' años';
+}
+
+document.getElementById('fecha-nac').addEventListener('change', function() {
+    calcularEdadDesdeFecha(this.value);
+});
+
+// Construcción inicial de la grilla de Tipos Celulares al cargar la página.
+construirTiposCelulares();
+actualizarVisibilidadTiposCelulares();
+
+// Genérico para Descripción / Conclusión / Nota: sincroniza el <textarea>
+// editable (no imprime) con su mirror de solo-lectura (.print-only, que sí
+// se imprime y fluye/corta bien entre hojas), y oculta el bloque completo
+// al imprimir si quedó vacío.
+// ============================================================
+// CKEDITOR 5 — solo en el campo Descripción (negrita, cursiva, tamaño de
+// fuente, tablas personalizadas). Conclusión y Nota siguen siendo
+// <textarea> de texto plano, sin cambios.
+// ============================================================
+let editorDescripcion = null;
+
+const _editorDescripcionListo = (async () => {
+  const { ClassicEditor, Essentials, Paragraph, Bold, Italic, FontSize,
+          Table, TableToolbar, TableCellProperties, TableProperties } = CKEDITOR;
+  editorDescripcion = await ClassicEditor.create(document.getElementById('descripcion-txt'), {
+    licenseKey: 'GPL',
+    plugins: [Essentials, Paragraph, Bold, Italic, FontSize, Table, TableToolbar, TableCellProperties, TableProperties],
+    toolbar: ['undo', 'redo', '|', 'bold', 'italic', 'fontSize', '|', 'insertTable'],
+    table: {
+      contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells', 'tableCellProperties', 'tableProperties']
+    },
+    placeholder: "Escriba aquí los hallazgos descriptivos, o use \"Generar descripción\" para partir desde Tipos Celulares + Poblaciones..."
+  });
+  // Cada vez que cambia el contenido (tipear, pegar, deshacer, etc.) se
+  // sincroniza el mirror de impresión — mismo mecanismo que el 'input' de
+  // los textarea de Conclusión/Nota, adaptado al evento propio de CKEditor.
+  editorDescripcion.model.document.on('change:data', () => actualizarCampoTexto('descripcion'));
+})();
+
+// Escapa texto plano antes de envolverlo en <p> — para cuando
+// generarDescripcion() arma HTML a partir de texto plano (Tipos Celulares,
+// nombres de población) que podría, en teoría, traer un "<" o "&" suelto.
+function escapeHtmlLigero(str) {
+  const div = document.createElement('div');
+  div.textContent = str == null ? '' : String(str);
+  return div.innerHTML;
+}
+
+// Quita etiquetas HTML para vistas cortas (resumen de una línea, atributos
+// title="...") donde no tiene sentido mostrar el marcado, solo el texto.
+function stripHtml(html) {
+  const div = document.createElement('div');
+  div.innerHTML = html || '';
+  return (div.textContent || div.innerText || '').trim();
+}
+
+function esHtmlVacio(html) {
+  return stripHtml(html) === '';
+}
+
+function actualizarCampoTexto(campo) {
+    if (campo === 'descripcion') {
+        if (!editorDescripcion) return;
+        const html = editorDescripcion.getData();
+        const mirror = document.getElementById('descripcion-mirror');
+        const container = document.getElementById('descripcion-container');
+        if (mirror) mirror.innerHTML = html;
+        if (container) container.classList.toggle('observaciones-vacio', esHtmlVacio(html));
+        return;
+    }
+    const textarea = document.getElementById(campo + '-txt');
+    const mirror = document.getElementById(campo + '-mirror');
+    const container = document.getElementById(campo + '-container');
+    if (!textarea || !container) return;
+    if (mirror) mirror.textContent = textarea.value;
+    container.classList.toggle('observaciones-vacio', !textarea.value.trim());
+}
+
+['conclusion', 'nota'].forEach(campo => {
+    const textarea = document.getElementById(campo + '-txt');
+    if (!textarea) return;
+    textarea.addEventListener('input', () => actualizarCampoTexto(campo));
+    setTimeout(() => actualizarCampoTexto(campo), 100);
+});
+// Descripción se sincroniza sola vía el listener 'change:data' de CKEditor
+// (agregado apenas el editor termina de crearse, más arriba).
+
+
+// Compatibilidad: código legado en otras partes del archivo puede seguir
+// llamando actualizarClaseObservaciones() — la mantenemos como alias.
+function actualizarClaseObservaciones() {
+    ['descripcion', 'conclusion', 'nota'].forEach(actualizarCampoTexto);
+}
+
+// Construcción inicial (vacía) de la lista de poblaciones al abrir la página.
+renderizarPoblaciones();
+
+// ========== REPORTE.JS EN SERVIDOR (multi-paciente, indexado por N° Muestra) ==========
+// js/reporte.js define window.REPORTES_POR_MUESTRA = { "<N° Muestra>": {...}, ... }
+// Se carga UNA sola vez al abrir la página (no en cada consulta). El botón
+// "Cargar reporte" busca el N° Muestra actual dentro de esa copia ya cargada
+// en memoria — no vuelve a pedir el archivo al servidor.
+//
+// El guardado es automático: ocurre al presionar "Imprimir / Guardar PDF",
+// sin que el clínico tenga que hacer nada aparte. Lo hace un endpoint PHP
+// (api/guardar_reporte.php) porque JavaScript del navegador no puede
+// escribir archivos en el servidor directamente.
+
+
+// Clave compartida simple (sin login real todavía) — la misma que ya se
+// usaba para api/get_muestra_completa.php. Es un candado básico para la
+// red interna, no reemplaza un login real: cualquiera que vea el código
+// fuente de esta página puede leerla. Si más adelante se arma un login,
+// esto se reemplaza por sesión de verdad.
+
+function recopilarDatosReporte() {
+  const tiposCelulares = [];
+  document.querySelectorAll('#tc-grid .tc-item[data-index]').forEach(item => {
+    const idx = parseInt(item.dataset.index, 10);
+    const input = item.querySelector('input.res-input');
+    tiposCelulares.push({ idx, pct: input.value });
+  });
+  const tiposCelularesCustomGuardar = tiposCelularesCustom.map(c => ({ nombre: c.nombre, pct: c.pct }));
+
+  return {
+    meta: { version: 1, guardado: new Date().toISOString() },
+    paciente: {
+      nombre: document.getElementById('nombre-paciente').value,
+      rutFicha: document.getElementById('rut-ficha').value,
+      numMuestra: document.getElementById('num-muestra').value,
+      fechaNac: document.getElementById('fecha-nac').value,
+      edad: document.getElementById('edad').value,
+      sexo: document.getElementById('sexo').value
+    },
+    laboratorio: {
+      procedencia: document.getElementById('procedencia').value,
+      medicoSolicitante: document.getElementById('medico-solicitante').value,
+      tratamiento: document.getElementById('tratamiento').value,
+      fechaRecepcion: document.getElementById('fecha-recepcion').value,
+      fechaInforme: document.getElementById('fecha-informe').value,
+      tipoMuestra: document.getElementById('tipo-muestra').value,
+      diagnosticoPresuntivo: document.getElementById('diagnostico-presuntivo').value
+    },
+    tiposCelulares,
+    tiposCelularesCustom: tiposCelularesCustomGuardar,
+    gatingInfiniTwo: gatingInfiniTwoActual,
+    panelNombre: panelNombreActual,
+    anticuerpos: panelAnticuerposActual.map(a => ({
+      nombre: a.nombre, tubos: a.tubos, intensidad: a.intensidad,
+      porcentaje: a.porcentaje, grupo: a.grupo
+    })),
+    poblaciones: poblacionesActuales.map(p => ({ nombre: p.nombre, pct: p.pct, texto: p.texto })),
+    descripcion: editorDescripcion ? editorDescripcion.getData() : '',
+    conclusion: document.getElementById('conclusion-txt').value,
+    nota: document.getElementById('nota-txt').value,
+    sellos: sellosParaGuardar(),
+    firmas: {
+      firma1Nombre: document.getElementById('firma1-nombre').value,
+      firma2Nombre: document.getElementById('firma2-nombre').value
+    }
+  };
+}
+
+function aplicarDatosReporte(data) {
+  if (!data) return;
+  const p = data.paciente || {};
+  const l = data.laboratorio || {};
+
+  if (p.nombre !== undefined) document.getElementById('nombre-paciente').value = p.nombre;
+  if (p.rutFicha !== undefined) document.getElementById('rut-ficha').value = p.rutFicha;
+  if (p.numMuestra !== undefined) document.getElementById('num-muestra').value = p.numMuestra;
+  if (p.fechaNac) {
+    document.getElementById('fecha-nac').value = p.fechaNac;
+    calcularEdadDesdeFecha(p.fechaNac);
+  } else if (p.edad !== undefined) {
+    document.getElementById('edad').value = p.edad;
+  }
+  if (p.sexo !== undefined) document.getElementById('sexo').value = p.sexo;
+
+  if (l.procedencia !== undefined) document.getElementById('procedencia').value = l.procedencia;
+  if (l.medicoSolicitante !== undefined) document.getElementById('medico-solicitante').value = l.medicoSolicitante;
+  if (l.tratamiento !== undefined) document.getElementById('tratamiento').value = l.tratamiento;
+  if (l.fechaRecepcion !== undefined) document.getElementById('fecha-recepcion').value = l.fechaRecepcion;
+  if (l.fechaInforme !== undefined) document.getElementById('fecha-informe').value = l.fechaInforme;
+  if (l.tipoMuestra !== undefined) document.getElementById('tipo-muestra').value = l.tipoMuestra;
+  if (l.diagnosticoPresuntivo !== undefined) document.getElementById('diagnostico-presuntivo').value = l.diagnosticoPresuntivo;
+
+  // Compatibilidad: reportes guardados antes de este cambio traían un
+  // único campo "observaciones" — se restaura como "Descripción".
+  if (data.descripcion !== undefined || data.conclusion !== undefined || data.nota !== undefined || data.observaciones !== undefined) {
+    {
+      // Compatibilidad: los pocos reportes guardados antes de este cambio
+      // tienen "descripcion" en texto plano (o "observaciones", el nombre
+      // viejo del campo). Si no trae ninguna etiqueta HTML, se envuelve en
+      // un <p> antes de pasárselo a CKEditor — así no se pierden los
+      // saltos de párrafo que tenía como texto plano.
+      const valorDescripcion = data.descripcion !== undefined ? data.descripcion : (data.observaciones || '');
+      const esHtml = /<[a-z][\s\S]*>/i.test(valorDescripcion);
+      const htmlParaEditor = !valorDescripcion ? '' : (esHtml ? valorDescripcion :
+        valorDescripcion.split(/\n\s*\n/).map(parr => `<p>${escapeHtmlLigero(parr.trim())}</p>`).join(''));
+      _editorDescripcionListo.then(() => {
+        if (!editorDescripcion) return;
+        editorDescripcion.setData(htmlParaEditor);
+        actualizarCampoTexto('descripcion');
+      });
+    }
+    document.getElementById('conclusion-txt').value = data.conclusion || '';
+    document.getElementById('nota-txt').value = data.nota || '';
+    actualizarClaseObservaciones();
+  }
+
+  poblacionesActuales = (data.poblaciones || []).map(p => ({ id: 'p' + (_poblacionIdSeq++), nombre: p.nombre || '', pct: p.pct || '', texto: p.texto || '' }));
+  poblacionActivaId = poblacionesActuales.length ? poblacionesActuales[poblacionesActuales.length - 1].id : null;
+  renderizarPoblaciones();
+
+  const f = data.firmas || {};
+  if (f.firma1Nombre !== undefined) document.getElementById('firma1-nombre').value = f.firma1Nombre;
+  if (f.firma2Nombre !== undefined) document.getElementById('firma2-nombre').value = f.firma2Nombre;
+  sellosDesdeGuardado(data.sellos);
+
+  // Tipos celulares personalizados: se reconstruyen ANTES de construirTiposCelulares()
+  // ya la llama actualizarVisibilidadTiposCelulares() más abajo — construirTiposCelulares()
+  // ya se ejecutó al cargar la página, así que solo hace falta reconstruir la grilla.
+  tiposCelularesCustom = (data.tiposCelularesCustom || []).map(c => ({ id: 'tc' + (_tcCustomIdSeq++), nombre: c.nombre || '', pct: c.pct || '' }));
+  construirTiposCelulares();
+
+  (data.tiposCelulares || []).forEach(tc => {
+    const item = document.querySelector(`#tc-grid .tc-item[data-index="${tc.idx}"]`);
+    if (!item) return;
+    const input = item.querySelector('input.res-input');
+    if (tc.pct !== undefined && tc.pct !== '') input.value = tc.pct;
+  });
+  actualizarVisibilidadTiposCelulares();
+  gatingInfiniTwoActual = (data.gatingInfiniTwo && Array.isArray(data.gatingInfiniTwo.poblaciones)) ? data.gatingInfiniTwo : null;
+  renderGatingInfiniTwo();
+
+  // El panel de anticuerpos guardado en el REPORTE (con resultados ya
+  // ingresados) tiene prioridad sobre lo que traiga panel.js — así al
+  // restaurar una versión anterior del historial se ven los resultados
+  // que ya se habían tipeado, no una lista en blanco recién precargada.
+  if (Array.isArray(data.anticuerpos) && data.anticuerpos.length > 0) {
+    panelAnticuerposActual = data.anticuerpos.map(a => ({
+      nombre: a.nombre, tubos: a.tubos || [], intensidad: a.intensidad || '',
+      porcentaje: a.porcentaje || '', grupo: a.grupo || null
+    }));
+    panelNombreActual = data.panelNombre || '';
+    const panelInfo = document.getElementById('panel-nombre-texto');
+    const origenInfo = document.getElementById('panel-origen-sub');
+    if (panelInfo) panelInfo.textContent = nombrePanelParaMostrar(panelNombreActual);
+    if (origenInfo) origenInfo.textContent = 'Restaurado desde el reporte guardado · ' + panelAnticuerposActual.length + ' anticuerpo(s)';
+    renderizarPanelAnticuerpos();
+  }
+}
+
+// Carga js/reporte.js UNA sola vez (al abrir la página). Usa un <script>
+// inyectado (igual que data.js en el Kanban) en vez de fetch+eval, para que
+// funcione igual sea que el archivo se sirva por HTTP o se abra localmente.
+function cargarReporteServidorUnaVez() {
+  window.REPORTES_POR_MUESTRA = lsGet(LS_REPORTES) || {};
+  window.REPORTES_CAMBIOS = lsGet(LS_HIST) || {};
+  return Promise.resolve(true);
+}
+
+// Identificador de este tipo de informe — se usa como sufijo de la clave
+// en reporte.js, para que un mismo N° de Muestra pueda tener más de un
+// tipo de informe sin que se pisen entre sí (ej. un PIDOT y un
+// Inmunofenotipo Estandarizado del mismo paciente).
+const TIPO_INFORME = 'inmunofenotipo';
+
+function claveReporte(numMuestra) {
+  return numMuestra + '::' + TIPO_INFORME;
+}
+
+// Busca el N° Muestra actual dentro de la copia YA cargada en memoria
+// (window.REPORTES_POR_MUESTRA) y rellena el formulario si existe.
+// Primero intenta la clave compuesta nueva (N°Muestra::pidot); si no
+// existe, cae a la clave antigua (solo N°Muestra) — así los reportes ya
+// guardados antes de este cambio se siguen encontrando con normalidad.
+function cargarPorNumMuestraActual({ avisarSiNoExiste = false } = {}) {
+  const num = document.getElementById('num-muestra').value.trim();
+  if (!num) return false;
+
+  const dict = window.REPORTES_POR_MUESTRA || {};
+  const registro = dict[claveReporte(num)] || dict[num];
+  if (registro) {
+    aplicarDatosReporte(registro);
+    return true;
+  }
+  if (avisarSiNoExiste) {
+    console.info('N° Muestra "' + num + '" no tiene reporte previo — se completará como uno nuevo.');
+  }
+  return false;
+}
+
+// Disparo automático: al terminar de escribir el N° Muestra (perder el
+// foco), busca si ya existe un reporte guardado para ese código Y, en
+// paralelo, precarga el panel de anticuerpos desde panel.js — salvo que
+// el reporte ya guardado trajera sus propios resultados de anticuerpos
+// (en ese caso no se pisan con una recarga en blanco del panel).
+document.getElementById('num-muestra').addEventListener('blur', async function () {
+  await _cargaInicialReporte;
+  const cargadoReporte = cargarPorNumMuestraActual();
+  await cargarPanelServidorUnaVez();
+  if (!(cargadoReporte && panelAnticuerposActual.length > 0)) {
+    cargarPanelPorNumMuestraActual();
+  }
+});
+
+// El botón "Cargar reporte" hace lo mismo a demanda — sirve como respaldo
+// visible para ese mismo caso (reintentar manualmente si el blur ocurrió
+// antes de que la carga terminara) y como pista para quien no sepa que el
+// blur ya lo hace solo.
+async function cargarReporteBoton() {
+  await _cargaInicialReporte;
+  const cargado = cargarPorNumMuestraActual({ avisarSiNoExiste: true });
+  await cargarPanelServidorUnaVez();
+  if (!(cargado && panelAnticuerposActual.length > 0)) {
+    cargarPanelPorNumMuestraActual();
+  }
+  if (!cargado) {
+    const num = document.getElementById('num-muestra').value.trim();
+    alert(num
+      ? `No hay un reporte guardado para el N° de Muestra "${num}" todavía.`
+      : 'Escribe primero el N° de Muestra a cargar.');
+  }
+}
+
+// Guarda el reporte actual en el servidor (api/guardar_reporte.php), que
+// escribe/actualiza js/reporte.js y respalda la versión anterior (si
+// existía) en js/reporte_change.js. Es automático: se llama solo al
+// imprimir, sin botón aparte ni interacción extra del clínico.
+async function guardarReporteEnServidor() {
+  await _editorDescripcionListo;
+  if (editorDescripcion && esHtmlVacio(editorDescripcion.getData())) { generarDescripcion(); }
+  const data = recopilarDatosReporte();
+  const numMuestra = data.paciente.numMuestra.trim();
+  if (!numMuestra) return { ok: false, motivo: 'sin_num_muestra' };
+  const clave = claveReporte(numMuestra);
+  const dict = window.REPORTES_POR_MUESTRA = window.REPORTES_POR_MUESTRA || {};
+  const hist = window.REPORTES_CAMBIOS = window.REPORTES_CAMBIOS || {};
+  if (dict[clave]) {   // la versión anterior pasa al historial (máx. 10)
+    hist[clave] = [Object.assign({}, dict[clave], { _respaldadoEn: new Date().toISOString() })].concat(hist[clave] || []).slice(0, 10);
+  }
+  dict[clave] = data;
+  const ok1 = lsSet(LS_REPORTES, dict), ok2 = lsSet(LS_HIST, hist);
+  return { ok: true, persistente: ok1 && ok2 };
+}
+
+// Carga inicial (una sola vez) al abrir la página.
+const _cargaInicialReporte = cargarReporteServidorUnaVez().then(() => {
+  // Si el N° Muestra ya viene precargado (ej. por parámetros de URL,
+  // servidor, o porque quedó escrito de una carga anterior), intenta
+  // encontrar su reporte apenas la copia en memoria esté lista.
+  cargarPorNumMuestraActual();
+});
+
+// Carga inicial del panel de anticuerpos (panel.js), en paralelo.
+const _cargaInicialPanel = cargarPanelServidorUnaVez();
+
+// ========== HISTORIAL DE VERSIONES ANTERIORES (reporte_change.js) ==========
+// js/reporte_change.js define window.REPORTES_CAMBIOS = { "<N° Muestra>": [
+//   {...versión anterior..., "_respaldadoEn": "2026-08-20T15:26:41+00:00"}, ...
+// ] }. Cada vez que se guarda un cambio sobre un N° de muestra que YA
+// existía, el servidor respalda ahí la versión previa (ver
+// api/guardar_reporte.php) — esto solo la muestra y permite restaurarla.
+//
+// A diferencia de reporte.js, este archivo se carga de forma PEREZOSA (solo
+// la primera vez que se abre el panel de historial), ya que puede crecer
+// bastante con el tiempo y no todas las visitas lo necesitan.
+
+let _historialCargado = false;
+
+function cargarHistorialServidorSiHaceFalta() {
+  window.REPORTES_CAMBIOS = lsGet(LS_HIST) || window.REPORTES_CAMBIOS || {}; _historialCargado = true;
+  return Promise.resolve();
+}
+
+function formatearFechaHistorial(iso) {
+  const fecha = new Date(iso);
+  if (isNaN(fecha)) return iso || '—';
+  return fecha.toLocaleString('es-CL', {
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit'
+  });
+}
+
+function construirVistaPreviaHTML(version) {
+  const p = version.paciente || {};
+  const l = version.laboratorio || {};
+  const f = version.firmas || {};
+  const esc = (s) => (s === undefined || s === null || s === '') ? '—' : String(s);
+
+  const tcFijosConDatos = (version.tiposCelulares || []).filter(tc => tc.pct !== '' && tc.pct !== undefined);
+  const tcCustomConDatos = (version.tiposCelularesCustom || []).filter(tc => tc.pct !== '' && tc.pct !== undefined && tc.nombre);
+  const tcHTML = (tcFijosConDatos.length === 0 && tcCustomConDatos.length === 0)
+    ? `<span class="hist-preview-vacio">Sin tipos celulares cargados.</span>`
+    : [
+        ...tcFijosConDatos.map(tc => `${esc(TIPOS_CELULARES[tc.idx])}: <strong>${esc(tc.pct)}%</strong>`),
+        ...tcCustomConDatos.map(tc => `${esc(tc.nombre)}: <strong>${esc(tc.pct)}%</strong>`)
+      ].join(' · ');
+
+  const anticuerpos = version.anticuerpos || [];
+  const conResultado = anticuerpos.filter(a => a.intensidad);
+  const positivos = conResultado.filter(a => (a.grupo || grupoAutomatico(a.intensidad)) === 'positivo');
+  const negativos = conResultado.filter(a => (a.grupo || grupoAutomatico(a.intensidad)) === 'negativo');
+  const fmtAc = (a) => `${esc(a.nombre)} ${a.intensidad}${a.porcentaje ? ` (${a.porcentaje}%)` : ''}`;
+
+  return `
+    <h4>Paciente</h4>
+    <div class="hist-preview-grid">
+      <div><span>Nombre:</span>${esc(p.nombre)}</div>
+      <div><span>RUT:</span>${esc(p.rutFicha)}</div>
+      <div><span>N° Muestra:</span>${esc(p.numMuestra)}</div>
+      <div><span>Edad:</span>${esc(p.edad)}</div>
+      <div><span>Sexo:</span>${esc(p.sexo)}</div>
+      <div><span>Diagnóstico:</span>${esc(l.diagnosticoPresuntivo)}</div>
+    </div>
+    <h4>Tipos Celulares Normales</h4>
+    <div class="hist-preview-obs">${tcHTML}</div>
+    ${(version.gatingInfiniTwo && Array.isArray(version.gatingInfiniTwo.poblaciones)) ? `<h4>Análisis por gating — INFINI-TWO</h4>
+    <div class="hist-preview-obs">${version.gatingInfiniTwo.poblaciones.map(p => `${esc(p.nombre)}: <strong>${esc(p.pct)}%</strong>`).join(' · ')}${version.gatingInfiniTwo.otras ? ` · Otras células nucleadas: <strong>${esc(version.gatingInfiniTwo.otras.pct)}%</strong>` : ''}<br><small>${esc(version.gatingInfiniTwo.estrategia || 'gates dibujados a mano')} · n = ${esc(version.gatingInfiniTwo.baseNucleadas)} células nucleadas</small></div>` : ''}
+    <h4>Panel de Anticuerpos — ${esc(nombrePanelParaMostrar(version.panelNombre))} (${conResultado.length})</h4>
+    <table>
+      <thead><tr><th>Positivos</th><th>Negativos</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>${positivos.length ? positivos.map(fmtAc).join('<br>') : '<span class="hist-preview-vacio">—</span>'}</td>
+          <td>${negativos.length ? negativos.map(fmtAc).join('<br>') : '<span class="hist-preview-vacio">—</span>'}</td>
+        </tr>
+      </tbody>
+    </table>
+    <h4>Poblaciones y Fenotipo</h4>
+    <div class="hist-preview-obs">${
+      (version.poblaciones || []).length
+        ? version.poblaciones.filter(p => (p.texto || '').trim()).map(p => {
+            const encabezado = [esc(p.nombre), p.pct ? `${esc(p.pct)}%` : ''].filter(Boolean).join(' ');
+            return `<strong>${encabezado}:</strong> ${esc(p.texto)}`;
+          }).join('<br><br>') || '<span class="hist-preview-vacio">Sin poblaciones con texto.</span>'
+        : '<span class="hist-preview-vacio">Sin poblaciones.</span>'
+    }</div>
+    <h4>Descripción</h4>
+    <div class="hist-preview-obs">${((version.descripcion !== undefined ? version.descripcion : version.observaciones) || '').trim() || '<span class="hist-preview-vacio">Sin descripción.</span>'}</div>
+    <h4>Conclusión</h4>
+    <div class="hist-preview-obs">${(version.conclusion || '').trim() || '<span class="hist-preview-vacio">Sin conclusión.</span>'}</div>
+    ${(version.nota || '').trim() ? `<h4>Nota</h4><div class="hist-preview-obs">${esc(version.nota)}</div>` : ''}
+    <h4>Firmas</h4>
+    <div class="hist-preview-grid">
+      <div><span>Profesionales:</span>${esc(f.firma1Nombre)}</div>
+      <div><span>Informado por:</span>${esc(f.firma2Nombre)}</div>
+    </div>
+  `;
+}
+
+async function mostrarHistorialVersiones() {
+  const numMuestra = document.getElementById('num-muestra').value.trim();
+  if (!numMuestra) {
+    alert('Escribe primero el N° de Muestra para ver su historial.');
+    return;
+  }
+
+  await cargarHistorialServidorSiHaceFalta();
+
+  const versiones = (window.REPORTES_CAMBIOS || {})[claveReporte(numMuestra)] || (window.REPORTES_CAMBIOS || {})[numMuestra] || [];
+  const lista = document.getElementById('histLista');
+  lista.innerHTML = '';
+
+  if (versiones.length === 0) {
+    lista.innerHTML = `<div class="hist-vacio">No hay versiones anteriores guardadas para "${numMuestra}".<br>Las versiones se guardan en este navegador cada vez que imprimes o pulsas «💾 Guardar».</div>`;
+  } else {
+    // Más recientes primero.
+    const ordenadas = [...versiones].sort((a, b) =>
+      new Date(b._respaldadoEn || 0) - new Date(a._respaldadoEn || 0)
+    );
+    ordenadas.forEach((version) => {
+      const item = document.createElement('div');
+      item.className = 'hist-item';
+      const obsCorta = stripHtml((version.descripcion !== undefined ? version.descripcion : version.observaciones) || '');
+      item.innerHTML = `
+        <div class="hist-item-info">
+          <div class="hist-item-fecha">${formatearFechaHistorial(version._respaldadoEn)}</div>
+          ${obsCorta ? `<div class="hist-item-obs" title="${obsCorta.replace(/"/g,'&quot;')}">${obsCorta}</div>` : ''}
+        </div>
+        <div class="hist-item-botones">
+          <button type="button" class="secundario">Vista previa</button>
+          <button type="button">Restaurar</button>
+        </div>
+        <div class="hist-preview"></div>
+      `;
+      const [btnPreview, btnRestaurar] = item.querySelectorAll('button');
+      const panelPreview = item.querySelector('.hist-preview');
+
+      btnPreview.addEventListener('click', () => {
+        const abierto = panelPreview.classList.contains('open');
+        if (abierto) {
+          panelPreview.classList.remove('open');
+          btnPreview.textContent = 'Vista previa';
+        } else {
+          if (!panelPreview.dataset.construido) {
+            panelPreview.innerHTML = construirVistaPreviaHTML(version);
+            panelPreview.dataset.construido = '1';
+          }
+          panelPreview.classList.add('open');
+          btnPreview.textContent = 'Ocultar vista previa';
+        }
+      });
+      btnRestaurar.addEventListener('click', () => restaurarVersionHistorial(version));
+
+      lista.appendChild(item);
+    });
+  }
+
+  document.getElementById('histOverlay').classList.add('open');
+}
+
+function restaurarVersionHistorial(version) {
+  const fechaTexto = formatearFechaHistorial(version._respaldadoEn);
+  if (!confirm(`¿Restaurar la versión del ${fechaTexto}?\n\nEsto reemplaza los datos actuales del formulario (todavía no se guarda — revisa y presiona "Imprimir / Guardar PDF" para confirmarlo).`)) {
+    return;
+  }
+  aplicarDatosReporte(version);
+  cerrarHistorialVersiones();
+}
+
+function cerrarHistorialVersiones() {
+  document.getElementById('histOverlay').classList.remove('open');
+}
+
+// ========== REDUCCIÓN AUTOMÁTICA A 1 HOJA A4 ANTES DE IMPRIMIR ==========
+// Misma técnica que en la Solicitud de Citometría: transform:scale() + una
+// altura explícita reducida (zoom NO afecta la paginación de impresión de
+// Chrome — ya lo comprobamos ahí). La reducción se aplica SOLO al panel de
+// anticuerpos (que es lo que puede variar mucho en tamaño, de pocos a
+// muchos marcadores) — los datos del paciente, tipos celulares,
+// observaciones y firmas siempre quedan a tamaño completo.
+
+// Alto útil real de 1 hoja A4 (297mm) con margen de 10mm en cada extremo
+// (@page{size:A4;margin:10mm}), calculado igual que para la Solicitud (Carta).
+const USABLE_PAGE_HEIGHT_PX_A4 = 1010;
+
+function aplicarAjustePagina() {
+  const hoja = document.getElementById('hoja-informe');
+  // "Poblaciones y Fenotipo" ya no vive dentro de la hoja imprimible (se
+  // movió a la ventana lateral, que no imprime) — ya no hay una tabla
+  // grande y de tamaño variable que reducir dentro del documento. Se deja
+  // el mecanismo apuntando a Tipos Celulares (lo único con tamaño algo
+  // variable que queda) por si algún día crece; en la práctica, con sus
+  // 15 poblaciones fijas, casi nunca hará falta reducir nada.
+  const tabla = document.getElementById('tipos-celulares-wrapper');
+
+  // Resetear para medir el alto natural sin reducción previa.
+  hoja.style.minHeight = '';
+  hoja.style.maxWidth = '';
+  hoja.style.width = '';
+  tabla.style.transform = '';
+  tabla.style.transformOrigin = '';
+  tabla.style.height = '';
+  tabla.style.overflow = '';
+
+  // Clave 0: en pantalla .hoja puede llegar a 1180px de ancho, pero al
+  // imprimir en A4 el ancho real disponible es ~190mm (A4 menos el margen
+  // de @page). El texto se ajusta (word-wrap) distinto según el ancho, así
+  // que medir con el ancho de pantalla subestima la altura real impresa.
+  // Forzamos el ancho de A4 ANTES de medir para que coincida.
+  hoja.style.maxWidth = '190mm';
+  hoja.style.width = '190mm';
+
+  // Clave 0.5: .fila-sin-datos y .observaciones-vacio solo se ocultan
+  // dentro de @media print — en pantalla siguen visibles para poder
+  // editarlas. Si medimos así, sobreestimamos el alto real impreso.
+  // Las ocultamos aquí temporalmente para medir lo que de verdad se imprime.
+  const itemsOcultosEnImpresion = document.querySelectorAll('#tc-grid .fila-sin-datos');
+  const displayPrevio = [];
+  itemsOcultosEnImpresion.forEach(el => { displayPrevio.push(el.style.display); el.style.display = 'none'; });
+
+  // Los 3 campos de texto (Descripción/Conclusión/Nota) vacíos tampoco se
+  // imprimen — se ocultan igual que las filas sin datos ANTES de medir,
+  // para no sobreestimar el alto real impreso. Los <textarea> editables
+  // tampoco imprimen (se reemplazan por su mirror), así que también se
+  // ocultan para la medición.
+  const elementosOcultosImpresion = document.querySelectorAll(
+    '.observaciones-vacio, .observaciones textarea, .ck-editor, #tipos-celulares-wrapper.tc-wrapper-vacio'
+  );
+  const displayPrevio2 = [];
+  elementosOcultosImpresion.forEach(el => { displayPrevio2.push(el.style.display); el.style.display = 'none'; });
+
+  const totalNaturalHeight = hoja.scrollHeight; // encabezado + datos + tipos celulares + poblaciones + observaciones + firmas, sin reducir
+  const tablaNaturalHeight = tabla.scrollHeight;
+
+  // Restaurar la visibilidad normal de pantalla — ya medimos lo que hacía falta.
+  itemsOcultosEnImpresion.forEach((el, i) => { el.style.display = displayPrevio[i]; });
+  elementosOcultosImpresion.forEach((el, i) => { el.style.display = displayPrevio2[i]; });
+
+  // El ancho de 190mm solo era para MEDIR correctamente — el CSS de
+  // impresión (@media print) ya deja .hoja en max-width:100% dentro de la
+  // página real. Si dejáramos el ancho forzado puesto, se pisa con eso y la
+  // tabla queda cortada en el borde derecho. Se revierte apenas medimos.
+  hoja.style.maxWidth = '';
+  hoja.style.width = '';
+
+  // Todo lo que NO se reduce (encabezado, datos paciente, tipos celulares,
+  // observaciones, firmas, paddings), medido como diferencia real en vez
+  // de sumar cada padding/margen a mano.
+  const fixedChrome = totalNaturalHeight - tablaNaturalHeight;
+  const usableTablaHeight = USABLE_PAGE_HEIGHT_PX_A4 - fixedChrome;
+
+  if (tablaNaturalHeight > usableTablaHeight) {
+    const factorNecesario = usableTablaHeight / tablaNaturalHeight;
+
+    if (factorNecesario < 0.70) {
+      // Reducir por debajo de 70% deja el texto demasiado chico. En ese
+      // caso, mejor no reducir nada: se deja tamaño normal y el reporte
+      // fluye naturalmente a 2 hojas (la tabla se corta entre página 1 y
+      // 2 sin partir ninguna fila a la mitad, y firmas + lo que esté
+      // debajo queda en la segunda hoja).
+      return 1;
+    }
+
+    // Nunca reduce más allá de 70% — bajo eso el texto deja de ser legible.
+    const factor = factorNecesario;
+    tabla.style.transformOrigin = 'top center';
+    tabla.style.transform = `scale(${factor})`;
+    tabla.style.height = Math.ceil(tablaNaturalHeight * factor) + 'px';
+    // Clave: .tabla-wrapper tiene overflow:hidden (para las esquinas
+    // redondeadas). Si lo dejamos así, al fijar una altura menor a la
+    // natural el contenido que no entra se RECORTARÍA antes de aplicar el
+    // transform, en vez de simplemente verse más chico. Hay que dejarlo
+    // visible mientras dure la reducción.
+    tabla.style.overflow = 'visible';
+    return factor;
+  }
+  return 1;
+}
+
+function restablecerAjustePagina() {
+  const hoja = document.getElementById('hoja-informe');
+  const tabla = document.getElementById('tipos-celulares-wrapper');
+  if (hoja) {
+    hoja.style.minHeight = '';
+    hoja.style.maxWidth = '';
+    hoja.style.width = '';
+  }
+  if (tabla) {
+    tabla.style.transform = '';
+    tabla.style.transformOrigin = '';
+    tabla.style.height = '';
+    tabla.style.overflow = '';
+  }
+}
+
+async function imprimirReporte() {
+  // Guardado automático en el servidor — sin botón aparte, sin que el
+  // clínico tenga que hacer nada más que imprimir. Si falla, se avisa pero
+  // NO se bloquea la impresión (la copia local/impresa sigue siendo válida
+  // aunque el servidor no haya podido actualizarse).
+  const resultado = await guardarReporteEnServidor();
+  if (!resultado.ok) {
+    const mensajes = {
+      sin_num_muestra: 'No se guardó una copia local: falta ingresar el N° de Muestra.',
+      conexion: 'No se pudo guardar la copia local del reporte.'
+    };
+    alert('Aviso — ' + (mensajes[resultado.motivo] || ('No se pudo guardar la copia local: ' + resultado.motivo)) +
+          '\nSe imprimirá de todas formas.');
+  }
+
+  aplicarAjustePagina();
+  setTimeout(() => window.print(), 50);
+}
+
+window.addEventListener('afterprint', restablecerAjustePagina);
+
+// ========== CARGAR DATOS DESDE EL SERVIDOR ==========
+function cargarDatosDesdeServidor(codigoLaboratorio) {
+  if (!codigoLaboratorio) return;
+  document.getElementById('num-muestra').value = codigoLaboratorio;
+  (async () => { await _cargaInicialReporte; cargarPorNumMuestraActual(); })();
+}
+
+// ========== CARGAR PARÁMETROS DESDE LA URL ==========
+function cargarParametrosDesdeURL() {
+    const params = new URLSearchParams(window.location.search);
+    const mapeo = {
+        'nombre_completo': 'nombre-paciente',
+        'rut': 'rut-ficha',
+        'codigo_laboratorio': 'num-muestra',
+        'fecha_nacimiento': 'fecha-nac',
+        'sexo': 'sexo',
+        'medico_tratante': 'medico-solicitante',
+        'servicio': 'procedencia',
+        'tipo_muestra': 'tipo-muestra',
+        'diagnostico': 'diagnostico-presuntivo',
+        'ficha_clinica': 'rut-ficha'
+    };
+    let codigoLab = '';
+    for (const [param, id] of Object.entries(mapeo)) {
+        const valor = params.get(param);
+        if (valor !== null && valor !== '') {
+            const input = document.getElementById(id);
+            if (!input) continue;
+            if (param === 'fecha_nacimiento') {
+                let fechaFormateada = '';
+                const partes = valor.split('/');
+                if (partes.length === 3 && partes[0].length === 2 && partes[1].length === 2 && partes[2].length === 4) {
+                    fechaFormateada = `${partes[2]}-${partes[1].padStart(2,'0')}-${partes[0].padStart(2,'0')}`;
+                } else if (/^\d{4}-\d{2}-\d{2}$/.test(valor)) {
+                    fechaFormateada = valor;
+                } else {
+                    const fechaObj = new Date(valor);
+                    if (!isNaN(fechaObj)) {
+                        const año = fechaObj.getFullYear();
+                        const mes = String(fechaObj.getMonth() + 1).padStart(2, '0');
+                        const dia = String(fechaObj.getDate()).padStart(2, '0');
+                        fechaFormateada = `${año}-${mes}-${dia}`;
+                    }
+                }
+                if (fechaFormateada) {
+                    input.value = fechaFormateada;
+                    calcularEdadDesdeFecha(fechaFormateada);
+                }
+            } else if (input.tagName === 'SELECT') {
+                const option = Array.from(input.options).find(opt => opt.value === valor);
+                if (option) input.value = valor;
+            } else {
+                input.value = valor;
+            }
+            if (param === 'codigo_laboratorio') codigoLab = valor;
+        }
+    }
+    const edadVal = params.get('edad');
+    if (edadVal !== null && edadVal !== '') {
+        document.getElementById('edad').value = edadVal;
+    }
+    if (codigoLab) {
+        cargarDatosDesdeServidor(codigoLab);
+    }
+}
+
+setTimeout(cargarParametrosDesdeURL, 200);
+
+// ============================================================
+// CONFIGURACIÓN DEL INFORME (nombre, logos, firmas predeterminadas, pie)
+// ============================================================
+const CFG_DEFECTO = {
+  hospital: 'HOSPITAL DEMO', subtitulo: '', pie: '', logoIzq: '', logoDer: '', firma1: '', firma2: '', sellos: {},
+  legal: 'Aviso de confidencialidad: este informe contiene información confidencial y privilegiada solamente para el destinatario que se indica. Entrega, distribución o diseminación de esta comunicación a otra persona está estrictamente prohibido.'
+};
+function cfgActual() { return Object.assign({}, CFG_DEFECTO, lsGet(LS_CFG) || {}); }
+function _mostrarSi(el, txt) { el.textContent = txt || ''; el.style.display = (txt || '').trim() ? '' : 'none'; }
+function aplicarCfg(cfg) {
+  window._cfgSellos = cfg.sellos || {}; if (typeof renderSellos === 'function') renderSellos();
+  _mostrarSi(document.getElementById('enc-hospital'), cfg.hospital); _mostrarSi(document.getElementById('enc-sub'), cfg.subtitulo);
+  _mostrarSi(document.getElementById('pie-legal-txt'), cfg.legal); _mostrarSi(document.getElementById('pie-pagina-txt'), cfg.pie);
+  [['logo-izq', cfg.logoIzq], ['logo-der', cfg.logoDer]].forEach(([id, src]) => { const im = document.getElementById(id); if (src) { im.src = src; im.style.display = ''; } else { im.removeAttribute('src'); im.style.display = 'none'; } });
+}
+function _precargarFirmas(cfg, previa) {
+  [['firma1-nombre', 'firma1'], ['firma2-nombre', 'firma2']].forEach(([id, k]) => { const ta = document.getElementById(id); if (!ta.value.trim() || (previa && ta.value === previa[k])) ta.value = cfg[k] || ''; });
+}
+let _logosCfg = { izq: '', der: '' };
+function _pintarLogoCfg(lado) { const im = document.getElementById('cfg-logo-' + lado + '-img'); if (_logosCfg[lado]) { im.src = _logosCfg[lado]; im.style.display = ''; } else { im.removeAttribute('src'); im.style.display = 'none'; } }
+function quitarLogoCfg(lado) { _logosCfg[lado] = ''; document.getElementById('cfg-logo-' + lado).value = ''; _pintarLogoCfg(lado); }
+function _reducirLogo(file) {
+  return new Promise((res, rej) => {
+    const fr = new FileReader(); fr.onerror = () => rej(fr.error);
+    fr.onload = () => { const im = new Image(); im.onerror = () => rej(new Error('Imagen no válida')); im.onload = () => {
+      const k = Math.min(1, 320 / im.width, 160 / im.height), c = document.createElement('canvas'); c.width = Math.max(1, Math.round(im.width * k)); c.height = Math.max(1, Math.round(im.height * k));
+      c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); res(c.toDataURL(/png|svg|gif/i.test(file.type) ? 'image/png' : 'image/jpeg', 0.9)); }; im.src = fr.result; };
+    fr.readAsDataURL(file);
+  });
+}
+document.addEventListener('change', async e => {   // delegado: el diálogo está más abajo en el documento
+  const m = /^cfg-logo-(izq|der)$/.exec(e.target.id || ''); if (!m) return;
+  const lado = m[1], f = e.target.files && e.target.files[0]; if (!f) return;
+  try { _logosCfg[lado] = await _reducirLogo(f); _pintarLogoCfg(lado); } catch (err) { alert('No se pudo leer la imagen: ' + err.message); }
+});
+function abrirConfigInforme() {
+  const c = cfgActual();
+  document.getElementById('cfg-hospital').value = c.hospital; document.getElementById('cfg-sub').value = c.subtitulo; document.getElementById('cfg-pie').value = c.pie; document.getElementById('cfg-legal').value = c.legal;
+  document.getElementById('cfg-firma1').value = c.firma1; document.getElementById('cfg-firma2').value = c.firma2;
+  _logosCfg = { izq: c.logoIzq, der: c.logoDer }; _pintarLogoCfg('izq'); _pintarLogoCfg('der');
+  _sellosCfg = Object.assign({}, c.sellos || {}); SELLOS.forEach(_pintarSelloCfg);
+  document.getElementById('cfgOverlay').classList.add('open');
+}
+function cerrarConfigInforme() { document.getElementById('cfgOverlay').classList.remove('open'); }
+function guardarConfigInforme() {
+  const previa = cfgActual();
+  const c = { hospital: document.getElementById('cfg-hospital').value.trim(), subtitulo: document.getElementById('cfg-sub').value.trim(), pie: document.getElementById('cfg-pie').value.trim(),
+    legal: document.getElementById('cfg-legal').value.trim(), firma1: document.getElementById('cfg-firma1').value, firma2: document.getElementById('cfg-firma2').value, logoIzq: _logosCfg.izq, logoDer: _logosCfg.der, sellos: Object.assign({}, _sellosCfg) };
+  const ok = lsSet(LS_CFG, c); aplicarCfg(c); _precargarFirmas(c, previa); cerrarConfigInforme();
+  avisoInforme(ok ? 'Configuración guardada en este navegador' : 'Configuración aplicada (este navegador no permite guardarla)');
+}
+function borrarDatosInforme() {
+  if (!confirm('Se borrarán la configuración, los informes y las versiones anteriores guardados por este informe en este navegador (incluidos timbres, firmas y logos). ¿Continuar?')) return;
+  [LS_REPORTES, LS_HIST, LS_CFG].forEach(k => { delete _memLS[k]; try { localStorage.removeItem(k); } catch (e) { /* sin almacenamiento */ } });
+  location.reload();
+}
+function restaurarConfigDemo() {
+  if (!confirm('¿Restaurar los valores de demostración (HOSPITAL DEMO, sin logos, firmas ni contacto)?')) return;
+  const previa = cfgActual(); lsSet(LS_CFG, {}); const c = cfgActual(); aplicarCfg(c); _precargarFirmas(c, previa); abrirConfigInforme();
+}
+async function guardarReporteBoton() {
+  const r = await guardarReporteEnServidor();
+  if (!r.ok) { alert('Escribe primero el N° de Muestra para poder guardar el reporte.'); return; }
+  avisoInforme(r.persistente ? 'Reporte guardado en este navegador' : 'Reporte guardado solo para esta sesión (el navegador no permite guardar)');
+}
+// ---- Interfaz para INFINI-TWO (cuando el informe va incrustado) ----
+function importarInfiniTwoObjeto(J) {
+  if (!J || J.app !== 'infinitwo-informe' || !Array.isArray(J.poblaciones)) { alert('Los datos recibidos no parecen un resultado exportado por INFINI-TWO.'); return false; }
+  _infPendiente = J; renderDialogoInfiniTwo(); document.getElementById('inf-overlay').classList.add('open'); return true;
+}
+window.INFORME_API = {
+  importar: importarInfiniTwoObjeto,
+  numMuestra: () => document.getElementById('num-muestra').value.trim(),
+  fijarNumMuestra: v => { document.getElementById('num-muestra').value = v || ''; try { cargarPorNumMuestraActual(); } catch (e) { /* sin reporte previo */ } }
+};
+// ---- Arranque: aplicar configuración y firmas predeterminadas ----
+// ---- Timbre y firma (imágenes) ----
+const SELLOS = ['timbre1', 'firma1', 'timbre2', 'firma2'];
+let SELLOS_REPORTE = {};      // undefined = usa el predeterminado · '' = quitado en este informe · data:… = propio de este informe
+let _selloDestino = null, _sellosCfg = {};
+function _selloActual(k) { return SELLOS_REPORTE[k] !== undefined ? SELLOS_REPORTE[k] : ((window._cfgSellos || {})[k] || ''); }
+function renderSellos() {
+  SELLOS.forEach(k => {
+    const el = document.querySelector('.sello-slot[data-slot="' + k + '"]'); if (!el) return;
+    const src = _selloActual(k), im = el.querySelector('img');
+    if (src) { im.src = src; im.style.display = ''; el.classList.add('con-img'); } else { im.removeAttribute('src'); im.style.display = 'none'; el.classList.remove('con-img'); }
+  });
+}
+// en el reporte guardado, el sello predeterminado se anota como '@cfg' (así no se duplican las imágenes en el almacenamiento)
+function sellosParaGuardar() { const o = {}; SELLOS.forEach(k => { o[k] = SELLOS_REPORTE[k] === undefined ? '@cfg' : SELLOS_REPORTE[k]; }); return o; }
+function sellosDesdeGuardado(s) { SELLOS_REPORTE = {}; if (s) SELLOS.forEach(k => { if (s[k] !== undefined && s[k] !== '@cfg') SELLOS_REPORTE[k] = s[k]; }); renderSellos(); }
+function _procesarSello(file) {
+  return new Promise((res, rej) => {
+    const fr = new FileReader(); fr.onerror = () => rej(fr.error);
+    fr.onload = () => { const im = new Image(); im.onerror = () => rej(new Error('Imagen no válida')); im.onload = () => {
+      const k = Math.min(1, 480 / im.width, 240 / im.height), w = Math.max(1, Math.round(im.width * k)), h = Math.max(1, Math.round(im.height * k));
+      const c = document.createElement('canvas'); c.width = w; c.height = h; const g = c.getContext('2d'); g.drawImage(im, 0, 0, w, h);
+      const d = g.getImageData(0, 0, w, h), p = d.data;
+      for (let i = 0; i < p.length; i += 4) { const mn = Math.min(p[i], p[i + 1], p[i + 2]); if (mn > 236) p[i + 3] = 0; else if (mn > 205) p[i + 3] = Math.round(p[i + 3] * (236 - mn) / 31); }   // fondo blanco → transparente
+      g.putImageData(d, 0, 0); res(c.toDataURL('image/png')); }; im.src = fr.result; };
+    fr.readAsDataURL(file);
+  });
+}
+function _pintarSelloCfg(k) { const im = document.getElementById('cfg-sello-' + k + '-img'); if (!im) return; if (_sellosCfg[k]) { im.src = _sellosCfg[k]; im.style.display = ''; } else { im.removeAttribute('src'); im.style.display = 'none'; } }
+function quitarSelloCfg(k) { delete _sellosCfg[k]; const i = document.getElementById('cfg-sello-' + k); if (i) i.value = ''; _pintarSelloCfg(k); }
+document.addEventListener('click', e => {
+  const x = e.target.closest('.sello-x'); if (x) { e.stopPropagation(); SELLOS_REPORTE[x.parentElement.dataset.slot] = ''; renderSellos(); return; }
+  const slot = e.target.closest('.sello-slot'); if (slot && !slot.classList.contains('con-img')) { _selloDestino = slot.dataset.slot; document.getElementById('sello-file').click(); }
+});
+document.addEventListener('change', async e => {
+  if (e.target.id === 'sello-file') {
+    const f = e.target.files && e.target.files[0]; e.target.value = ''; if (!f || !_selloDestino) return;
+    try { SELLOS_REPORTE[_selloDestino] = await _procesarSello(f); renderSellos(); } catch (err) { alert('No se pudo leer la imagen: ' + err.message); } return;
+  }
+  const m = /^cfg-sello-(timbre1|firma1|timbre2|firma2)$/.exec(e.target.id || ''); if (!m) return;
+  const f = e.target.files && e.target.files[0]; if (!f) return;
+  try { _sellosCfg[m[1]] = await _procesarSello(f); _pintarSelloCfg(m[1]); } catch (err) { alert('No se pudo leer la imagen: ' + err.message); }
+});
+(function () { const c = cfgActual(); aplicarCfg(c); _precargarFirmas(c, null); })();
+// ---- Barra: menú ⚙, «Traer análisis» y «Ayuda» (integrados con INFINI-TWO cuando el informe va incrustado) ----
+function _puenteInfiniTwo() { try { return (window.parent && window.parent !== window && window.parent.infiniTwoPuente) || null; } catch (e) { return null; } }
+function traerAnalisisInfiniTwo() { const p = _puenteInfiniTwo(); if (p) p.traer(); else abrirImportarInfiniTwo(); }
+function ayudaInforme() { const p = _puenteInfiniTwo(); if (p) p.ayuda(); else document.getElementById('ayudaOverlay').classList.add('open'); }
+(function () {
+  const b = document.getElementById('menu-inf-btn'), l = document.getElementById('menu-inf-lista');
+  const set = o => { l.classList.toggle('open', o); b.setAttribute('aria-expanded', o ? 'true' : 'false'); };
+  b.addEventListener('click', e => { e.stopPropagation(); set(!l.classList.contains('open')); });
+  l.addEventListener('click', () => setTimeout(() => set(false), 0));
+  document.addEventListener('click', () => set(false));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') set(false); });
+  if (!_puenteInfiniTwo()) document.getElementById('btn-traer').title = 'Carga el archivo N°muestra.json exportado por INFINI-TWO';
+})();
+</script>
+<div class="hist-overlay no-print" id="inf-overlay" onclick="if(event.target===this) cerrarImportarInfiniTwo()">
+  <div class="hist-panel" style="max-width:880px">
+    <div class="hist-header">
+      <span>🧬 Importar resultado de INFINI-TWO</span>
+      <button type="button" onclick="cerrarImportarInfiniTwo()" title="Cerrar">✕</button>
+    </div>
+    <div id="inf-contenido" style="max-height:68vh;overflow-y:auto;padding:4px 2px"></div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:10px">
+      <button type="button" class="btn gris" onclick="cerrarImportarInfiniTwo()">Cancelar</button>
+      <button type="button" class="btn verde" id="inf-aplicar" onclick="aplicarImportacionInfiniTwo()">Aplicar al informe</button>
+    </div>
+  </div>
+</div>
+<div class="hist-overlay no-print" id="ayudaOverlay" onclick="if(event.target===this) this.classList.remove('open')">
+  <div class="hist-panel" style="max-width:640px">
+    <div class="hist-header"><span>📖 Ayuda del informe</span><button type="button" onclick="document.getElementById('ayudaOverlay').classList.remove('open')" title="Cerrar">✕</button></div>
+    <div style="font-size:.8rem;line-height:1.6;color:#334155;max-height:65vh;overflow-y:auto">
+      <ol style="padding-left:20px">
+        <li><b>🧬 Traer análisis de INFINI-TWO</b>: en esta versión independiente abre el selector de archivos para cargar el <code>N°muestra.json</code> que exporta INFINI-TWO («📄 Exportar para informe»). Dentro de INFINI-TWO lo envía directo.</li>
+        <li>Revisa la tabla de correspondencia y pulsa «Aplicar al informe»: se completan los tipos celulares y aparece el bloque «Análisis por gating».</li>
+        <li>Completa los datos del paciente, la descripción, la conclusión y los profesionales.</li>
+        <li><b>Almacenamiento y términos</b>: este informe <b>no usa cookies</b>; guarda la configuración y los informes solo en este navegador. Al usarlo se asume que aceptas los <i>Términos y condiciones</i> y la <i>Política de cookies y almacenamiento local</i> de INFINI-TWO (github.com/palmor357/INFINI-TWO). Puedes borrar todo desde ⚙ → «Configuración del informe…» → «Borrar datos guardados».</li>
+        <li><b>Timbre y firma</b>: haz clic en los recuadros «+ Timbre» y «+ Firma» del pie para subir las imágenes de este informe, o déjalas predeterminadas en ⚙ → Configuración del informe… Se imprimen en la hoja.</li>
+        <li>El menú <b>⚙</b> reúne las demás opciones: limpiar resultados, importar desde archivo, guardar y cargar reportes (en este navegador), versiones anteriores, imprimir / guardar PDF y la configuración (hospital, logos, firmas, pie de página).</li>
+      </ol>
+    </div>
+  </div>
+</div>
+<div class="hist-overlay no-print" id="cfgOverlay" onclick="if(event.target===this) cerrarConfigInforme()">
+  <div class="hist-panel" style="max-width:700px">
+    <div class="hist-header"><span>⚙ Configuración del informe</span><button type="button" onclick="cerrarConfigInforme()" title="Cerrar">✕</button></div>
+    <div style="max-height:70vh;overflow-y:auto;padding:2px 4px">
+      <div class="cfg-campo"><label for="cfg-hospital">Nombre del hospital o institución</label><input type="text" id="cfg-hospital" placeholder="HOSPITAL DEMO"></div>
+      <div class="cfg-campo"><label for="cfg-sub">Subtítulo (laboratorio, ciudad…)</label><input type="text" id="cfg-sub" placeholder="En blanco: no se muestra"></div>
+      <div class="cfg-2">
+        <div class="cfg-campo"><label>Logo izquierdo</label><div class="cfg-logo"><img id="cfg-logo-izq-img" alt="" style="display:none"><input type="file" id="cfg-logo-izq" accept="image/*"><button type="button" class="btn gris" onclick="quitarLogoCfg('izq')">Quitar</button></div></div>
+        <div class="cfg-campo"><label>Logo derecho</label><div class="cfg-logo"><img id="cfg-logo-der-img" alt="" style="display:none"><input type="file" id="cfg-logo-der" accept="image/*"><button type="button" class="btn gris" onclick="quitarLogoCfg('der')">Quitar</button></div></div>
+      </div>
+      <div class="cfg-2">
+        <div class="cfg-campo"><label for="cfg-firma1">Profesionales responsables (predeterminado)</label><textarea id="cfg-firma1" rows="3" placeholder="En blanco: se completa en cada informe"></textarea></div>
+        <div class="cfg-campo"><label for="cfg-firma2">Informado por (predeterminado)</label><textarea id="cfg-firma2" rows="3" placeholder="En blanco: se completa en cada informe"></textarea></div>
+      </div>
+      <div class="cfg-campo"><label>Timbre y firma (imágenes): se imprimen en el pie del informe</label>
+  <div class="cfg-sellos">
+    <div class="cfg-sello-grupo"><div class="cfg-sello-tit">Profesionales responsables</div>
+      <div class="cfg-logo"><span>Timbre</span><img id="cfg-sello-timbre1-img" alt="" style="display:none"><input type="file" id="cfg-sello-timbre1" accept="image/*"><button type="button" class="btn gris" onclick="quitarSelloCfg('timbre1')">Quitar</button></div>
+      <div class="cfg-logo"><span>Firma</span><img id="cfg-sello-firma1-img" alt="" style="display:none"><input type="file" id="cfg-sello-firma1" accept="image/*"><button type="button" class="btn gris" onclick="quitarSelloCfg('firma1')">Quitar</button></div></div>
+    <div class="cfg-sello-grupo"><div class="cfg-sello-tit">Informado por (responsable)</div>
+      <div class="cfg-logo"><span>Timbre</span><img id="cfg-sello-timbre2-img" alt="" style="display:none"><input type="file" id="cfg-sello-timbre2" accept="image/*"><button type="button" class="btn gris" onclick="quitarSelloCfg('timbre2')">Quitar</button></div>
+      <div class="cfg-logo"><span>Firma</span><img id="cfg-sello-firma2-img" alt="" style="display:none"><input type="file" id="cfg-sello-firma2" accept="image/*"><button type="button" class="btn gris" onclick="quitarSelloCfg('firma2')">Quitar</button></div></div>
+  </div>
+  <div style="font-size:.68rem;color:#64748b;margin-top:4px">Se usan en todos los informes; en cada informe puedes cambiarlos con un clic en los recuadros del pie. El fondo blanco de la imagen se vuelve transparente.</div></div>
+<div class="cfg-campo"><label for="cfg-pie">Pie de página / datos de contacto</label><input type="text" id="cfg-pie" placeholder="En blanco: no se muestra"></div>
+      <div class="cfg-campo"><label for="cfg-legal">Texto legal (acreditaciones, confidencialidad)</label><textarea id="cfg-legal" rows="3"></textarea></div>
+      <div style="font-size:.7rem;color:#64748b">La configuración se guarda en este navegador. Los logos, timbres y firmas se reducen de tamaño automáticamente. INFINI-TWO se distribuye bajo la licencia GNU GPL v3.0. Sin cookies: los datos quedan solo en este navegador.</div>
+    </div>
+    <div style="display:flex;justify-content:space-between;gap:8px;margin-top:10px">
+      <span><button type="button" class="btn gris" onclick="restaurarConfigDemo()">Restaurar valores de demo</button> <button type="button" class="btn gris" onclick="borrarDatosInforme()" title="Elimina la configuración, los informes y las versiones guardados en este navegador">Borrar datos guardados</button></span>
+      <span><button type="button" class="btn gris" onclick="cerrarConfigInforme()">Cancelar</button> <button type="button" class="btn verde" onclick="guardarConfigInforme()">Guardar configuración</button></span>
+    </div>
+  </div>
+</div>
+<div class="hist-overlay no-print" id="histOverlay" onclick="if(event.target===this) cerrarHistorialVersiones()">
+  <div class="hist-panel">
+    <div class="hist-header">
+      <span>🕐 Versiones anteriores</span>
+      <button type="button" onclick="cerrarHistorialVersiones()" title="Cerrar">✕</button>
+    </div>
+    <div class="hist-lista" id="histLista"></div>
+  </div>
+</div>
+
+<script>
+// ============ DICTADO POR VOZ: botón de micrófono genérico ============
+// Se agrega automáticamente a TODOS los <textarea> de la página (incluidos
+// los que se crean dinámicamente, como las poblaciones del inmunofenotipo).
+// Al presionar el botón 🎤 comienza a escuchar y transcribe lo dictado,
+// insertándolo en la posición del cursor. Se detiene al volver a presionar.
+(function(){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  function insertarTexto(campo, texto) {
+    const inicio = campo.selectionStart ?? campo.value.length;
+    const fin = campo.selectionEnd ?? campo.value.length;
+    const antes = campo.value.slice(0, inicio);
+    const separador = (antes && !/\s$/.test(antes)) ? ' ' : '';
+    const nuevoValor = antes + separador + texto + ' ' + campo.value.slice(fin);
+    campo.value = nuevoValor;
+    const cursor = inicio + separador.length + texto.length + 1;
+    campo.focus();
+    campo.setSelectionRange(cursor, cursor);
+    // Dispara 'input' para que sigan funcionando los listeners ya existentes
+    // (guardado automático, contador de caracteres, marcar población activa, etc.)
+    campo.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
+  function agregarBotonMic(textarea) {
+    if (textarea.dataset.micListo) return;
+    // Los campos de firma son listas fijas de nombres; no necesitan dictado
+    if ((textarea.id || '').startsWith('firma')) return;
+    textarea.dataset.micListo = '1';
+    if (!SR) return; // navegador sin soporte de reconocimiento de voz
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'mic-wrap';
+    textarea.parentNode.insertBefore(wrapper, textarea);
+    wrapper.appendChild(textarea);
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn-mic no-print';
+    btn.title = 'Dictar por voz';
+    btn.textContent = '🎤';
+    wrapper.appendChild(btn);
+
+    let recognition = null;
+    let escuchando = false;
+
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (escuchando) { recognition && recognition.stop(); return; }
+
+      recognition = new SR();
+      recognition.lang = 'es-CL';
+      recognition.continuous = true;
+      recognition.interimResults = false;
+
+      recognition.onstart = () => {
+        escuchando = true;
+        btn.classList.add('grabando');
+        btn.textContent = '⏹️';
+      };
+      recognition.onend = () => {
+        escuchando = false;
+        btn.classList.remove('grabando');
+        btn.textContent = '🎤';
+      };
+      recognition.onerror = (ev) => {
+        if (ev.error !== 'no-speech' && ev.error !== 'aborted') {
+          console.error('Dictado por voz:', ev.error);
+        }
+      };
+      recognition.onresult = (ev) => {
+        let texto = '';
+        for (let i = ev.resultIndex; i < ev.results.length; i++) {
+          if (ev.results[i].isFinal) texto += ev.results[i][0].transcript;
+        }
+        if (texto.trim()) insertarTexto(textarea, texto.trim());
+      };
+      try { recognition.start(); } catch(err) { /* ya estaba iniciado */ }
+    });
+  }
+
+  function escanearTextareas() {
+    document.querySelectorAll('textarea').forEach(agregarBotonMic);
+  }
+
+  document.addEventListener('DOMContentLoaded', escanearTextareas);
+  window.addEventListener('load', escanearTextareas);
+  // Observa cambios en el DOM para detectar textareas creados dinámicamente
+  // (ej. cada vez que se agrega una nueva "población" en inmunofenotipo)
+  new MutationObserver(escanearTextareas).observe(document.body, { childList: true, subtree: true });
+})();
+</script>
+
+<script>
+// ============ DICTADO POR VOZ: campo Descripción (CKEditor) ============
+// El campo Descripción no es un <textarea>, es un editor CKEditor, así que
+// necesita su propio botón (se agrega junto a "Generar descripción").
+(async function(){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR || typeof _editorDescripcionListo === 'undefined') return;
+  await _editorDescripcionListo;
+  if (typeof editorDescripcion === 'undefined' || !editorDescripcion) return;
+
+  const toolbar = document.querySelector('#descripcion-container .obs-toolbar');
+  if (!toolbar) return;
+
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.textContent = '🎤 Dictar';
+  let recognition = null;
+  let escuchando = false;
+
+  btn.addEventListener('click', () => {
+    if (escuchando) { recognition && recognition.stop(); return; }
+
+    recognition = new SR();
+    recognition.lang = 'es-CL';
+    recognition.continuous = true;
+    recognition.interimResults = false;
+
+    recognition.onstart = () => { escuchando = true; btn.textContent = '⏹️ Detener'; };
+    recognition.onend = () => { escuchando = false; btn.textContent = '🎤 Dictar'; };
+    recognition.onerror = (ev) => {
+      if (ev.error !== 'no-speech' && ev.error !== 'aborted') {
+        console.error('Dictado por voz (Descripción):', ev.error);
+      }
+    };
+    recognition.onresult = (ev) => {
+      let texto = '';
+      for (let i = ev.resultIndex; i < ev.results.length; i++) {
+        if (ev.results[i].isFinal) texto += ev.results[i][0].transcript;
+      }
+      if (texto.trim() && editorDescripcion) {
+        // Inserta el texto dictado en la posición del cursor dentro del editor
+        editorDescripcion.execute('insertText', { text: texto.trim() + ' ' });
+        if (typeof actualizarCampoTexto === 'function') actualizarCampoTexto('descripcion');
+      }
+    };
+    try { recognition.start(); } catch(err) { /* ya estaba iniciado */ }
+  });
+
+  toolbar.appendChild(btn);
+})();
+</script>
+
+</body>
+</html>
