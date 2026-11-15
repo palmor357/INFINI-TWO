@@ -1133,8 +1133,8 @@ body .loading,body .modal,body .fs-overlay{backdrop-filter:none!important;-webki
       <details class="tool" id="quad-side">
         <summary><span class="sec-t">➕ Cuadrantes</span></summary>
         <div class="adv-form"><div class="fld"><label for="quad-panel">Tomar ejes de</label><select id="quad-panel"></select></div>
-              <div class="fld"><label for="quad-cx">Eje X</label><div class="fld-row"><select id="quad-cx"></select><span class="sc"><label><input type="radio" name="qxs" value="linear"> lin</label><label><input type="radio" name="qxs" value="log"> log</label><label title="Escala biexponencial (arcsinh)"><input type="radio" name="qxs" value="biex"> biex</label></span></div></div>
-              <div class="fld"><label for="quad-cy">Eje Y</label><div class="fld-row"><select id="quad-cy"></select><span class="sc"><label><input type="radio" name="qys" value="linear"> lin</label><label><input type="radio" name="qys" value="log"> log</label><label title="Escala biexponencial (arcsinh)"><input type="radio" name="qys" value="biex"> biex</label></span></div></div>
+              <div class="fld"><label for="quad-cx">Eje X</label><div class="fld-row"><select id="quad-cx"></select><span class="sc"><label><input type="radio" name="qxs" value="linear"> lin</label><label><input type="radio" name="qxs" value="log"> log</label><label title="Escala biexponencial (arcsinh)"><input type="radio" name="qxs" value="biex"> biex</label><label title="Escala asinh con cofactor propio: casi lineal abajo, comprimida arriba"><input type="radio" name="qxs" value="asi"> asi</label></span></div></div>
+              <div class="fld"><label for="quad-cy">Eje Y</label><div class="fld-row"><select id="quad-cy"></select><span class="sc"><label><input type="radio" name="qys" value="linear"> lin</label><label><input type="radio" name="qys" value="log"> log</label><label title="Escala biexponencial (arcsinh)"><input type="radio" name="qys" value="biex"> biex</label><label title="Escala asinh con cofactor propio: casi lineal abajo, comprimida arriba"><input type="radio" name="qys" value="asi"> asi</label></span></div></div>
               <div class="fld-pair"><div class="fld"><label for="quad-x">Corte X</label><input type="number" id="quad-x" placeholder="mediana"></div><div class="fld"><label for="quad-y">Corte Y</label><input type="number" id="quad-y" placeholder="mediana"></div></div>
               <div class="fld"><label for="quad-parent">Población padre</label><select id="quad-parent"><option value="">— todos los eventos —</option></select></div>
               <div class="adv-actions"><button class="btn btn-primary btn-sm" id="btn-quadrants">Crear cuadrantes</button><button class="btn btn-light btn-sm" id="btn-quad-view" title="Ver los cuadrantes dibujados en los gráficos de Explorar">Ver en Explorar</button></div>
@@ -1626,6 +1626,10 @@ body .loading,body .modal,body .fs-overlay{backdrop-filter:none!important;-webki
 <div style="margin-top:10px;font-size:12px" title="Ancho de la escala biexponencial (cofactor de arcsinh). Valores mayores amplían la zona lineal alrededor de 0. Se aplica a los ejes en «biex».">
           <label>Escala biex · ancho: <span class="rng-val" id="biex-w-val">150</span></label>
           <input type="range" id="biex-w" min="10" max="2000" step="10" value="150">
+        </div>
+        <div style="margin-top:10px;font-size:12px" title="Cofactor de la escala «asi»: asinh(valor / cofactor). Casi lineal cerca de 0 y comprimida arriba; pensada para SSC/FSC. Independiente de la escala biex. Los datos y los gates no cambian.">
+          <label>Escala asi · cofactor: <span class="rng-val" id="asi-c-val">27000</span></label>
+          <input type="range" id="asi-c" min="1000" max="100000" step="500" value="27000">
         </div>
         
 <div class="vis-box" style="margin-top:10px;font-size:12px">
@@ -3099,6 +3103,9 @@ const ES_EN = {
 };
 
 Object.assign(ES_EN, {
+  'Escala asi · cofactor:': 'Asi scale · cofactor:', 'asi': 'asi',
+  'Escala asinh con cofactor propio: casi lineal abajo, comprimida arriba': 'Asinh scale with its own cofactor: almost linear at the bottom, compressed at the top',
+  'Cofactor de la escala «asi»: asinh(valor / cofactor). Casi lineal cerca de 0 y comprimida arriba; pensada para SSC/FSC. Independiente de la escala biex. Los datos y los gates no cambian.': 'Cofactor of the “asi” scale: asinh(value / cofactor). Almost linear near 0 and compressed above; meant for SSC/FSC. Independent of the biex scale. Data and gates do not change.',
   'Datos': 'Data',
   'Gráficos': 'Plots',
   'Poblaciones': 'Populations',
@@ -3254,7 +3261,7 @@ document.addEventListener('DOMContentLoaded', () => { applyLang(); });
    - Cada canal se sube UNA vez como Float32Array (carga perezosa, por tramos, con evicción LRU bajo un presupuesto de memoria).
    - X e Y son atributos elegidos; la muestra/filtro es un buffer de índices (drawElements UNSIGNED_INT).
    - La población de cada evento va en un buffer uint8 y los colores en una paleta de 256 entradas.
-   - El vertex shader aplica lineal / log10(max(v,1)) / asinh((v-shift)/biexW), igual que el código de los gráficos.
+   - El vertex shader aplica lineal / log10(max(v,1)) / asinh((v-shift)/biexW) / asinh(v/asiC) (escala «asi»), igual que el código de los gráficos.
    Sin dependencias. Todo el texto visible lo pone quien lo usa (aquí no hay cadenas de interfaz).
    ------------------------------------------------------------ */
 const GPU_BUFFER_BUDGET_MB = 512;         // presupuesto conservador de buffers en GPU (canales + clases + índices)
@@ -3323,12 +3330,13 @@ layout(location=0) in float aX;
 layout(location=1) in float aY;
 layout(location=2) in uint aC;
 layout(location=3) in float aV;
-uniform vec4 uView; uniform ivec2 uSc; uniform vec2 uSh; uniform float uW; uniform float uSize; uniform float uOp;
+uniform vec4 uView; uniform ivec2 uSc; uniform vec2 uSh; uniform float uW; uniform float uC; uniform float uSize; uniform float uOp;
 uniform int uMode; uniform vec4 uSolid; uniform vec2 uVr; uniform sampler2D uPal;
 out vec4 vCol;
 float tf(float v, int s, float sh) {
   if (s == 1) return log(max(v, 1.0)) * 0.4342944819;
   if (s == 2) return asinh((v - sh) / uW);
+  if (s == 3) return asinh(v / uC);
   return v;
 }
 void main() {
@@ -3352,7 +3360,7 @@ void main() {
     const p = gl.createProgram(); gl.attachShader(p, vs); gl.attachShader(p, fs); gl.linkProgram(p);
     if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new GLPointsError('nogl', gl.getProgramInfoLog(p));
     this.prog = p; this.u = {};
-    for (const n of ['uView', 'uSc', 'uSh', 'uW', 'uSize', 'uOp', 'uMode', 'uSolid', 'uVr', 'uPal', 'uRound']) this.u[n] = gl.getUniformLocation(p, n);
+    for (const n of ['uView', 'uSc', 'uSh', 'uW', 'uC', 'uSize', 'uOp', 'uMode', 'uSolid', 'uVr', 'uPal', 'uRound']) this.u[n] = gl.getUniformLocation(p, n);
     this.vao = gl.createVertexArray();
     this.pal = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, this.pal);
@@ -3422,8 +3430,8 @@ void main() {
 
   /**
    * Dibuja y copia al canvas 2D `target` (que se redimensiona a w·dpr × h·dpr).
-   * p = { target, w, h, dpr, bg (color CSS o null), xKey, yKey, sx, sy ('lin'|'log'|'biex'), shx, shy, biexW,
-   *       view:[x0,x1,y0,y1] (unidades transformadas: log10 para log, asinh para biex),
+   * p = { target, w, h, dpr, bg (color CSS o null), xKey, yKey, sx, sy ('lin'|'log'|'biex'|'asi'), shx, shy, biexW, asiC,
+   *       view:[x0,x1,y0,y1] (unidades transformadas: log10 para log, asinh para biex y asi),
    *       palette:Uint8Array(256·4 RGBA) , lut:Uint8Array(256·4)|null, size (px CSS), opacity,
    *       passes:[{ index:GLIndexSet, count?, classKey?, colorKey?, vr?:[lo,hi], solid?:[r,g,b,a] 0..1 }] }
    */
@@ -3438,9 +3446,9 @@ void main() {
     const X = this._cache.get(p.xKey), Y = this._cache.get(p.yKey);
     if (!X || !Y) throw new GLPointsError('stale', 'canal sin subir');
     X.last = Y.last = ++this._tick;
-    const sc = { lin: 0, log: 1, biex: 2 };
+    const sc = { lin: 0, log: 1, biex: 2, asi: 3 };
     gl.uniform4f(this.u.uView, p.view[0], p.view[1], p.view[2], p.view[3]);
-    gl.uniform2i(this.u.uSc, sc[p.sx] | 0, sc[p.sy] | 0); gl.uniform2f(this.u.uSh, p.shx || 0, p.shy || 0); gl.uniform1f(this.u.uW, p.biexW || 150);
+    gl.uniform2i(this.u.uSc, sc[p.sx] | 0, sc[p.sy] | 0); gl.uniform2f(this.u.uSh, p.shx || 0, p.shy || 0); gl.uniform1f(this.u.uW, p.biexW || 150); gl.uniform1f(this.u.uC, p.asiC || 27000);
     const size = Math.min(this.maxPoint, Math.max(1, (p.size || 2) * dpr));
     gl.uniform1f(this.u.uSize, size); gl.uniform1f(this.u.uRound, size > 2.5 ? 1 : 0); gl.uniform1f(this.u.uOp, p.opacity == null ? 1 : p.opacity);
     gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, this.pal); gl.uniform1i(this.u.uPal, 0);
@@ -3666,7 +3674,7 @@ const S = {
   emb: { tsne: null, umap: null }, embStale: false, embJob: 0, pcaCache: null,
   matPath: [], matOrder: [], fsKind: null,
   chanInfo: {}, meta: null, infoDirty: true, compInfo: null, compApplied: false,
-  selGeom: {}, gates: [], gateSeq: 0, biexW: 150, statChan: '', showGates: true, stratDirty: true, stratView: null, popSource: null, rowIdx: null, editGates: false, editUndo: [], stratApplied: null,
+  selGeom: {}, gates: [], gateSeq: 0, biexW: 150, asiC: 27000, statChan: '', showGates: true, stratDirty: true, stratView: null, popSource: null, rowIdx: null, editGates: false, editUndo: [], stratApplied: null,
 };
 window.__S = S;
 
@@ -3704,7 +3712,7 @@ function axisRange(col, scale) {
   if (!S.cols[col]) return undefined;
   const { lo, hi } = colStats(col);
   if (!(lo < hi)) return undefined;
-  if (scale === 'biex') { const a = axv(lo, 'biex', col), b = axv(hi, 'biex', col), pd = (b - a) * 0.05; return [a - pd, b + pd]; }
+  if (isAsh(scale)) { const a = axv(lo, scale, col), b = axv(hi, scale, col), pd = (b - a) * 0.05; return [a - pd, b + pd]; }
   const pad = (hi - lo) * 0.05;
   return [lo - pad, hi + pad];
 }
@@ -3769,15 +3777,15 @@ function sampleFiltered(cap, base, soloAsignados) {
 /** Eventos del gráfico `i` dentro del polígono (unidades de dato crudas, como lo guarda geomRaw): cuenta el 100 %, no solo los puntos dibujados. */
 let _geomScratch = new Int32Array(0);       // búfer reutilizable: el lazo sobre millones de eventos no reserva un Int32Array del tamaño del gráfico en cada uso
 /** Bucle del lazo (función pura: se ejecuta tal cual en el hilo principal y, copiada con toString(), dentro del Worker).
-    p: { px, py (polígono transformado), nP, cx, cy (0 lineal · 1 log · 2 biex), shx, shy, W, x0, x1, y0, y1 (caja transformada), rxl, rxh, ryl, ryh (caja cruda conservadora) } */
+    p: { px, py (polígono transformado), nP, cx, cy (0 lineal · 1 log · 2 biex/asi), shx, shy, Wx, Wy, x0, x1, y0, y1 (caja transformada), rxl, rxh, ryl, ryh (caja cruda conservadora) } */
 function geomRun(base, X, Y, p, out) {
-  const { px, py, nP, cx, cy, shx, shy, W, x0, x1, y0, y1, rxl, rxh, ryl, ryh } = p; let c = 0;
+  const { px, py, nP, cx, cy, shx, shy, Wx, Wy, x0, x1, y0, y1, rxl, rxh, ryl, ryh } = p; let c = 0;
   for (let k = 0; k < base.length; k++) {
     const e = base[k], vx = X[e];
     if (!(vx >= rxl && vx <= rxh)) continue;                          // prefiltro por caja en valores crudos (sin funciones trascendentes)
     const vy = Y[e]; if (!(vy >= ryl && vy <= ryh)) continue;
-    const x = cx === 0 ? vx : cx === 1 ? Math.log10(Math.max(vx, 1)) : Math.asinh((vx - shx) / W);
-    const y = cy === 0 ? vy : cy === 1 ? Math.log10(Math.max(vy, 1)) : Math.asinh((vy - shy) / W);
+    const x = cx === 0 ? vx : cx === 1 ? Math.log10(Math.max(vx, 1)) : Math.asinh((vx - shx) / Wx);
+    const y = cy === 0 ? vy : cy === 1 ? Math.log10(Math.max(vy, 1)) : Math.asinh((vy - shy) / Wy);
     if (x < x0 || x > x1 || y < y0 || y > y1) continue;
     let inside = false;                                               // pointInPoly, sin arrays anidados
     for (let a = 0, b = nP - 1; a < nP; b = a++) {
@@ -3798,11 +3806,11 @@ function geomPrep(i, g) {
   let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
   for (let q = 0; q < nP; q++) { if (px[q] < x0) x0 = px[q]; if (px[q] > x1) x1 = px[q]; if (py[q] < y0) y0 = py[q]; if (py[q] > y1) y1 = py[q]; }
   // Cotas crudas CONSERVADORAS (la decisión exacta se toma luego en el espacio transformado)
-  const code = s => s === 'log' ? 1 : s === 'biex' ? 2 : 0, cx = code(cfg.xs), cy = code(cfg.ys), shx = bxShift(cfg.x), shy = bxShift(cfg.y), W = S.biexW;
+  const code = s => s === 'log' ? 1 : isAsh(s) ? 2 : 0, cx = code(cfg.xs), cy = code(cfg.ys), shx = scShift(cfg.xs, cfg.x), shy = scShift(cfg.ys, cfg.y), Wx = scW(cfg.xs), Wy = scW(cfg.ys);
   const wid = v => 1e-6 * (Math.abs(v) + 1);
-  const lo = (t, c, sh) => c === 1 ? (t > 0 ? Math.pow(10, t) * (1 - 1e-9) : -Infinity) : c === 2 ? W * Math.sinh(t) + sh - wid(W * Math.sinh(t) + sh) : t;
-  const hi = (t, c, sh) => c === 1 ? (t >= 0 ? Math.pow(10, t) * (1 + 1e-9) : -Infinity) : c === 2 ? W * Math.sinh(t) + sh + wid(W * Math.sinh(t) + sh) : t;
-  return { cfg, base, X, Y, p: { px, py, nP, cx, cy, shx, shy, W, x0, x1, y0, y1, rxl: lo(x0, cx, shx), rxh: hi(x1, cx, shx), ryl: lo(y0, cy, shy), ryh: hi(y1, cy, shy) } };
+  const lo = (t, c, sh, W) => c === 1 ? (t > 0 ? Math.pow(10, t) * (1 - 1e-9) : -Infinity) : c === 2 ? W * Math.sinh(t) + sh - wid(W * Math.sinh(t) + sh) : t;
+  const hi = (t, c, sh, W) => c === 1 ? (t >= 0 ? Math.pow(10, t) * (1 + 1e-9) : -Infinity) : c === 2 ? W * Math.sinh(t) + sh + wid(W * Math.sinh(t) + sh) : t;
+  return { cfg, base, X, Y, p: { px, py, nP, cx, cy, shx, shy, Wx, Wy, x0, x1, y0, y1, rxl: lo(x0, cx, shx, Wx), rxh: hi(x1, cx, shx, Wx), ryl: lo(y0, cy, shy, Wy), ryh: hi(y1, cy, shy, Wy) } };
 }
 function idsInGeom(i, g) {
   const P = geomPrep(i, g); if (!P) return new Int32Array(0);
@@ -4051,9 +4059,9 @@ function buildPanelsDom() {
       <div class="shown" id="sh-p${i}"></div>
       <div class="axes">
         <div class="ax"><b>X:</b><select data-k="x">${opts}</select>
-          <span class="sc"><label><input type="radio" name="xs${i}" value="linear"> lin</label><label><input type="radio" name="xs${i}" value="log"> log</label><label title="Escala biexponencial (arcsinh): muestra valores negativos de datos compensados"><input type="radio" name="xs${i}" value="biex"> biex</label></span></div>
+          <span class="sc"><label><input type="radio" name="xs${i}" value="linear"> lin</label><label><input type="radio" name="xs${i}" value="log"> log</label><label title="Escala biexponencial (arcsinh): muestra valores negativos de datos compensados"><input type="radio" name="xs${i}" value="biex"> biex</label><label title="Escala asinh con cofactor propio: casi lineal abajo, comprimida arriba"><input type="radio" name="xs${i}" value="asi"> asi</label></span></div>
         <div class="ax"><b>Y:</b><select data-k="y">${opts}</select>
-          <span class="sc"><label><input type="radio" name="ys${i}" value="linear"> lin</label><label><input type="radio" name="ys${i}" value="log"> log</label><label title="Escala biexponencial (arcsinh): muestra valores negativos de datos compensados"><input type="radio" name="ys${i}" value="biex"> biex</label></span></div>
+          <span class="sc"><label><input type="radio" name="ys${i}" value="linear"> lin</label><label><input type="radio" name="ys${i}" value="log"> log</label><label title="Escala biexponencial (arcsinh): muestra valores negativos de datos compensados"><input type="radio" name="ys${i}" value="biex"> biex</label><label title="Escala asinh con cofactor propio: casi lineal abajo, comprimida arriba"><input type="radio" name="ys${i}" value="asi"> asi</label></span></div>
       </div>`;
     grid.appendChild(card);
     fillPopSelect(card.querySelector('select[data-k=pop]'), cfg);
@@ -4169,7 +4177,7 @@ function figPanel(i, big) {
   if (!f.length) { L.annotations = [{ text: cfg.pop ? t('msg.nopopev') : t('msg.novis'), showarrow: false, font: { size: 12, color: '#777' } }]; return { data: [], layout: L, ids: null, info: '' }; }
   const lgx = cfg.xs === 'log', lgy = cfg.ys === 'log';
   const tx = v => axv(v, cfg.xs, cfg.x), ty = v => axv(v, cfg.ys, cfg.y);
-  const tlab = (c, sc) => sc === 'log' ? `log10(${chLabel(c)})` : sc === 'biex' ? `biex(${chLabel(c)})` : chLabel(c);
+  const tlab = (c, sc) => sc === 'log' ? `log10(${chLabel(c)})` : sc === 'biex' ? `biex(${chLabel(c)})` : sc === 'asi' ? `asinh(${chLabel(c)}/${S.asiC})` : chLabel(c);
 
   if (cfg.mode === 'hist') {
     // Histograma sobre el 100 % de los eventos del gráfico; opcionalmente superpone cada población con su color
@@ -4212,10 +4220,10 @@ function figPanel(i, big) {
   const dens = forced || (!GLPon && useGl && !Number.isFinite(cap) && f.length > DENSITY_MIN);     // «Todos» con millones de eventos: densidad 100 % + puntos asignados
   const idx = GLPon ? new Int32Array(0) : perfT('muestreo', () => dens ? ((forced && !VIS.dpts) ? new Int32Array(0) : sampleFiltered(Math.min(500000, Math.max(cap, 1)), f, true)) : sampleFiltered(cap, f), r => fmtInt(r.length) + ' pts'), m = idx.length;
   const px = new Float32Array(GLPon ? 0 : m), py = new Float32Array(GLPon ? 0 : m);
-  const bxx = cfg.xs === 'biex', bxy = cfg.ys === 'biex', shx = bxShift(cfg.x), shy = bxShift(cfg.y);
+  const bxx = isAsh(cfg.xs), bxy = isAsh(cfg.ys), shx = scShift(cfg.xs, cfg.x), shy = scShift(cfg.ys, cfg.y), wx = scW(cfg.xs), wy = scW(cfg.ys);
   if (!GLPon) perfT('transformación', () => { for (let k = 0; k < m; k++) {
     const a = X[idx[k]], b = Y[idx[k]];
-    px[k] = lgx ? Math.max(a, 1) : bxx ? Math.asinh((a - shx) / S.biexW) : a; py[k] = lgy ? Math.max(b, 1) : bxy ? Math.asinh((b - shy) / S.biexW) : b;
+    px[k] = lgx ? Math.max(a, 1) : bxx ? Math.asinh((a - shx) / wx) : a; py[k] = lgy ? Math.max(b, 1) : bxy ? Math.asinh((b - shy) / wy) : b;
   } });
   const rxs = axisRange(cfg.x, cfg.xs), rys = axisRange(cfg.y, cfg.ys);
   L.xaxis = { ...L.xaxis, title: axTitle(chLabel(cfg.x)), type: lgx ? 'log' : 'linear', range: rxs, ...axisExtra(cfg.xs, rxs, cfg.x) };
@@ -4231,7 +4239,7 @@ function figPanel(i, big) {
   let densSpec = null;
   if (dens && rxs && rys) {
     const nbD = VIS.dbins === 'auto' ? (big ? 400 : 320) : +VIS.dbins;
-    densSpec = { f, X, Y, xk: cfg.x, yk: cfg.y, rx: rxs, ry: rys, lgx, lgy, sx: lgx ? 1 : bxx ? 2 : 0, sy: lgy ? 1 : bxy ? 2 : 0, shx, shy, nb: nbD,
+    densSpec = { f, X, Y, xk: cfg.x, yk: cfg.y, rx: rxs, ry: rys, lgx, lgy, sx: lgx ? 1 : bxx ? 2 : 0, sy: lgy ? 1 : bxy ? 2 : 0, shx, shy, wx, wy, nb: nbD,
       fallback: () => densityTrace(f, X, Y, rxs, rys, tx, ty, lgx, lgy, big) };
   }
   if (dens) {
@@ -4244,7 +4252,7 @@ function figPanel(i, big) {
       for (let k = 0; k < f.length && j < hx.length; k++) {
         const e = f[k]; if (!test(e) || (frac < 1 && S.rk[e] >= frac)) continue;
         const a = X[e], b = Y[e];
-        hx[j] = lgx ? Math.max(a, 1) : bxx ? Math.asinh((a - shx) / S.biexW) : a; hy[j++] = lgy ? Math.max(b, 1) : bxy ? Math.asinh((b - shy) / S.biexW) : b;
+        hx[j] = lgx ? Math.max(a, 1) : bxx ? Math.asinh((a - shx) / wx) : a; hy[j++] = lgy ? Math.max(b, 1) : bxy ? Math.asinh((b - shy) / wy) : b;
       }
       data.push({ type: useGl ? 'scattergl' : 'scatter', mode: 'markers', x: hx.subarray(0, j), y: hy.subarray(0, j), marker: { color, size: Math.max(VIS.msize, 2), opacity: op }, hoverinfo: 'skip' });
     };
@@ -4255,7 +4263,7 @@ function figPanel(i, big) {
   }
   if (m) data.push({
     type: useGl ? 'scattergl' : 'scatter', mode: 'markers', x: px, y: py, customdata: idx, marker: buildMarker(idx),
-    hovertemplate: `${chLabel(cfg.x)}${bxx ? ' (biex)' : ''}: %{x:.1f}<br>${chLabel(cfg.y)}${bxy ? ' (biex)' : ''}: %{y:.1f}<br>ID: %{customdata}<extra></extra>`,
+    hovertemplate: `${chLabel(cfg.x)}${bxx ? ' (' + cfg.xs + ')' : ''}: %{x:.1f}<br>${chLabel(cfg.y)}${bxy ? ' (' + cfg.ys + ')' : ''}: %{y:.1f}<br>ID: %{customdata}<extra></extra>`,
   });
   else data.push({ type: useGl ? 'scattergl' : 'scatter', mode: 'markers', x: [rxs ? (lgx ? Math.pow(10, rxs[0]) : rxs[0]) : 0], y: [rys ? (lgy ? Math.pow(10, rys[0]) : rys[0]) : 0], marker: { opacity: 0, size: 2 }, hoverinfo: 'skip' });   // traza vacía: mantiene activo el lazo
   return { data, layout: L, ids: idx, edit: ov.edit, full: true, info: shownInfo(m, f.length, dens), dens: densSpec };
@@ -4962,7 +4970,7 @@ function quadScope(parent) {
   S.popNames.forEach((nm, p) => { hid[p] = (p === 0 ? hiddenUnassigned : hidden.includes(nm)) ? 1 : 0; });
   return { hid, scope: { hidden, hiddenUnassigned } };
 }
-const qShow = (v, sc, c) => v - (sc === 'biex' ? bxShift(c) : 0);          // valor que muestra el eje (biex: valor real)
+const qShow = (v, sc, c) => v - (sc === 'biex' ? bxShift(c) : 0);   // «asi» no usa shift          // valor que muestra el eje (biex: valor real)
 /** Cortes vigentes (valores mostrados por el eje) y eventos analizados. */
 function quadCompute() {
   const q = quadCfg(), X = S.cols[q.x], Y = S.cols[q.y];
@@ -5581,7 +5589,7 @@ function saveWorkspace() {
   if (S.comp && S.comp.editada && S.comp.cur) ws.compensacion = { spill: compSpillString(S.comp.cur) };
   if (S.fs) ws.flowsom_cluster = Array.from(S.fs, v => v >= 0 ? S.fsNames[v] : '');
   if (S.gates.length) ws.gates = S.gates;
-  ws.biexW = S.biexW;
+  ws.biexW = S.biexW; ws.asiC = S.asiC;
   download('workspace_gating.json', new Blob([JSON.stringify(ws)], { type: 'application/json' }));
 }
 async function loadWorkspace(file) {
@@ -5594,6 +5602,7 @@ async function loadWorkspaceInner(file) {
     if (ws.compensacion && ws.compensacion.spill) { try { await compDesdeWorkspace(ws.compensacion); } catch (e) { setAssignMsg('⚠ No se pudo restaurar la compensación editada del workspace: ' + e.message); } }
     S.popNames = ['']; S.pop.fill(0); S.bgPop = null; S.popSource = null;
     if (ws.biexW > 0) { S.biexW = ws.biexW; $('biex-w').value = ws.biexW; $('biex-w-val').textContent = ws.biexW; }
+    if (ws.asiC > 0) setAsiC(ws.asiC);
     S.gates = Array.isArray(ws.gates) ? ws.gates.filter(validGate) : [];
     Object.assign(S.colorMap, ws.colors || {});
     for (const [k, v] of Object.entries(ws.populations || {})) { const i = +k; if (Number.isInteger(i) && i >= 0 && i < S.n && v) S.pop[i] = popIndex(v); }
@@ -5778,7 +5787,7 @@ function captureProfile(name) {
     panels: S.panels.map(p => ({ x: p.x, xStain: stainOf(p.x), y: p.y, yStain: stainOf(p.y), xs: p.xs, ys: p.ys, mode: p.mode })),
     color: { by: S.colorBy, channel: S.colorChan, channelStain: stainOf(S.colorChan), base: S.baseColor, showGates: S.showGates },
     maturation: { show: mat.checked, x: $('mat-x').value, xStain: stainOf($('mat-x').value), y: $('mat-y').value, yStain: stainOf($('mat-y').value), xs: radioVal('mat-xs'), ys: radioVal('mat-ys-path') },
-    embN: +$('emb-n').value, biexW: S.biexW,
+    embN: +$('emb-n').value, biexW: S.biexW, asiC: S.asiC,
   };
 }
 /** Canal del archivo actual que corresponde al del perfil: mismo nombre; si no existe, mismo anticuerpo. */
@@ -5804,6 +5813,7 @@ function applyProfile(pf, opts) {
   const warns = [], render = !(opts && opts.render === false);
   const k = Math.max(1, Math.min(MAX_PANELS, pf.panels.length));
   if (pf.biexW > 0) { S.biexW = pf.biexW; $('biex-w').value = pf.biexW; $('biex-w-val').textContent = pf.biexW; }
+  if (pf.asiC > 0) setAsiC(pf.asiC);
   if (pf.panels.length > MAX_PANELS) warns.push(`El perfil tiene ${pf.panels.length} gráficos; se cargaron los primeros ${MAX_PANELS}.`);
   $('num-panels').value = k; $('num-panels-val').textContent = k; $('num-panels-n').value = k;
   S.panels = []; ensurePanels(k);
@@ -5861,7 +5871,7 @@ function profMsg(t, warn) { const e = $('prof-msg'); e.textContent = t; e.classN
 function profSummary(pf) {
   const pairs = pf.panels.slice(0, 3).map(p => {
     const md = p.mode === 'hist' ? ' [hist]' : p.mode === 'density' ? ' [dens]' : '';
-    return `${p.x}${p.xStain ? ' (' + p.xStain + ')' : ''}${p.xs === 'log' || p.xs === 'biex' ? ' ' + p.xs : ''} × ${p.y}${p.ys === 'log' || p.ys === 'biex' ? ' ' + p.ys : ''}${md}`;
+    return `${p.x}${p.xStain ? ' (' + p.xStain + ')' : ''}${p.xs === 'log' || isAsh(p.xs) ? ' ' + p.xs : ''} × ${p.y}${p.ys === 'log' || isAsh(p.ys) ? ' ' + p.ys : ''}${md}`;
   });
   return `${pf.panels.length} gráfico${pf.panels.length > 1 ? 's' : ''} · ` + pairs.join(' · ') + (pf.panels.length > 3 ? ' …' : '');
 }
@@ -5925,13 +5935,17 @@ function closeProfiles() { $('prof-modal').classList.remove('open'); }
    Estrategia de análisis: registro de gates, reproducción y guardado
    ------------------------------------------------------------ */
 const bxShift = c => (c && S.chanInfo[c] && S.chanInfo[c].shift) || 0;     // el cero real de un canal desplazado es su «shift»
-const axv = (v, scale, c) => scale === 'log' ? Math.log10(Math.max(v, 1)) : scale === 'biex' ? Math.asinh((v - bxShift(c)) / S.biexW) : v;
+/** Escalas tipo arcsinh: «biex» (ancho S.biexW, con el shift del canal) y «asi» (cofactor propio S.asiC, sin shift: pensada para SSC/FSC). */
+const isAsh = s => s === 'biex' || s === 'asi';
+const scW = s => s === 'asi' ? S.asiC : S.biexW;
+const scShift = (s, c) => s === 'asi' ? 0 : bxShift(c);
+const axv = (v, scale, c) => scale === 'log' ? Math.log10(Math.max(v, 1)) : isAsh(scale) ? Math.asinh((v - scShift(scale, c)) / scW(scale)) : v;
 /** Inversa de axv (coordenada del eje → valor crudo). */
-const axInv = (t, scale, c) => scale === 'log' ? Math.pow(10, t) : scale === 'biex' ? S.biexW * Math.sinh(t) + bxShift(c) : t;
+const axInv = (t, scale, c) => scale === 'log' ? Math.pow(10, t) : isAsh(scale) ? scW(scale) * Math.sinh(t) + scShift(scale, c) : t;
 /** Valor crudo → coordenada que Plotly espera: en puntos el eje log es nativo (datos); biex y el resto van ya transformados. */
-const plotCo = (v, sc, mode, c) => mode === 'scatter' ? (sc === 'log' ? Math.max(v, 1) : sc === 'biex' ? axv(v, 'biex', c) : v) : axv(v, sc, c);
-const plotInv = (t, sc, mode, c) => mode === 'scatter' ? (sc === 'biex' ? axInv(t, 'biex', c) : t) : axInv(t, sc, c);
-const normScale = s => s === 'log' || s === 'biex' ? s : 'linear';
+const plotCo = (v, sc, mode, c) => mode === 'scatter' ? (sc === 'log' ? Math.max(v, 1) : isAsh(sc) ? axv(v, sc, c) : v) : axv(v, sc, c);
+const plotInv = (t, sc, mode, c) => mode === 'scatter' ? (isAsh(sc) ? axInv(t, sc, c) : t) : axInv(t, sc, c);
+const normScale = s => s === 'log' || s === 'biex' || s === 'asi' ? s : 'linear';
 /** Marcas del eje biexponencial: 0 y ±10^k, con etiquetas en valores crudos. */
 function biexTicks(range, c) {
   const vals = [0];
@@ -5941,13 +5955,23 @@ function biexTicks(range, c) {
   const lab = x => x === 0 ? '0' : (x < 0 ? '−' : '') + (Math.abs(x) >= 1000 ? (Math.abs(x) / 1000) + 'k' : Math.abs(x));
   return { tickmode: 'array', tickvals: v.map(x => axv(x + bxShift(c), 'biex', c)), ticktext: v.map(lab) };
 }
-const axisExtra = (sc, range, c) => sc === 'biex' ? biexTicks(range, c) : {};
+/** Marcas del eje «asi»: valores ORIGINALES (0, 5000, 10000, 25000, 50000…) colocados en asinh(valor/c); nunca la unidad transformada. */
+function asiTicks(range) {
+  const vals = [0, 5000, 10000, 25000, 50000, 100000, 150000, 200000, 250000];
+  const lo = range ? Math.min(range[0], range[1]) : -Infinity, hi = range ? Math.max(range[0], range[1]) : Infinity;
+  const v = vals.filter(x => { const t = axv(x, 'asi'); return t >= lo && t <= hi; });
+  const lab = x => x >= 1000 ? (x / 1000) + 'k' : String(x);
+  return { tickmode: 'array', tickvals: v.map(x => axv(x, 'asi')), ticktext: v.map(lab) };
+}
+const axisExtra = (sc, range, c) => sc === 'biex' ? biexTicks(range, c) : sc === 'asi' ? asiTicks(range) : {};
 /** Recalcula los gates cuando cambia el ancho biex (los contornos están en unidades crudas). */
+/** Fija el cofactor de «asi» (rango del slider 1000–100000) sin redibujar. */
+function setAsiC(v) { v = Math.max(1000, Math.min(100000, +v || 27000)); S.asiC = v; if ($('asi-c')) $('asi-c').value = v; if ($('asi-c-val')) $('asi-c-val').textContent = v; }
 function onBiexChange() {
-  $('biex-w-val').textContent = S.biexW;
+  $('biex-w-val').textContent = S.biexW; if ($('asi-c-val')) $('asi-c-val').textContent = S.asiC;
   if (!S.n) return;
   for (const k of Object.keys(S.sel)) if (/^p\d+$/.test(k)) { S.sel[k] = null; delete S.selGeom[k]; }
-  if (S.gates.length && S.gates.some(g => g.regions.some(r => r.xs === 'biex' || r.ys === 'biex'))) { replayGates(); S.popSource = null; afterPopChange(); }
+  if (S.gates.length && S.gates.some(g => g.regions.some(r => isAsh(r.xs) || isAsh(r.ys)))) { replayGates(); S.popSource = null; afterPopChange(); }
   else renderAll();
 }
 
@@ -5963,8 +5987,8 @@ function geomFromEvent(ev) {
 /** Si el eje del gráfico es biex, la geometría del evento viene transformada: se vuelve a unidades crudas. */
 function geomRaw(g, key) {
   if (!g || !/^p\d+$/.test(key)) return g;
-  const c = S.panels[+key.slice(1)]; if (!c || (c.xs !== 'biex' && c.ys !== 'biex')) return g;
-  return { ...g, poly: g.poly.map(([x, y]) => [c.xs === 'biex' ? axInv(x, 'biex', c.x) : x, c.ys === 'biex' ? axInv(y, 'biex', c.y) : y]) };
+  const c = S.panels[+key.slice(1)]; if (!c || (!isAsh(c.xs) && !isAsh(c.ys))) return g;
+  return { ...g, poly: g.poly.map(([x, y]) => [isAsh(c.xs) ? axInv(x, c.xs, c.x) : x, isAsh(c.ys) ? axInv(y, c.ys, c.y) : y]) };
 }
 /** Simplifica el contorno (Douglas-Peucker en el espacio del eje) para guardarlo compacto. */
 function simplifyPoly(poly, xs, ys, cx, cy) {
@@ -6069,6 +6093,7 @@ function applyStrategyCore(st) {
   if (typeof st.compensacion === 'boolean' && st.compensacion !== !!S.compApplied) warns.push(st.compensacion ? 'La estrategia se hizo con datos COMPENSADOS y este archivo se cargó sin compensar: activa «Aplicar la compensación» y vuelve a cargarlo.' : 'La estrategia se hizo SIN compensar y este archivo se cargó compensado.');
   Object.assign(S.colorMap, st.colors || {});
   if (st.biexW > 0) { S.biexW = st.biexW; $('biex-w').value = st.biexW; $('biex-w-val').textContent = st.biexW; }
+  if (st.asiC > 0) setAsiC(st.asiC);
   for (const g of st.gates) {
     const regs = []; let ok = true;
     for (const r of g.regions) {
@@ -6294,14 +6319,14 @@ function setEditMode(on) {
 
 /* ---- vista «Estrategia de análisis» ---- */
 function fmtTickAxis(v, log, c) {
-  if (log === 'biex') v = axInv(v, 'biex', c) - bxShift(c), log = false;
+  if (isAsh(log)) v = axInv(v, log, c) - scShift(log, c), log = false;
   else if (log === true || log === 'log') log = true;
   if (log) { const x = Math.pow(10, v); return x >= 1000 ? (x / 1000).toFixed(x >= 10000 ? 0 : 1).replace(/\.0$/, '') + 'k' : String(Math.round(x)); }
   const a = Math.abs(v); return a >= 1000 ? (v / 1000).toFixed(a >= 10000 ? 0 : 1).replace(/\.0$/, '') + 'k' : String(Math.round(v));
 }
 function regionSVG(r, color, withDots) {
   const W = 200, H = 142, L = 34, R = 8, T = 8, B = 28, pw = W - L - R, ph = H - T - B;
-  const lx = r.xs === 'biex' ? 'biex' : r.xs === 'log', ly = r.ys === 'biex' ? 'biex' : r.ys === 'log', poly = regionPoly(r).map(([x, y]) => [axv(x, r.xs, r.x), axv(y, r.ys, r.y)]);
+  const lx = isAsh(r.xs) ? r.xs : r.xs === 'log', ly = isAsh(r.ys) ? r.ys : r.ys === 'log', poly = regionPoly(r).map(([x, y]) => [axv(x, r.xs, r.x), axv(y, r.ys, r.y)]);
   const X = S.cols[r.x], Y = S.cols[r.y], haveData = r.portable && X && Y;
   let xr = haveData ? axisRange(r.x, r.xs) : null, yr = haveData ? axisRange(r.y, r.ys) : null;
   if (!xr || !yr) {
@@ -6363,7 +6388,7 @@ function renderStrategy() {
     const pct = g.total ? (100 * g.count / g.total).toFixed(2) : '—';
     const regs = g.regions.map((r, j) => {
       const what = r.kind === 'box' ? 'caja' : r.kind === 'lasso' ? `lazo de ${r.poly.length} vértices` : 'selección';
-      const sc = r.portable ? ` · ejes ${r.xs === 'log' ? 'log' : r.xs === 'biex' ? 'biex' : 'lin'} × ${r.ys === 'log' ? 'log' : r.ys === 'biex' ? 'biex' : 'lin'}` : '';
+      const sc = r.portable ? ` · ejes ${r.xs === 'log' ? 'log' : isAsh(r.xs) ? r.xs : 'lin'} × ${r.ys === 'log' ? 'log' : isAsh(r.ys) ? r.ys : 'lin'}` : '';
       const btn = !view && r.portable ? `<button class="btn btn-light btn-sm" data-show="${i}:${j}">Ver en gráfico</button> <button class="btn btn-light btn-sm" data-edit="${i}:${j}" title="Abre el gráfico en modo edición">✏️ Editar</button>` : '';
       return (j ? '<div class="gate-inter" title="Los eventos deben estar dentro de todas las regiones">∩</div>' : '') +
         `<figure class="region">${regionSVG(r, col, !view)}<figcaption><b>${esc(r.graph)}</b> · ${what}${sc}${r.portable ? '' : '<br><span class="np">No reproducible en otro archivo (proyección)</span>'}</figcaption>${btn}</figure>`;
@@ -6405,7 +6430,7 @@ function captureStrategy(name) {
   return {
     app: 'infinitwo-estrategia', version: 1, name, creado: new Date().toISOString(), compensacion: !!S.compApplied,
     origen: { archivo: S.fileName, eventos: S.n, canales: S.names.map(c => ({ canal: c, anticuerpo: stainOf(c) })) },
-    gates: JSON.parse(JSON.stringify(S.gates)), colors, biexW: S.biexW,
+    gates: JSON.parse(JSON.stringify(S.gates)), colors, biexW: S.biexW, asiC: S.asiC,
   };
 }
 function updateStratBadge() {
@@ -6669,6 +6694,7 @@ function init() {
   $('num-panels').addEventListener('input', e => setPanelCount(e.target.value, false));
   let npT; $('num-panels-n').addEventListener('input', e => { clearTimeout(npT); npT = setTimeout(() => setPanelCount(e.target.value, true), 350); });
   $('num-panels-n').addEventListener('change', e => setPanelCount(e.target.value, false));
+  { let at; $('asi-c').addEventListener('input', e => { setAsiC(e.target.value); clearTimeout(at); at = setTimeout(onBiexChange, 150); }); }
   { let bt; $('biex-w').addEventListener('input', e => { S.biexW = +e.target.value; $('biex-w-val').textContent = S.biexW; clearTimeout(bt); bt = setTimeout(onBiexChange, 150); }); }
   $('show-maturation').addEventListener('change', e => {
     $('mat-wrap').style.display = e.target.checked ? 'block' : 'none';
@@ -6869,8 +6895,8 @@ function glpPrepare(cfg, f, cap, o) {
   const At = e.A.subarray(0, tA), Bt = e.B.subarray(0, tB);
   // refinamiento progresivo: se dibuja primero el nivel automático y se completa hasta k en tiempo ocioso
   const k0 = (!hasTemp && GLP.bench) ? Math.min(k, glpAutoCap(nPan)) : k, [a0, b0] = glpTake(e.totA, e.totB, k0);
-  const spec = { x: cfg.x, y: cfg.y, xa: S.cols[cfg.x], ya: S.cols[cfg.y], sx: o.lgx ? 'log' : o.bxx ? 'biex' : 'lin', sy: o.lgy ? 'log' : o.bxy ? 'biex' : 'lin',
-    shx: o.shx, shy: o.shy, biexW: S.biexW, view: [o.rxs[0], o.rxs[1], o.rys[0], o.rys[1]], pal: null, size: Math.max(VIS.msize, 1), dark, passes: [], lut: null, colorbar: null,
+  const spec = { x: cfg.x, y: cfg.y, xa: S.cols[cfg.x], ya: S.cols[cfg.y], sx: o.lgx ? 'log' : o.bxx ? (cfg.xs === 'asi' ? 'asi' : 'biex') : 'lin', sy: o.lgy ? 'log' : o.bxy ? (cfg.ys === 'asi' ? 'asi' : 'biex') : 'lin',
+    shx: o.shx, shy: o.shy, biexW: S.biexW, asiC: S.asiC, view: [o.rxs[0], o.rxs[1], o.rys[0], o.rys[1]], pal: null, size: Math.max(VIS.msize, 1), dark, passes: [], lut: null, colorbar: null,
     total: tA + tB, sig: hasTemp ? null : [e.id, S.popVer, tA, tB, a0, b0].join('|') };
   const baseOp = hasTemp ? 0.15 : 1, add = (idxArr, extra) => { if (idxArr.length) spec.passes.push(Object.assign({ idx: idxArr, op: 1, n0: idxArr.length }, extra)); };
   let base;                                    // { clsKey, cls, pal } | { colorKey, colorArr, vr }
@@ -6936,7 +6962,7 @@ function glpDraw(gd, target, scale, reduced) {
   const meas = !target && GLP.meas, t0 = PERF || meas ? performance.now() : 0;
   if (meas) gp.sync();
   gp.draw({ target: cv, w: sz.w * sc, h: sz.h * sc, dpr: target ? 1 : (window.devicePixelRatio || 1), bg: target ? null : (gd._glpBg || null),
-    xKey: 'c:' + spec.x, yKey: 'c:' + spec.y, sx: spec.sx, sy: spec.sy, shx: spec.shx, shy: spec.shy, biexW: spec.biexW,
+    xKey: 'c:' + spec.x, yKey: 'c:' + spec.y, sx: spec.sx, sy: spec.sy, shx: spec.shx, shy: spec.shy, biexW: spec.biexW, asiC: spec.asiC,
     view: [xr[0], xr[1], yr[0], yr[1]], palette: spec.pal, lut: spec.lut, size: spec.size * sc, opacity: 1,
     passes: spec.passes.map(q => ({ index: q.set, count: frac < 1 ? Math.ceil(q.set.count * frac) : undefined, classKey: q.clsKey, colorKey: q.colorKey, vr: q.vr, solid: q.solid, op: q.op })) });
   if (meas) { gp.sync(); const n = spec.passes.reduce((s, q) => s + q.set.count, 0); meas.ms += performance.now() - t0; meas.n++; meas.pts = Math.max(meas.pts, n); }
@@ -7182,11 +7208,11 @@ onmessage = e => {
   const f = store.get(m.f), X = store.get(m.x), Y = store.get(m.y);
   if (!f || !X || !Y) { postMessage({ id: m.id, err: 'sin datos' }); return; }
   const nb = m.nb, z = new Uint32Array(nb * nb), x0 = m.rx[0], x1 = m.rx[1], y0 = m.ry[0], y1 = m.ry[1], wx = (x1 - x0) / nb, wy = (y1 - y0) / nb;
-  const sx = m.sx, sy = m.sy, hx = m.hx, hy = m.hy, W = m.W;
+  const sx = m.sx, sy = m.sy, hx = m.hx, hy = m.hy, Wx = m.Wx, Wy = m.Wy;
   for (let k = 0; k < f.length; k++) {
     const e0 = f[k]; let a = X[e0], b = Y[e0];
-    a = sx === 0 ? a : sx === 1 ? Math.log10(Math.max(a, 1)) : Math.asinh((a - hx) / W);
-    b = sy === 0 ? b : sy === 1 ? Math.log10(Math.max(b, 1)) : Math.asinh((b - hy) / W);
+    a = sx === 0 ? a : sx === 1 ? Math.log10(Math.max(a, 1)) : Math.asinh((a - hx) / Wx);
+    b = sy === 0 ? b : sy === 1 ? Math.log10(Math.max(b, 1)) : Math.asinh((b - hy) / Wy);
     if (a < x0 || a >= x1 || b < y0 || b >= y1) continue;
     z[(((b - y0) / wy) | 0) * nb + (((a - x0) / wx) | 0)]++;
   }
@@ -7208,13 +7234,13 @@ const dwFid = f => { let i = DW.fids.get(f); if (!i) DW.fids.set(f, i = ++DW.fid
 /** Conteos 2D (Uint32Array nb×nb) calculados en el Worker; en caché por población/ejes/rango/bins. Devuelve null si no hay Worker. */
 function dwCounts(d) {
   const w = dwWorker(); if (!w) return Promise.resolve(null);
-  const key = [dwFid(d.f), d.f.length, d.xk, d.yk, d.sx, d.sy, d.rx.join(','), d.ry.join(','), d.nb, d.shx, d.shy, S.biexW].join('|'), hit = DW.cache.get(key);
+  const key = [dwFid(d.f), d.f.length, d.xk, d.yk, d.sx, d.sy, d.rx.join(','), d.ry.join(','), d.nb, d.shx, d.shy, d.wx, d.wy].join('|'), hit = DW.cache.get(key);
   if (hit) { DW.cache.delete(key); DW.cache.set(key, hit); return Promise.resolve(hit); }
   dwSend('f:' + dwFid(d.f), d.f); dwSend('c:' + d.xk, d.X); dwSend('c:' + d.yk, d.Y);
   const id = ++DW.id;
   return new Promise((res, rej) => {
     DW.pend.set(id, { res, rej });
-    w.postMessage({ t: 'dens', id, f: 'f:' + dwFid(d.f), x: 'c:' + d.xk, y: 'c:' + d.yk, nb: d.nb, rx: d.rx, ry: d.ry, sx: d.sx, sy: d.sy, hx: d.shx, hy: d.shy, W: S.biexW });
+    w.postMessage({ t: 'dens', id, f: 'f:' + dwFid(d.f), x: 'c:' + d.xk, y: 'c:' + d.yk, nb: d.nb, rx: d.rx, ry: d.ry, sx: d.sx, sy: d.sy, hx: d.shx, hy: d.shy, Wx: d.wx, Wy: d.wy });
   }).then(z => { DW.cache.set(key, z); if (DW.cache.size > 24) DW.cache.delete(DW.cache.keys().next().value); return z; });
 }
 const DENS_HEAT = [[0, 'rgba(8,24,58,0)'], [0.03, '#233cff'], [0.25, '#1f8bff'], [0.45, '#16d6e8'], [0.65, '#3df59a'], [0.85, '#ffe45c'], [1, '#ff5f5f']];   // misma escala que el modo oscuro de Plotly
