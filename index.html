@@ -636,6 +636,60 @@ body.ui-dark .np-custom label{color:#9bb0c9}
 }
 @media (max-width:480px){.gdiv{height:min(300px,78vw)}}
 </style>
+<style id="ui-modern">
+/* ---- Capa moderna: panel lateral por pasos, engranes y modales de ajustes ---- */
+.sidebar details>summary{list-style:none}
+.sidebar details>summary::-webkit-details-marker{display:none}
+.sidebar details>summary::after{content:"";width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);opacity:.5;margin:0 4px 0 2px;flex:none;transition:transform .15s}
+.sidebar details[open]>summary::after{transform:rotate(45deg)}
+.sidebar details>summary{display:flex;align-items:center;gap:8px;margin:0;min-height:30px;font-size:13.5px;font-weight:700;cursor:pointer;user-select:none}
+.sidebar details[open]>summary{margin-bottom:10px}
+.sidebar .rng-val{float:none;font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
+.sec-t{flex:1;min-width:0;display:flex;align-items:center;gap:9px}
+.sec-n{font-style:normal;flex:none;width:21px;height:21px;border-radius:50%;display:inline-grid;place-items:center;font-size:11px;font-weight:800;background:var(--primary,#1f77b4);color:var(--on-primary,#fff)}
+.cfg-gear{flex:none;width:28px;height:28px;padding:0;display:grid;place-items:center;border:1px solid transparent;border-radius:8px;background:transparent;color:var(--text-2,#5b6b7c);font-size:15px;line-height:1;cursor:pointer;transition:background .12s,color .12s}
+.cfg-gear:hover{background:var(--soft,#eef3f7);border-color:var(--border,#d4e0ea);color:var(--text,#222)}
+.cfg-gear:focus-visible,.sidebar summary:focus-visible{outline:2px solid var(--focus,#3b86ab);outline-offset:2px}
+.sub-t{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-2,#5b6b7c);margin:10px 0 4px}
+.sub-t:first-child{margin-top:0}
+.side-tools-h{margin:14px 4px 6px;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-2,#5b6b7c)}
+.sidebar details.tool>summary{font-weight:600;font-size:13px}
+.cfg-box{width:460px}
+.cfg-box h3{margin:0 0 4px;font-size:17px;color:var(--text,#222)}
+.cfg-sub{margin:0 0 12px}
+.cfg-body{display:flex;flex-direction:column;gap:6px}
+.cfg-body select,.cfg-body input[type=text]{width:100%}
+.cfg-foot{display:flex;justify-content:flex-end;margin-top:16px}
+#btn-assign{width:100%;padding:10px 14px;margin-bottom:6px}
+#btn-assign+#btn-reset{margin:0!important;width:100%}
+body.ui-dark .sec-n{background:#1f77b4;color:#fff}
+body.ui-dark .cfg-gear{color:#9bb0c9}
+body.ui-dark .cfg-gear:hover{background:#12294d;border-color:#2a4770;color:#d6e4f5}
+body.ui-dark .sub-t,body.ui-dark .side-tools-h{color:#9bb0c9}
+body.ui-dark .cfg-box h3{color:#d6e4f5}
+/* aspecto claro y moderno (temas pastel; Escarcha, Laguna y oscuro conservan el suyo) */
+body:not(.theme-escarcha):not(.theme-laguna):not(.ui-dark){--radius:12px}
+body:not(.theme-escarcha):not(.theme-laguna):not(.ui-dark){background:#f6f8fa}
+body:not(.theme-escarcha):not(.theme-laguna):not(.ui-dark) .topbar{background:#fff;border:1px solid var(--border);box-shadow:0 1px 2px rgba(20,40,60,.05);border-radius:14px}
+body:not(.theme-escarcha):not(.theme-laguna):not(.ui-dark) .sidebar{background:#fff;border:1px solid var(--border);box-shadow:0 1px 2px rgba(20,40,60,.05);padding:6px 14px 14px}
+body:not(.theme-escarcha):not(.theme-laguna):not(.ui-dark) .logo{padding-top:6px}
+body:not(.theme-escarcha):not(.theme-laguna):not(.ui-dark) .tagline{border-bottom:none;padding-bottom:2px;margin-bottom:4px}
+body:not(.theme-escarcha):not(.theme-laguna):not(.ui-dark) .sidebar details{background:transparent;border:none;border-radius:0;border-top:1px solid var(--border-soft);margin:0;padding:12px 2px}
+body:not(.theme-escarcha):not(.theme-laguna):not(.ui-dark) .sidebar details.step:first-of-type{border-top:none}
+body:not(.theme-escarcha):not(.theme-laguna):not(.ui-dark) .sidebar details.tool{background:var(--surface-2);border:1px solid var(--border-soft);border-radius:12px;margin-bottom:8px;padding:8px 12px}
+body:not(.theme-escarcha):not(.theme-laguna):not(.ui-dark) .sidebar details.tool[open]{background:var(--surface)}
+body:not(.theme-escarcha):not(.theme-laguna):not(.ui-dark) .btn{border-radius:9px;font-weight:600}
+body:not(.theme-escarcha):not(.theme-laguna):not(.ui-dark) .btn-primary{box-shadow:0 1px 2px rgba(20,40,60,.15)}
+body:not(.theme-escarcha):not(.theme-laguna):not(.ui-dark) select,body:not(.theme-escarcha):not(.theme-laguna):not(.ui-dark) input[type=text],body:not(.theme-escarcha):not(.theme-laguna):not(.ui-dark) input[type=number]{border-radius:9px}
+body:not(.theme-escarcha):not(.theme-laguna):not(.ui-dark) .drop{border:2px dashed var(--border-strong);background:var(--surface-2);border-radius:12px;height:76px;line-height:76px;transition:background .15s,border-color .15s}
+body:not(.theme-escarcha):not(.theme-laguna):not(.ui-dark) .drop:hover{background:var(--soft);border-color:var(--primary)}
+body:not(.theme-escarcha):not(.theme-laguna):not(.ui-dark) .sidebar .logo,body:not(.theme-escarcha):not(.theme-laguna):not(.ui-dark) .sidebar .tagline{display:none}
+body:not(.ui-dark) input[type=range]{-webkit-appearance:none;appearance:none;height:6px;border-radius:99px;background:var(--border);outline:none;margin:8px 0}
+body:not(.ui-dark) input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--primary);border:2px solid #fff;box-shadow:0 1px 3px rgba(20,40,60,.35);cursor:pointer}
+body:not(.ui-dark) input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--primary);border:2px solid #fff;box-shadow:0 1px 3px rgba(20,40,60,.35);cursor:pointer}
+body:not(.ui-dark) input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--ring,rgba(120,185,213,.4))}
+@media (max-width:640px){.cfg-box{width:96%}}
+</style>
 <style>
 /* ---- Modo oscuro de la interfaz (independiente del de los gráficos) ---- */
 html.ui-dark{color-scheme:dark}
@@ -979,36 +1033,28 @@ body .loading,body .modal,body .fs-overlay{backdrop-filter:none!important;-webki
       </div>
       <div class="tagline">Gating interactivo</div>
 
-      <!-- Archivo -->
-      <details open>
-        <summary>📁 Archivo de datos</summary>
+      <!-- 1 · Datos -->
+      <details open class="step" id="sec-data">
+        <summary><span class="sec-t"><i class="sec-n">1</i>Datos</span><button type="button" class="cfg-gear" data-cfg="cfg-load" aria-label="Opciones de carga" title="Opciones de carga">⚙</button></summary>
         <label class="drop" id="drop" for="file-input">Arrastra .csv/.fcs aquí o haz clic</label>
         <input type="file" id="file-input" accept=".fcs,.csv" hidden>
         <div id="upload-msg" class="msg-ok"></div>
         <div id="prof-note" class="msg-warn note"><button type="button" class="note-x" aria-label="Cerrar aviso" title="Cerrar aviso">×</button><span class="note-t"></span></div>
         <div id="strat-note" class="msg-warn note"><button type="button" class="note-x" aria-label="Cerrar aviso" title="Cerrar aviso">×</button><span class="note-t"></span></div>
-        <div style="font-size:11px;color:#555;margin-bottom:2px">Máx. de eventos al cargar:</div>
-        <select id="maxev" title="Cuántos eventos del archivo se cargan en memoria. «Todos» carga el 100 % (recomendado para EMR/MRD); el análisis y los conteos usan todos los cargados.">
-          <option value="5000">5.000</option><option value="10000">10.000</option><option value="20000">20.000</option><option value="50000">50.000</option>
-          <option value="100000">100.000</option><option value="500000">500.000</option><option value="1000000">1.000.000</option><option value="0" selected>Todos (100 %)</option>
-        </select>
-        <div id="load-warn" class="perf-warn"></div>
-        <label style="display:flex;align-items:flex-start;gap:5px;font-size:12px;margin-top:8px" title="Los FCS de BD FACSDiva guardan los valores sin compensar y la matriz aparte ($SPILL). Esta casilla aplica la compensación a los gráficos y gates. La predicción de IA compensa siempre con la matriz del archivo, esté o no marcada.">
-          <input type="checkbox" id="apply-comp" checked style="margin-top:2px"> <span>Aplicar la compensación del archivo (<code>$SPILL</code>) al cargar</span></label>
+        
       </details>
 
-      <!-- Gráficos -->
-      <details>
-        <summary>📊 Número de gráficos <span class="rng-val" id="num-panels-val">4</span></summary>
+      <!-- 2 · Gráficos -->
+      <details class="step" id="sec-plots">
+        <summary><span class="sec-t"><i class="sec-n">2</i>Gráficos</span><span class="rng-val" id="num-panels-val">4</span><button type="button" class="cfg-gear" data-cfg="cfg-draw" aria-label="Apariencia de los gráficos" title="Apariencia de los gráficos">⚙</button></summary>
+        <div class="sub-t">Número de gráficos</div>
         <input type="range" id="num-panels" min="1" max="16" step="1" value="4">
         <div class="np-custom" title="Escribe el número exacto de gráficos (1 a 16)">
           <label for="num-panels-n">Número personalizado</label>
           <input type="number" id="num-panels-n" min="1" max="16" step="1" value="4" inputmode="numeric">
         </div>
-        <div style="margin-top:10px;font-size:12px" title="Ancho de la escala biexponencial (cofactor de arcsinh). Valores mayores amplían la zona lineal alrededor de 0. Se aplica a los ejes en «biex».">
-          <label>Escala biex · ancho: <span class="rng-val" id="biex-w-val">150</span></label>
-          <input type="range" id="biex-w" min="10" max="2000" step="10" value="150">
-        </div>
+        
+        <div class="sub-t" style="margin-top:12px">Eventos dibujados</div>
         <div class="np-custom" style="margin-top:10px" title="Cuántos eventos se DIBUJAN por gráfico. Los conteos, porcentajes y compuertas siempre usan el 100 % de los eventos cargados.">
           <label for="render-cap">Eventos a mostrar</label>
           <select id="render-cap"><option value="auto" selected>Automático (según tu equipo)</option><option value="50000">50.000</option><option value="150000">150.000</option><option value="250000">250.000</option><option value="500000">500.000</option><option value="1000000">1.000.000</option><option value="2000000">2.000.000</option><option value="5000000">5.000.000</option><option value="pct50">50 % de los eventos</option><option value="pct20">20 % de los eventos</option><option value="pct10">10 % de los eventos</option><option value="pct5">5 % de los eventos</option><option value="all">Todos</option></select>
@@ -1016,62 +1062,25 @@ body .loading,body .modal,body .fs-overlay{backdrop-filter:none!important;-webki
         <div id="render-auto" class="perf-warn" style="background:#e8f3ff;border-color:#9cc4ee;color:#1f5f99"></div>
         <div id="render-warn" class="perf-warn"></div>
         <div style="margin:6px 0;display:flex;gap:6px"><button class="btn btn-light btn-sm" id="btn-cap-less">◂ menos</button><button class="btn btn-light btn-sm" id="btn-cap-more">Mostrar más ▸</button></div>
-        <div class="vis-box" style="margin-top:10px;font-size:12px">
-          <b>Densidad</b>
-          <div class="np-custom"><label for="v-dbins">Resolución</label><select id="v-dbins"><option value="auto" selected>Automática</option><option value="200">200 × 200</option><option value="400">400 × 400</option><option value="600">600 × 600</option><option value="800">800 × 800</option></select></div>
-          <div class="np-custom"><label for="v-dpal">Paleta</label><select id="v-dpal"><option value="flow" selected>Flow (jet)</option><option value="viridis">Viridis</option><option value="blues">Azules</option></select></div>
-          <label style="display:flex;gap:5px;align-items:center"><input type="checkbox" id="v-dsm" checked> <span>Suavizar densidad</span></label>
-          <label style="display:flex;gap:5px;align-items:center"><input type="checkbox" id="v-dpts"> <span>Puntos de poblaciones sobre la densidad</span></label>
-          <b style="display:block;margin-top:8px">Dotplot</b>
-          <div class="np-custom"><label for="v-msize">Tamaño del punto</label><select id="v-msize"><option value="1">1 px</option><option value="2" selected>2 px</option><option value="3">3 px</option><option value="4">4 px</option><option value="5">5 px</option></select></div>
-          <div class="np-custom"><label for="v-mop">Opacidad</label><select id="v-mop"><option value="0.3">30 %</option><option value="0.5">50 %</option><option value="0.7">70 %</option><option value="0.8" selected>80 %</option><option value="1">100 %</option></select></div>
-          <div class="np-custom"><label for="v-cols">Gráficos por fila</label><select id="v-cols" title="En «Auto» se calcula según el tamaño de tu pantalla y el número de gráficos"><option value="auto" selected>Auto (según pantalla)</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select></div>
-          <b style="display:block;margin-top:8px">Histograma</b>
-          <div class="np-custom"><label for="v-hbins">Bins</label><select id="v-hbins"><option value="40">40</option><option value="80">80</option><option value="128">128</option><option value="256" selected>256</option><option value="512">512</option></select></div>
-          <div class="np-custom"><label for="v-hnorm">Escala Y</label><select id="v-hnorm"><option value="count" selected>Eventos</option><option value="pct">% del máximo</option></select></div>
-          <label style="display:flex;gap:5px;align-items:center"><input type="checkbox" id="v-hpop" checked> <span>Superponer poblaciones</span></label>
-          <label style="display:flex;gap:5px;align-items:center"><input type="checkbox" id="v-hsm"> <span>Suavizar</span></label>
-        </div>
-        <label style="display:flex;align-items:center;gap:5px;font-size:12px;margin-top:8px" title="Gráficos cuadrados (1:1) que se adaptan al ancho sin deformarse"><input type="checkbox" id="sq-plots" checked> <span>Gráficos cuadrados 1:1</span></label>
+        
       </details>
 
-      <!-- FlowSOM -->
-      <details>
-        <summary>🤖 FlowSOM automático</summary>
-        <label class="blk" style="margin-top:6px">Número de metaclusters: <b id="fs-k-val">10</b></label>
-        <input type="range" id="fs-k" min="5" max="40" step="1" value="10">
-        <div style="font-size:11px;margin-top:6px">
-          <label><input type="checkbox" id="fs-as-pop" checked> Usar clusters como poblaciones</label>
-        </div>
-        <button class="btn btn-primary" id="btn-flowsom" style="margin-top:6px">Calcular FlowSOM</button>
-        <div id="flowsom-msg" style="margin-top:4px;font-size:11px;color:#006400"></div>
-        <hr style="margin:8px 0 4px;border:none;border-top:1px solid #b9d3f2">
-        <div style="font-size:11px;font-weight:bold">Clusters FlowSOM (click = backgating):</div>
-        <div id="flowsom-list">No hay FlowSOM calculado aún.</div>
-      </details>
-
-      <!-- Poblaciones -->
-      <details open>
-        <summary>🧬 Poblaciones</summary>
+      <!-- 3 · Poblaciones -->
+      <details open class="step" id="sec-pops">
+        <summary><span class="sec-t"><i class="sec-n">3</i>Poblaciones</span><button type="button" class="cfg-gear" data-cfg="cfg-pop" aria-label="Opciones de poblaciones" title="Opciones de poblaciones">⚙</button></summary>
         <div id="gate-edit-bar">
           <div>✏️ Editando el gate de <b id="gate-edit-name"></b></div>
           <div class="geb-help">Dibuja con lazo o caja el nuevo contorno (en varios gráficos = intersección). Al aplicar, reemplaza todas las regiones del gate anterior.</div>
           <div class="geb-info" id="gate-edit-info"></div>
           <div class="geb-btns"><button class="btn btn-primary btn-sm" id="btn-gate-edit-apply">Aplicar nuevo gate</button><button class="btn btn-light btn-sm" id="btn-gate-edit-cancel">Cancelar</button></div>
         </div>
-        <div class="stat-row" title="Muestra MFI (media) y mediana del canal en cada población, además del % del padre.">
-          <label for="stat-chan">MFI y mediana por población</label>
-          <select id="stat-chan"><option value="">— ninguno —</option></select>
-        </div>
         <div class="tree-hint" id="tree-hint" style="font-size:10.5px;color:#567;margin:2px 0 4px">💡 Clic derecho (o 📈) en una población: crear un gráfico solo con sus eventos.</div>
         <div id="pop-list"></div>
+
         <div class="row-between">
           <button class="btn btn-light btn-sm" id="btn-clear-bg">Limpiar Backgating</button>
-          <label style="font-size:12px;margin-left:auto">Color base:</label>
-          <input type="color" id="base-color" value="#1f77b4" style="margin:0">
         </div>
-        <textarea id="pop-summary" readonly>Sin datos.</textarea>
-
+        <div class="sub-t" style="margin-top:12px">Crear población nueva</div>
         <label class="blk">Población padre (opcional):</label>
         <select id="parent-pop"><option value="">—</option></select>
 
@@ -1087,11 +1096,42 @@ body .loading,body .modal,body .fs-overlay{backdrop-filter:none!important;-webki
           <button class="btn btn-secondary" id="btn-reset" style="margin-left:8px">Reset</button>
         </div>
         <div id="assign-msg" style="margin-top:8px;color:green;font-size:12px"></div>
+      
+      </details>
+
+      <!-- Colorear -->
+      <details open class="step" id="sec-color">
+        <summary><span class="sec-t"><i class="sec-n">4</i>Colorear por</span></summary>
+        
+        <select id="color-by" style="margin-bottom:6px">
+          <option value="population">Población</option>
+          <option value="flowsom_cluster">FlowSOM</option>
+          <option value="channel">Canal continuo</option>
+        </select>
+        <select id="color-channel" style="display:none;font-size:11px"></select>
+        <label style="display:flex;align-items:center;gap:4px;font-size:12px;margin-top:8px"><input type="checkbox" id="show-gates" checked> Mostrar contornos de los gates en los gráficos</label>
+        <label style="display:flex;align-items:center;gap:4px;font-size:12px;margin-top:6px"><input type="checkbox" id="edit-gates"> ✏️ Editar contornos de los gates</label>
+        <div id="edit-hint" class="info-note" style="display:none;margin:4px 0 0">Arrastra un vértice para moverlo (las cajas se redimensionan). Doble clic en un borde agrega un vértice; clic derecho sobre un vértice lo quita. Cada cambio recalcula toda la jerarquía.</div>
+        <button class="btn btn-light btn-sm" id="btn-edit-undo" style="display:none;margin-top:6px">↶ Deshacer edición</button>
+      
+      </details>
+
+      <div class="side-tools-h">Herramientas avanzadas</div>
+
+      <!-- FlowSOM -->
+      <details class="tool" id="sec-flowsom">
+        <summary><span class="sec-t">🤖 FlowSOM automático</span><button type="button" class="cfg-gear" data-cfg="cfg-fs" aria-label="Opciones de FlowSOM" title="Opciones de FlowSOM">⚙</button></summary>
+        <button class="btn btn-primary" id="btn-flowsom" style="margin-top:6px">Calcular FlowSOM</button>
+        <div id="flowsom-msg" style="margin-top:4px;font-size:11px;color:#006400"></div>
+        <hr style="margin:8px 0 4px;border:none;border-top:1px solid #b9d3f2">
+        <div style="font-size:11px;font-weight:bold">Clusters FlowSOM (click = backgating):</div>
+        <div id="flowsom-list">No hay FlowSOM calculado aún.</div>
+      
       </details>
 
 <!-- Cuadrantes -->
-      <details id="quad-side">
-        <summary>➕ Cuadrantes</summary>
+      <details class="tool" id="quad-side">
+        <summary><span class="sec-t">➕ Cuadrantes</span></summary>
         <div class="adv-form"><div class="fld"><label for="quad-panel">Tomar ejes de</label><select id="quad-panel"></select></div>
               <div class="fld"><label for="quad-cx">Eje X</label><div class="fld-row"><select id="quad-cx"></select><span class="sc"><label><input type="radio" name="qxs" value="linear"> lin</label><label><input type="radio" name="qxs" value="log"> log</label><label title="Escala biexponencial (arcsinh)"><input type="radio" name="qxs" value="biex"> biex</label></span></div></div>
               <div class="fld"><label for="quad-cy">Eje Y</label><div class="fld-row"><select id="quad-cy"></select><span class="sc"><label><input type="radio" name="qys" value="linear"> lin</label><label><input type="radio" name="qys" value="log"> log</label><label title="Escala biexponencial (arcsinh)"><input type="radio" name="qys" value="biex"> biex</label></span></div></div>
@@ -1104,20 +1144,6 @@ body .loading,body .modal,body .fs-overlay{backdrop-filter:none!important;-webki
         <p class="adv-help">El gráfico y las estadísticas están en la pestaña «Análisis avanzado».</p>
       </details>
 
-            <!-- Colorear por -->
-      <details open>
-        <summary>🎨 Colorear por</summary>
-        <select id="color-by" style="margin-bottom:6px">
-          <option value="population">Población</option>
-          <option value="flowsom_cluster">FlowSOM</option>
-          <option value="channel">Canal continuo</option>
-        </select>
-        <select id="color-channel" style="display:none;font-size:11px"></select>
-        <label style="display:flex;align-items:center;gap:4px;font-size:12px;margin-top:8px"><input type="checkbox" id="show-gates" checked> Mostrar contornos de los gates en los gráficos</label>
-        <label style="display:flex;align-items:center;gap:4px;font-size:12px;margin-top:6px"><input type="checkbox" id="edit-gates"> ✏️ Editar contornos de los gates</label>
-        <div id="edit-hint" class="info-note" style="display:none;margin:4px 0 0">Arrastra un vértice para moverlo (las cajas se redimensionan). Doble clic en un borde agrega un vértice; clic derecho sobre un vértice lo quita. Cada cambio recalcula toda la jerarquía.</div>
-        <button class="btn btn-light btn-sm" id="btn-edit-undo" style="display:none;margin-top:6px">↶ Deshacer edición</button>
-      </details>
     </aside>
 
     <!-- ============ PANEL DERECHO ============ -->
@@ -1572,6 +1598,95 @@ body .loading,body .modal,body .fs-overlay{backdrop-filter:none!important;-webki
       <div class="comp-import-foot"><input type="file" id="comp-import-file" accept=".csv,.tsv,.txt" style="margin-right:auto"><button class="btn btn-light" id="comp-import-cancel">Cancelar</button><button class="btn btn-primary" id="comp-import-ok">Importar al editor</button></div>
     </div>
   </div>
+  <div class="modal cfg-modal" id="cfg-load" role="dialog" aria-modal="true" aria-labelledby="cfg-load-h">
+    <div class="modal-box cfg-box">
+      <button class="modal-x" data-cfg-close title="Cerrar">✕</button>
+      <h3 id="cfg-load-h">⚙ Opciones de carga</h3>
+      <p class="info-note cfg-sub">Se aplican al próximo archivo que cargues.</p>
+      <div class="cfg-body">
+<div style="font-size:11px;color:#555;margin-bottom:2px">Máx. de eventos al cargar:</div>
+        <select id="maxev" title="Cuántos eventos del archivo se cargan en memoria. «Todos» carga el 100 % (recomendado para EMR/MRD); el análisis y los conteos usan todos los cargados.">
+          <option value="5000">5.000</option><option value="10000">10.000</option><option value="20000">20.000</option><option value="50000">50.000</option>
+          <option value="100000">100.000</option><option value="500000">500.000</option><option value="1000000">1.000.000</option><option value="0" selected>Todos (100 %)</option>
+        </select>
+        <div id="load-warn" class="perf-warn"></div>
+        <label style="display:flex;align-items:flex-start;gap:5px;font-size:12px;margin-top:8px" title="Los FCS de BD FACSDiva guardan los valores sin compensar y la matriz aparte ($SPILL). Esta casilla aplica la compensación a los gráficos y gates. La predicción de IA compensa siempre con la matriz del archivo, esté o no marcada.">
+          <input type="checkbox" id="apply-comp" checked style="margin-top:2px"> <span>Aplicar la compensación del archivo (<code>$SPILL</code>) al cargar</span></label>
+      
+      </div>
+      <div class="cfg-foot"><button type="button" class="btn btn-primary btn-sm" data-cfg-close>Listo</button></div>
+    </div>
+  </div>
+  <div class="modal cfg-modal" id="cfg-draw" role="dialog" aria-modal="true" aria-labelledby="cfg-draw-h">
+    <div class="modal-box cfg-box">
+      <button class="modal-x" data-cfg-close title="Cerrar">✕</button>
+      <h3 id="cfg-draw-h">⚙ Apariencia de los gráficos</h3>
+      <p class="info-note cfg-sub">Ajustes de dibujo; se aplican al instante.</p>
+      <div class="cfg-body">
+<div style="margin-top:10px;font-size:12px" title="Ancho de la escala biexponencial (cofactor de arcsinh). Valores mayores amplían la zona lineal alrededor de 0. Se aplica a los ejes en «biex».">
+          <label>Escala biex · ancho: <span class="rng-val" id="biex-w-val">150</span></label>
+          <input type="range" id="biex-w" min="10" max="2000" step="10" value="150">
+        </div>
+        
+<div class="vis-box" style="margin-top:10px;font-size:12px">
+          <b>Densidad</b>
+          <div class="np-custom"><label for="v-dbins">Resolución</label><select id="v-dbins"><option value="auto" selected>Automática</option><option value="200">200 × 200</option><option value="400">400 × 400</option><option value="600">600 × 600</option><option value="800">800 × 800</option></select></div>
+          <div class="np-custom"><label for="v-dpal">Paleta</label><select id="v-dpal"><option value="flow" selected>Flow (jet)</option><option value="viridis">Viridis</option><option value="blues">Azules</option></select></div>
+          <label style="display:flex;gap:5px;align-items:center"><input type="checkbox" id="v-dsm" checked> <span>Suavizar densidad</span></label>
+          <label style="display:flex;gap:5px;align-items:center"><input type="checkbox" id="v-dpts"> <span>Puntos de poblaciones sobre la densidad</span></label>
+          <b style="display:block;margin-top:8px">Dotplot</b>
+          <div class="np-custom"><label for="v-msize">Tamaño del punto</label><select id="v-msize"><option value="1">1 px</option><option value="2" selected>2 px</option><option value="3">3 px</option><option value="4">4 px</option><option value="5">5 px</option></select></div>
+          <div class="np-custom"><label for="v-mop">Opacidad</label><select id="v-mop"><option value="0.3">30 %</option><option value="0.5">50 %</option><option value="0.7">70 %</option><option value="0.8" selected>80 %</option><option value="1">100 %</option></select></div>
+          <div class="np-custom"><label for="v-cols">Gráficos por fila</label><select id="v-cols" title="En «Auto» se calcula según el tamaño de tu pantalla y el número de gráficos"><option value="auto" selected>Auto (según pantalla)</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select></div>
+          <b style="display:block;margin-top:8px">Histograma</b>
+          <div class="np-custom"><label for="v-hbins">Bins</label><select id="v-hbins"><option value="40">40</option><option value="80">80</option><option value="128">128</option><option value="256" selected>256</option><option value="512">512</option></select></div>
+          <div class="np-custom"><label for="v-hnorm">Escala Y</label><select id="v-hnorm"><option value="count" selected>Eventos</option><option value="pct">% del máximo</option></select></div>
+          <label style="display:flex;gap:5px;align-items:center"><input type="checkbox" id="v-hpop" checked> <span>Superponer poblaciones</span></label>
+          <label style="display:flex;gap:5px;align-items:center"><input type="checkbox" id="v-hsm"> <span>Suavizar</span></label>
+        </div>
+        
+<label style="display:flex;align-items:center;gap:5px;font-size:12px;margin-top:8px" title="Gráficos cuadrados (1:1) que se adaptan al ancho sin deformarse"><input type="checkbox" id="sq-plots" checked> <span>Gráficos cuadrados 1:1</span></label>
+      
+      </div>
+      <div class="cfg-foot"><button type="button" class="btn btn-primary btn-sm" data-cfg-close>Listo</button></div>
+    </div>
+  </div>
+  <div class="modal cfg-modal" id="cfg-pop" role="dialog" aria-modal="true" aria-labelledby="cfg-pop-h">
+    <div class="modal-box cfg-box">
+      <button class="modal-x" data-cfg-close title="Cerrar">✕</button>
+      <h3 id="cfg-pop-h">⚙ Opciones de poblaciones</h3>
+      <p class="info-note cfg-sub">Estadísticas y color de las poblaciones.</p>
+      <div class="cfg-body">
+<div class="stat-row" title="Muestra MFI (media) y mediana del canal en cada población, además del % del padre.">
+          <label for="stat-chan">MFI y mediana por población</label>
+          <select id="stat-chan"><option value="">— ninguno —</option></select>
+        </div>
+        
+<div class="np-custom"><label style="font-size:12px;margin-left:auto">Color base:</label>
+          <input type="color" id="base-color" value="#1f77b4" style="margin:0"></div>
+<div class="sub-t" style="margin-top:12px">Resumen de poblaciones</div>
+<textarea id="pop-summary" readonly>Sin datos.</textarea>
+      </div>
+      <div class="cfg-foot"><button type="button" class="btn btn-primary btn-sm" data-cfg-close>Listo</button></div>
+    </div>
+  </div>
+  <div class="modal cfg-modal" id="cfg-fs" role="dialog" aria-modal="true" aria-labelledby="cfg-fs-h">
+    <div class="modal-box cfg-box">
+      <button class="modal-x" data-cfg-close title="Cerrar">✕</button>
+      <h3 id="cfg-fs-h">⚙ Opciones de FlowSOM</h3>
+      <p class="info-note cfg-sub">Parámetros del agrupamiento automático.</p>
+      <div class="cfg-body">
+<label class="blk">Número de metaclusters: <b id="fs-k-val">10</b></label>
+        <input type="range" id="fs-k" min="5" max="40" step="1" value="10">
+        <div style="font-size:11px;margin-top:6px">
+          <label><input type="checkbox" id="fs-as-pop" checked> Usar clusters como poblaciones</label>
+        </div>
+        
+      </div>
+      <div class="cfg-foot"><button type="button" class="btn btn-primary btn-sm" data-cfg-close>Listo</button></div>
+    </div>
+  </div>
+
   <div class="modal" id="theme-modal">
     <div class="modal-box">
       <button class="modal-x" id="theme-x" title="Cerrar">✕</button>
@@ -2982,6 +3097,32 @@ const ES_EN = {
   'El archivo no contiene estrategias válidas.': 'The file contains no valid strategies.', 'El archivo no contiene perfiles válidos.': 'The file contains no valid profiles.', 'El perfil está dañado.': 'The profile is damaged.', 'La estrategia está dañada.': 'The strategy is damaged.',
   'No hay estrategias para exportar.': 'No strategies to export.', 'No hay perfiles para exportar.': 'No profiles to export.',
 };
+
+Object.assign(ES_EN, {
+  'Datos': 'Data',
+  'Gráficos': 'Plots',
+  'Poblaciones': 'Populations',
+  'Colorear por': 'Color by',
+  'Herramientas avanzadas': 'Advanced tools',
+  'Número de gráficos': 'Number of plots',
+  'Eventos dibujados': 'Events drawn',
+  'Crear población nueva': 'Create new population',
+  'Resumen de poblaciones': 'Population summary',
+  'Listo': 'Done',
+  'Opciones de carga': 'Loading options',
+  'Apariencia de los gráficos': 'Plot appearance',
+  'Opciones de poblaciones': 'Population options',
+  'Opciones de FlowSOM': 'FlowSOM options',
+  '⚙ Opciones de carga': '⚙ Loading options',
+  '⚙ Apariencia de los gráficos': '⚙ Plot appearance',
+  '⚙ Opciones de poblaciones': '⚙ Population options',
+  '⚙ Opciones de FlowSOM': '⚙ FlowSOM options',
+  'Se aplican al próximo archivo que cargues.': 'Applied to the next file you load.',
+  'Ajustes de dibujo; se aplican al instante.': 'Drawing settings; applied instantly.',
+  'Estadísticas y color de las poblaciones.': 'Population statistics and color.',
+  'Parámetros del agrupamiento automático.': 'Automatic clustering parameters.',
+  'Cerrar': 'Close'
+});
 
 /* ---------- Mensajes dinámicos (regex → plantilla en inglés) ---------- */
 const RULES = [
@@ -8102,6 +8243,22 @@ document.addEventListener('DOMContentLoaded', () => {
   if (mq.matches) set(true);
   if (fs) new MutationObserver(function () { if (!/^Sin archivo/.test(fs.textContent)) set(false); }).observe(fs, { childList: true, characterData: true, subtree: true });
   if (mq.addEventListener) mq.addEventListener('change', function () { set(false); });
+})();
+</script>
+<script id="cfg-modals-js">
+(function () {
+  // Engranes ⚙ de cada sección: abren un modal con ajustes extra (los controles conservan sus ids).
+  var last = null;
+  function open(id, from) { var m = document.getElementById(id); if (!m) return; last = from || document.activeElement; m.classList.add('open'); var f = m.querySelector('select,input,button:not([data-cfg-close])'); if (f) try { f.focus(); } catch (e) {} }
+  function closeAll() { var any = false; document.querySelectorAll('.cfg-modal.open').forEach(function (m) { m.classList.remove('open'); any = true; }); if (any && last) { try { last.focus(); } catch (e) {} } return any; }
+  document.addEventListener('click', function (e) {
+    var g = e.target.closest && e.target.closest('.cfg-gear');
+    if (g) { e.preventDefault(); e.stopPropagation(); open(g.getAttribute('data-cfg'), g); return; }
+    if (e.target.closest && e.target.closest('[data-cfg-close]')) closeAll();
+  }, true);
+  document.addEventListener('mousedown', function (e) { if (e.target.classList && e.target.classList.contains('cfg-modal')) closeAll(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeAll(); });
+  window.infiniTwoAjustes = open;
 })();
 </script>
 </body>
