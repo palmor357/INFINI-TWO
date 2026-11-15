@@ -1346,6 +1346,8 @@ body .loading,body .modal,body .fs-overlay{backdrop-filter:none!important;-webki
 
           <section class="ia-sec">
             <h4>3 · Servidor Python <span class="info-sub">opcional · fusión profunda + consenso con tu FusionPredictor</span></h4>
+            <div class="ia-msg warn" style="display:block"><b>🚧 Servidor Python no disponible, en construcción.</b> Esta función aún no está habilitada; el resto de la predicción tabular funciona con normalidad en el navegador.</div>
+            <div inert aria-disabled="true" style="opacity:.45;pointer-events:none">
             <div class="ia-conn">
               <span id="ia-conn-chip" class="ia-chip off">○ Sin servidor (opcional)</span>
               <input type="text" id="ia-url" spellcheck="false" autocomplete="off" aria-label="Dirección del servidor">
@@ -1363,6 +1365,7 @@ body .loading,body .modal,body .fs-overlay{backdrop-filter:none!important;-webki
             <div id="ia-reqs" class="ia-msg warn" style="display:none"></div>
             <div id="ia-full-warn" class="ia-msg warn" style="display:none"><b>ℹ El mapeo no coincide con «las primeras 12 columnas».</b> Para la predicción completa, el servidor generará un archivo FCS temporal con <b>solo esos 12 canales en el orden del entrenamiento</b> (se descartan las demás columnas, como FSC-W o Time) y tu código lo leerá como siempre. Es lo mismo que hace el entrenamiento: solo cuentan 12 canales.</div>
             <div id="ia-resB"></div>
+          </div>
           </section>
         </div>
       </div>
@@ -2890,7 +2893,7 @@ const ES_EN = {
   '▶ Predecir con el módulo local': '▶ Predict with the local module', '🎯 Traspasar a los gráficos de análisis': '🎯 Transfer to the analysis plots', 'Asigna a': 'Assigns to', 'cada evento cargado': 'every loaded event',
   'el tipo celular que le da EverFlowNet (B_lym, T_lym, NK, Mono…) como población, con su color, para refinar los gráficos: ocultar o resaltar tipos, y dibujar lazos dentro de ellos.': 'the cell type given by EverFlowNet (B_lym, T_lym, NK, Mono…) as a population, with its color, to refine the plots: hide or highlight types and draw lassos inside them.',
   'Confianza mínima por evento': 'Minimum confidence per event', '0 % (asignar todos)': '0% (assign all)', '🎯 Traspasar a los gráficos': '🎯 Transfer to the plots',
-  '3 · Servidor Python': '3 · Python server', 'opcional · fusión profunda + consenso con tu FusionPredictor': 'optional · deep fusion + consensus with your FusionPredictor', '○ Sin servidor (opcional)': '○ No server (optional)',
+  '3 · Servidor Python': '3 · Python server', '🚧 Servidor Python no disponible, en construcción.': '🚧 Python server unavailable, under construction.', 'Esta función aún no está habilitada; el resto de la predicción tabular funciona con normalidad en el navegador.': 'This feature is not enabled yet; the rest of the tabular prediction works normally in the browser.', 'opcional · fusión profunda + consenso con tu FusionPredictor': 'optional · deep fusion + consensus with your FusionPredictor', '○ Sin servidor (opcional)': '○ No server (optional)',
   'Probar conexión': 'Test connection', '✓ Verificar contra Python (rápido)': '✓ Check against Python (fast)', '▶ Predicción completa con Python': '▶ Full prediction with Python',
   'Carga un archivo para ver su información.': 'Load a file to see its information.', 'Resumen del archivo': 'File summary', 'Canales y anticuerpos': 'Channels and antibodies',
   'Matriz de compensación': 'Compensation matrix', 'Todos los metadatos': 'All metadata', '⬇ CSV': '⬇ CSV', '⬇ JSON': '⬇ JSON', '⧉ Copiar': '⧉ Copy',
@@ -6456,7 +6459,9 @@ async function iaTransfer() {
 /* ------------------------------------------------------------
    Servidor Python (B)
    ------------------------------------------------------------ */
+const IA_SERVER_ENABLED = false;   // servidor Python en construcción: sin peticiones de red
 async function iaPing(manual) {
+  if (!IA_SERVER_ENABLED) return;
   IA.server.checking = true; if (manual) iaRenderServer();
   const ctrl = new AbortController(), tm = setTimeout(() => ctrl.abort(), 2500);
   try {
@@ -6469,7 +6474,8 @@ async function iaPing(manual) {
   } finally { clearTimeout(tm); }
   iaRenderServer(); iaRenderServerButtons();
 }
-async function iaServerCall(kind) {            // kind: 'tabular' | 'full'
+async function iaServerCall(kind) {
+  if (!IA_SERVER_ENABLED) return;            // kind: 'tabular' | 'full'
   const st = iaState();
   if (IA.busy || !IA.server.ok || !st.canRun || !S.file) return;
   if (kind === 'tabular' && !IA.resA) { await iaRunA(); if (!IA.resA) return; }
