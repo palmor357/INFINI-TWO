@@ -928,6 +928,8 @@ body .loading,body .modal,body .fs-overlay{backdrop-filter:none!important;-webki
           <button class="gear-item" id="btn-manual" type="button" role="menuitem" title="Manual de usuario">📖 Manual</button>
           <button class="gear-item" id="btn-legal" type="button" role="menuitem" title="Términos y condiciones y política de cookies y almacenamiento local">📜 Términos y cookies</button>
           <button class="gear-item" id="btn-about" type="button" role="menuitem" title="Créditos, referencias y contacto">ℹ️ Acerca de INFINI-TWO</button>
+          <div class="gear-sep"></div>
+          <button class="gear-item" id="btn-factory" type="button" role="menuitem" title="Restablece idioma, temas, columnas, opciones de dibujo, tutorial y mediciones. Pregunta antes de tocar perfiles y estrategias guardados.">↺ Configuración de fábrica</button>
         </div>
       </div>
       <input type="file" id="ws-input" accept=".json,application/json" hidden>
@@ -2802,6 +2804,10 @@ const I18N = {
     'warn.load': '⚠ Cargar todos los eventos de un archivo grande (millones) puede tardar y usar varios GB de memoria RAM.',
     'load.draw': 'Dibujando gráficos…',
     'glp.camera': 'Descargar como imagen PNG (alta resolución)',
+    'hist.sel.hint': 'arrastra para elegir un rango y asignarlo como población',
+    'hist.sel': 'Selección',
+    'factory.confirm': 'Se restablecerán a los valores de fábrica el idioma, los temas, el modo de los gráficos, las columnas, las opciones de dibujo, el tutorial y las mediciones de rendimiento. El análisis abierto se cerrará (guarda antes un workspace si lo necesitas). Tus archivos no se tocan. ¿Continuar?',
+    'factory.confirm2': 'Tus perfiles, estrategias e informes guardados NO se tocan, salvo que lo confirmes ahora.\n\nAceptar = borrarlos también · Cancelar = conservarlos',
     'glp.auto': 'Automático: {cap} puntos por gráfico ({n} gráficos; tu equipo dibuja ≈{rate} M puntos/s; presupuesto {ms} ms por cuadro).',
     'glp.frame': '{pts} puntos × {n} gráficos · {ms} ms/cuadro',
     'tour.1.h': '1 · Dibuja una compuerta', 'tour.1.p': 'Carga un archivo .fcs/.csv. En un gráfico de puntos elige lazo o caja, rodea una población, escribe su nombre en la barra lateral y pulsa «Asignar población».',
@@ -2826,6 +2832,10 @@ const I18N = {
     'warn.load': '⚠ Loading every event of a large file (millions) can take a while and use several GB of RAM.',
     'load.draw': 'Drawing plots…',
     'glp.camera': 'Download plot as PNG (high resolution)',
+    'hist.sel.hint': 'drag to pick a range and assign it as a population',
+    'hist.sel': 'Selection',
+    'factory.confirm': 'The language, themes, plot mode, columns, drawing options, tutorial and performance measurements will be reset to factory values. The open analysis will be closed (save a workspace first if you need it). Your files are not touched. Continue?',
+    'factory.confirm2': 'Your saved profiles, strategies and reports are NOT touched unless you confirm now.\n\nOK = delete them too · Cancel = keep them',
     'glp.auto': 'Automatic: {cap} points per plot ({n} plots; your device draws ≈{rate} M points/s; budget {ms} ms per frame).',
     'glp.frame': '{pts} points × {n} plots · {ms} ms/frame',
     'tour.1.h': '1 · Draw a gate', 'tour.1.p': 'Load a .fcs/.csv file. On a dot plot pick lasso or box, enclose a population, type its name in the side panel and press “Assign population”.',
@@ -2900,7 +2910,7 @@ const ES_EN = {
   '▶ Predecir con el módulo local': '▶ Predict with the local module', '🎯 Traspasar a los gráficos de análisis': '🎯 Transfer to the analysis plots', 'Asigna a': 'Assigns to', 'cada evento cargado': 'every loaded event',
   'el tipo celular que le da EverFlowNet (B_lym, T_lym, NK, Mono…) como población, con su color, para refinar los gráficos: ocultar o resaltar tipos, y dibujar lazos dentro de ellos.': 'the cell type given by EverFlowNet (B_lym, T_lym, NK, Mono…) as a population, with its color, to refine the plots: hide or highlight types and draw lassos inside them.',
   'Confianza mínima por evento': 'Minimum confidence per event', '0 % (asignar todos)': '0% (assign all)', '🎯 Traspasar a los gráficos': '🎯 Transfer to the plots',
-  '3 · Servidor Python': '3 · Python server', '◂ menos': '◂ less', 'Mostrar más ▸': 'Show more ▸', '50 % de los eventos': '50 % of events', '20 % de los eventos': '20 % of events', '10 % de los eventos': '10 % of events', '5 % de los eventos': '5 % of events', '🚧 Servidor Python no disponible, en construcción.': '🚧 Python server unavailable, under construction.', 'Esta función aún no está habilitada; el resto de la predicción tabular funciona con normalidad en el navegador.': 'This feature is not enabled yet; the rest of the tabular prediction works normally in the browser.', 'opcional · fusión profunda + consenso con tu FusionPredictor': 'optional · deep fusion + consensus with your FusionPredictor', '○ Sin servidor (opcional)': '○ No server (optional)',
+  '3 · Servidor Python': '3 · Python server', '↺ Configuración de fábrica': '↺ Factory settings', 'Restablece idioma, temas, columnas, opciones de dibujo, tutorial y mediciones. Pregunta antes de tocar perfiles y estrategias guardados.': 'Resets language, themes, columns, drawing options, tutorial and measurements. Asks before touching saved profiles and strategies.', '◂ menos': '◂ less', 'Mostrar más ▸': 'Show more ▸', '50 % de los eventos': '50 % of events', '20 % de los eventos': '20 % of events', '10 % de los eventos': '10 % of events', '5 % de los eventos': '5 % of events', '🚧 Servidor Python no disponible, en construcción.': '🚧 Python server unavailable, under construction.', 'Esta función aún no está habilitada; el resto de la predicción tabular funciona con normalidad en el navegador.': 'This feature is not enabled yet; the rest of the tabular prediction works normally in the browser.', 'opcional · fusión profunda + consenso con tu FusionPredictor': 'optional · deep fusion + consensus with your FusionPredictor', '○ Sin servidor (opcional)': '○ No server (optional)',
   'Probar conexión': 'Test connection', '✓ Verificar contra Python (rápido)': '✓ Check against Python (fast)', '▶ Predicción completa con Python': '▶ Full prediction with Python',
   'Carga un archivo para ver su información.': 'Load a file to see its information.', 'Resumen del archivo': 'File summary', 'Canales y anticuerpos': 'Channels and antibodies',
   'Matriz de compensación': 'Compensation matrix', 'Todos los metadatos': 'All metadata', '⬇ CSV': '⬇ CSV', '⬇ JSON': '⬇ JSON', '⧉ Copiar': '⧉ Copy',
@@ -4024,10 +4034,12 @@ function figPanel(i, big) {
     // Histograma sobre el 100 % de los eventos del gráfico; opcionalmente superpone cada población con su color
     const [lo, hi] = axisRange(cfg.x, cfg.xs) || [0, 1], nb = VIS.hbins, w = (hi - lo) / nb;
     const all = new Float64Array(nb), per = new Map(), pop = S.pop, over = VIS.hpop && S.popNames.length > 1;
+    const hasSel = S.tempSet.size > 0, selH = hasSel ? new Float64Array(nb) : null;     // eventos de la selección temporal (naranja), como en los gráficos de puntos
     for (let k = 0; k < f.length; k++) {
       const e = f[k], v = tx(X[e]);
       if (v < lo || v > hi) continue;
       const b = Math.min(nb - 1, Math.floor((v - lo) / w)); all[b]++;
+      if (hasSel && S.tempSet.has(e)) selH[b]++;
       if (over && pop[e]) { let a = per.get(pop[e]); if (!a) per.set(pop[e], a = new Float64Array(nb)); a[b]++; }
     }
     const smooth = a => { if (!VIS.hsm) return a; const o = new Float64Array(nb); for (let b = 0; b < nb; b++) { let sum = 0, c = 0; for (let d = -2; d <= 2; d++) { const q = a[b + d]; if (q !== undefined) { sum += q * (3 - Math.abs(d)); c += 3 - Math.abs(d); } } o[b] = sum / c; } return o; };
@@ -4038,10 +4050,16 @@ function figPanel(i, big) {
       const c = popColor(p), nm = S.popNames[p].split('/').pop();
       data.push({ type: 'scatter', mode: 'lines', x: cx, y: norm(a), name: nm, line: { color: c, width: 1.6, shape: 'spline', smoothing: 0.4 }, fill: 'tozeroy', fillcolor: c + '33', hovertemplate: '%{x:.2f}: %{y:.4g}<extra>' + esc(nm) + '</extra>' });
     });
-    L.dragmode = 'zoom'; L.showlegend = per.size > 0; L.legend = { orientation: 'h', y: 1.02, x: 0, font: { size: 9 } }; L.margin.t = per.size ? 26 : L.margin.t;
+    if (hasSel) {
+      // Se normaliza respecto al máximo de «todos los eventos»: la parte naranja es la fracción real de la población mostrada
+      const sa = smooth(selH), ma = (() => { let m = 0; for (const q of smooth(all)) if (q > m) m = q; return m; })(), hc = gateHighlightColor(S.baseColor), nmS = t('hist.sel');
+      data.push({ type: 'scatter', mode: 'lines', x: cx, y: Array.from(sa, q => pct ? (ma ? 100 * q / ma : 0) : q), name: nmS, line: { color: hc, width: 2, shape: 'spline', smoothing: 0.4 }, fill: 'tozeroy', fillcolor: hc + '99', hovertemplate: '%{x:.2f}: %{y:.4g}<extra>' + esc(nmS) + '</extra>' });
+    }
+    L.dragmode = 'select'; L.selectdirection = 'h'; L.showlegend = per.size > 0;     // arrastrar = elegir un rango de X (como compuerta); zoom y desplazamiento siguen en la barra de herramientas
+    L.showlegend = per.size > 0 || hasSel; L.legend = { orientation: 'h', y: 1.02, x: 0, font: { size: 9 } }; L.margin.t = (per.size || hasSel) ? 26 : L.margin.t;
     L.xaxis = { ...L.xaxis, title: axTitle(tlab(cfg.x, cfg.xs)), type: 'linear', range: [lo, hi], ...axisExtra(cfg.xs, [lo, hi], cfg.x) };
     L.yaxis = { ...L.yaxis, title: axTitle(pct ? t('hist.pct') : t('hist.events')), type: 'linear', rangemode: 'tozero' };
-    return { data, layout: L, ids: null, info: shownInfo(f.length, f.length) };
+    return { data, layout: L, ids: null, info: shownInfo(f.length, f.length) + ' · ' + t('hist.sel.hint'), hist: true };
   }
   // Puntos (scattergl). Se dibuja una muestra determinista (que prioriza las poblaciones asignadas); los conteos usan SIEMPRE el 100 %.
   // Los navegadores admiten ~16 contextos WebGL: solo los primeros GL_PANELS gráficos (y la vista ampliada) usan WebGL; los demás usan SVG con una muestra menor
@@ -4212,7 +4230,7 @@ function figFor(kind, big) {
    ------------------------------------------------------------ */
 function drawFig(gd, fig, key, cfg) {
   if (!gd) return Promise.resolve();
-  gd._ids = fig.ids || null; gd._key = key; gd._edit = fig.edit || null; gd._full = !!fig.full;
+  gd._ids = fig.ids || null; gd._key = key; gd._edit = fig.edit || null; gd._full = !!fig.full; gd._hist = !!fig.hist;
   { const sh = $('sh-' + key); if (sh) sh.textContent = fig.info || ''; }
   if (!gd._eh) { gd._eh = true; editInstall(gd); }
   // «selectionrevision» distinto = Plotly descarta la selección vigente (sin destruir el contexto WebGL)
@@ -4234,10 +4252,20 @@ function drawFig(gd, fig, key, cfg) {
     gd.on('plotly_selected', ev => {
       // Plotly vuelve a emitir 'plotly_selected' (sin lassoPoints/range, 0 puntos) cuando redibujamos
       // un gráfico con selección activa: solo cuentan los eventos originados por el usuario.
-      if (!ev || !(ev.lassoPoints || ev.range)) return;
-      const g = geomRaw(geomFromEvent(ev), gd._key);
+      const hist = !!gd._hist && /^p\d+$/.test(gd._key);
+      let g;
+      if (hist) {
+        // Histograma: el rango de X elegido es una compuerta rectangular que cubre ese rango y TODO Y (se guarda como caja de ese gráfico)
+        if (!ev || !ev.range || !ev.range.x) return;
+        const hc = S.panels[+gd._key.slice(1)], xa = Math.min(...ev.range.x), xb = Math.max(...ev.range.x), YB = 1e12;
+        const ra = axInv(xa, hc.xs, hc.x), rb = axInv(xb, hc.xs, hc.x);
+        g = { kind: 'box', hist: true, poly: [[ra, -YB], [rb, -YB], [rb, YB], [ra, YB]] };
+      } else {
+        if (!ev || !(ev.lassoPoints || ev.range)) return;
+        g = geomRaw(geomFromEvent(ev), gd._key);
+      }
       let ids;
-      if (gd._full && g && /^p\d+$/.test(gd._key)) {
+      if ((gd._full || hist) && g && /^p\d+$/.test(gd._key)) {
         // Gráfico de puntos de un panel: la selección se calcula sobre el 100 % de los eventos del gráfico (no solo los puntos dibujados)
         const pi = +gd._key.slice(1), pcfg = S.panels[pi], tok = gd._selTok = (gd._selTok || 0) + 1, t0 = PERF ? performance.now() : 0;
         S.selPop[gd._key] = pcfg.pop || '';
@@ -7780,6 +7808,21 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   $$('legal-clear').addEventListener('click', borrarDatos);
   window.infiniTwoLegal = { abrir: openLegal, version: VER, borrar: borrarDatos };
+})();
+
+/* ===== Configuración de fábrica (⚙): restablece las PREFERENCIAS; perfiles, estrategias e informes solo si el usuario lo confirma ===== */
+(function () {
+  const ALL = /^(infini2_|infinitwo_|infini_informe_)/, KEEP = /^infini2_legal_ack/, WORK = /^(infinitwo_profiles_v1|infinitwo_strategies_v1|infini_informe_)/;
+  function factoryReset() {
+    const gm = document.getElementById('gear-menu'); if (gm) gm.classList.remove('open');
+    if (!confirm(t('factory.confirm'))) return;
+    const wipe = confirm(t('factory.confirm2'));                      // Aceptar = borrar también perfiles/estrategias/informes; Cancelar = conservarlos
+    try { Object.keys(localStorage).filter(k => ALL.test(k) && !KEEP.test(k) && (wipe || !WORK.test(k))).forEach(k => localStorage.removeItem(k)); } catch (e) { /* sin almacenamiento */ }
+    if (wipe) { try { indexedDB.deleteDatabase('infinitwo'); } catch (e) { /* sin IndexedDB */ } }
+    location.replace(location.pathname);                              // recarga sin parámetros (?perf, ?glp…)
+  }
+  document.getElementById('btn-factory').addEventListener('click', factoryReset);
+  window.infiniTwoFabrica = factoryReset;
 })();
 
 /* ===== Editor de la matriz de compensación (spillover) =====
