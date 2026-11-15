@@ -1133,8 +1133,8 @@ body .loading,body .modal,body .fs-overlay{backdrop-filter:none!important;-webki
       <details class="tool" id="quad-side">
         <summary><span class="sec-t">➕ Cuadrantes</span></summary>
         <div class="adv-form"><div class="fld"><label for="quad-panel">Tomar ejes de</label><select id="quad-panel"></select></div>
-              <div class="fld"><label for="quad-cx">Eje X</label><div class="fld-row"><select id="quad-cx"></select><span class="sc"><label><input type="radio" name="qxs" value="linear"> lin</label><label><input type="radio" name="qxs" value="log"> log</label><label title="Escala biexponencial (arcsinh)"><input type="radio" name="qxs" value="biex"> biex</label><label title="Escala asinh con cofactor propio: casi lineal abajo, comprimida arriba"><input type="radio" name="qxs" value="asi"> asi</label></span></div></div>
-              <div class="fld"><label for="quad-cy">Eje Y</label><div class="fld-row"><select id="quad-cy"></select><span class="sc"><label><input type="radio" name="qys" value="linear"> lin</label><label><input type="radio" name="qys" value="log"> log</label><label title="Escala biexponencial (arcsinh)"><input type="radio" name="qys" value="biex"> biex</label><label title="Escala asinh con cofactor propio: casi lineal abajo, comprimida arriba"><input type="radio" name="qys" value="asi"> asi</label></span></div></div>
+              <div class="fld"><label for="quad-cx">Eje X</label><div class="fld-row"><select id="quad-cx"></select><span class="sc"><label><input type="radio" name="qxs" value="linear"> lin</label><label><input type="radio" name="qxs" value="log"> log</label><label title="Escala biexponencial (arcsinh)"><input type="radio" name="qxs" value="biex"> biex</label><label title="Escala asinh con cofactor propio: casi lineal abajo, comprimida arriba"><input type="radio" name="qxs" value="asi"> asinh</label></span></div></div>
+              <div class="fld"><label for="quad-cy">Eje Y</label><div class="fld-row"><select id="quad-cy"></select><span class="sc"><label><input type="radio" name="qys" value="linear"> lin</label><label><input type="radio" name="qys" value="log"> log</label><label title="Escala biexponencial (arcsinh)"><input type="radio" name="qys" value="biex"> biex</label><label title="Escala asinh con cofactor propio: casi lineal abajo, comprimida arriba"><input type="radio" name="qys" value="asi"> asinh</label></span></div></div>
               <div class="fld-pair"><div class="fld"><label for="quad-x">Corte X</label><input type="number" id="quad-x" placeholder="mediana"></div><div class="fld"><label for="quad-y">Corte Y</label><input type="number" id="quad-y" placeholder="mediana"></div></div>
               <div class="fld"><label for="quad-parent">Población padre</label><select id="quad-parent"><option value="">— todos los eventos —</option></select></div>
               <div class="adv-actions"><button class="btn btn-primary btn-sm" id="btn-quadrants">Crear cuadrantes</button><button class="btn btn-light btn-sm" id="btn-quad-view" title="Ver los cuadrantes dibujados en los gráficos de Explorar">Ver en Explorar</button></div>
@@ -1627,17 +1627,29 @@ body .loading,body .modal,body .fs-overlay{backdrop-filter:none!important;-webki
           <label>Escala biex · ancho: <span class="rng-val" id="biex-w-val">150</span></label>
           <input type="range" id="biex-w" min="10" max="2000" step="10" value="150">
         </div>
-        <div style="margin-top:10px;font-size:12px" title="Cofactor de la escala «asi»: asinh(valor / cofactor). Casi lineal cerca de 0 y comprimida arriba; pensada para SSC/FSC. Independiente de la escala biex. Los datos y los gates no cambian.">
-          <label>Escala asi · cofactor: <span class="rng-val" id="asi-c-val">27000</span></label>
+        <div style="margin-top:10px;font-size:12px" title="Cofactor de la escala «asi»: asinh(valor / cofactor). Casi lineal cerca de 0 y comprimida arriba; pensada para SSC/FSC. Independiente de la escala biex. Los datos y los gates no cambian. Valor aproximado ajustado a capturas de otro software; no es una fórmula oficial ni equivale exactamente a ninguna escala comercial.">
+          <label>Escala asinh · cofactor: <span class="rng-val" id="asi-c-val">27000</span></label>
           <input type="range" id="asi-c" min="1000" max="100000" step="500" value="27000">
+          <button type="button" class="btn btn-light btn-sm" id="asi-c-reset">Restablecer 27000</button>
         </div>
         
 <div class="vis-box" style="margin-top:10px;font-size:12px">
-          <b>Densidad</b>
+          <b>Gráficos nuevos</b>
+          <label style="display:flex;gap:5px;align-items:center" title="Con más de 100.000 eventos, los gráficos nuevos se abren en modo Densidad. No cambia los gráficos ya configurados ni los perfiles."><input type="checkbox" id="v-autodens" checked> <span>Abrir en Densidad si hay muchos eventos</span></label>
+          <div class="np-custom"><label for="v-sscale">Escala por defecto de dispersión (FSC/SSC)</label><select id="v-sscale" title="Se aplica solo a gráficos nuevos o reseteados."><option value="linear" selected>lin</option><option value="asi">asinh</option></select></div>
+          <b style="display:block;margin-top:8px">Densidad</b>
           <div class="np-custom"><label for="v-dbins">Resolución</label><select id="v-dbins"><option value="auto" selected>Automática</option><option value="200">200 × 200</option><option value="400">400 × 400</option><option value="600">600 × 600</option><option value="800">800 × 800</option></select></div>
           <div class="np-custom"><label for="v-dpal">Paleta</label><select id="v-dpal"><option value="flow" selected>Flow (jet)</option><option value="viridis">Viridis</option><option value="blues">Azules</option></select></div>
           <label style="display:flex;gap:5px;align-items:center"><input type="checkbox" id="v-dsm" checked> <span>Suavizar densidad</span></label>
           <label style="display:flex;gap:5px;align-items:center"><input type="checkbox" id="v-dpts"> <span>Puntos de poblaciones sobre la densidad</span></label>
+          <div id="kde-box" style="display:none;margin-top:8px">
+            <b>Puntos + densidad (KDE)</b>
+            <div class="np-custom" title="Ancho de banda del filtro gaussiano, en celdas de la grilla de 200×200."><label for="v-kbw">Suavizado: <span class="rng-val" id="v-kbw-val">3</span></label><input type="range" id="v-kbw" min="1" max="10" step="1" value="3"></div>
+            <div class="np-custom"><label for="v-kn">Niveles de contorno: <span class="rng-val" id="v-kn-val">12</span></label><input type="range" id="v-kn" min="6" max="24" step="1" value="12"></div>
+            <label style="display:flex;gap:5px;align-items:center"><input type="checkbox" id="v-kbar" checked> <span>Barra de color</span></label>
+            <label style="display:flex;gap:5px;align-items:center"><input type="checkbox" id="v-klines" checked> <span>Líneas de contorno</span></label>
+            <div class="np-custom"><label for="v-kpal">Escala de color</label><select id="v-kpal" title="«Color de los puntos»: escala de un solo tono (p. ej. azules) a partir del color base; el dotplot se mantiene debajo."><option value="mono" selected>Color de los puntos</option><option value="flow">Flow (jet)</option><option value="viridis">Viridis</option><option value="blues">Azules</option></select></div>
+          </div>
           <b style="display:block;margin-top:8px">Dotplot</b>
           <div class="np-custom"><label for="v-msize">Tamaño del punto</label><select id="v-msize"><option value="1">1 px</option><option value="2" selected>2 px</option><option value="3">3 px</option><option value="4">4 px</option><option value="5">5 px</option></select></div>
           <div class="np-custom"><label for="v-mop">Opacidad</label><select id="v-mop"><option value="0.3">30 %</option><option value="0.5">50 %</option><option value="0.7">70 %</option><option value="0.8" selected>80 %</option><option value="1">100 %</option></select></div>
@@ -1878,6 +1890,15 @@ function sanitizeCol(c) {
   return String(c).replace(/ /g, '_').replace(/-/g, '_').replace(/\./g, '_');
 }
 function guessScale(name) { return isFluor(name) ? 'log' : 'linear'; }
+/** Preferencias del usuario para gráficos NUEVOS o reseteados (no afectan a perfiles ni a gráficos ya configurados). */
+const PREF_AUTODENS = 'infinitwo_autodens', PREF_SCATSC = 'infinitwo_scatscale', AUTODENS_MIN = 100000;
+const PREF = { autoDens: true, scatScale: 'linear' };
+try { PREF.autoDens = localStorage.getItem(PREF_AUTODENS) !== '0'; PREF.scatScale = localStorage.getItem(PREF_SCATSC) === 'asi' ? 'asi' : 'linear'; } catch (e) { /* sin almacenamiento */ }
+const isScatterCh = name => isSSC(name) || String(name).toUpperCase().includes('FSC');
+/** Escala inicial de un gráfico NUEVO: la heurística de siempre, salvo FSC/SSC si el usuario eligió «asinh». */
+const defaultScale = name => PREF.scatScale === 'asi' && isScatterCh(name) ? 'asi' : guessScale(name);
+/** Modo inicial de un gráfico NUEVO: densidad cuando hay muchos eventos (la mancha de puntos no muestra estructura). */
+const defaultMode = () => PREF.autoDens && S.n > AUTODENS_MIN ? 'density' : 'scatter';
 function fmtInt(n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, (typeof LANG !== 'undefined' && LANG === 'en') ? ',' : '.'); }
 
 function mulberry32(a) {
@@ -2924,6 +2945,7 @@ const I18N = {
     'load.draw': 'Dibujando gráficos…',
     'glp.camera': 'Descargar como imagen PNG (alta resolución)',
     'hist.sel.hint': 'arrastra para elegir un rango y asignarlo como población',
+    'kde.cbar': 'Densidad',
     'hist.sel': 'Selección',
     'factory.confirm': 'Se restablecerán a los valores de fábrica el idioma, los temas, el modo de los gráficos, las columnas, las opciones de dibujo, el tutorial y las mediciones de rendimiento. El análisis abierto se cerrará (guarda antes un workspace si lo necesitas). Tus archivos no se tocan. ¿Continuar?',
     'factory.confirm2': 'Tus perfiles, estrategias e informes guardados NO se tocan, salvo que lo confirmes ahora.\n\nAceptar = borrarlos también · Cancelar = conservarlos',
@@ -2952,6 +2974,7 @@ const I18N = {
     'load.draw': 'Drawing plots…',
     'glp.camera': 'Download plot as PNG (high resolution)',
     'hist.sel.hint': 'drag to pick a range and assign it as a population',
+    'kde.cbar': 'Density',
     'hist.sel': 'Selection',
     'factory.confirm': 'The language, themes, plot mode, columns, drawing options, tutorial and performance measurements will be reset to factory values. The open analysis will be closed (save a workspace first if you need it). Your files are not touched. Continue?',
     'factory.confirm2': 'Your saved profiles, strategies and reports are NOT touched unless you confirm now.\n\nOK = delete them too · Cancel = keep them',
@@ -3103,6 +3126,14 @@ const ES_EN = {
 };
 
 Object.assign(ES_EN, {
+  'Puntos + densidad (KDE)': 'Dots + density (KDE)', 'Escala de color': 'Color scale', 'Color de los puntos': 'Dot color', 'Azules': 'Blues',
+  '«Color de los puntos»: escala de un solo tono (p. ej. azules) a partir del color base; el dotplot se mantiene debajo.': '“Dot color”: single-hue scale (e.g. blues) from the base color; the dot plot stays underneath.', 'Suavizado:': 'Smoothing:', 'Niveles de contorno:': 'Contour levels:', 'Barra de color': 'Color bar', 'Líneas de contorno': 'Contour lines',
+  'Ancho de banda del filtro gaussiano, en celdas de la grilla de 200×200.': 'Bandwidth of the Gaussian filter, in cells of the 200×200 grid.',
+  'asinh': 'asinh', 'Escala asinh · cofactor:': 'Asinh scale · cofactor:', 'Restablecer 27000': 'Reset to 27000',
+  'Gráficos nuevos': 'New plots', 'Abrir en Densidad si hay muchos eventos': 'Open in Density when there are many events',
+  'Con más de 100.000 eventos, los gráficos nuevos se abren en modo Densidad. No cambia los gráficos ya configurados ni los perfiles.': 'With more than 100,000 events, new plots open in Density mode. Configured plots and profiles are not changed.',
+  'Escala por defecto de dispersión (FSC/SSC)': 'Default scatter scale (FSC/SSC)', 'Se aplica solo a gráficos nuevos o reseteados.': 'Applies only to new or reset plots.',
+  'Cofactor de la escala «asi»: asinh(valor / cofactor). Casi lineal cerca de 0 y comprimida arriba; pensada para SSC/FSC. Independiente de la escala biex. Los datos y los gates no cambian. Valor aproximado ajustado a capturas de otro software; no es una fórmula oficial ni equivale exactamente a ninguna escala comercial.': 'Cofactor of the “asinh” scale: asinh(value / cofactor). Almost linear near 0 and compressed above; meant for SSC/FSC. Independent of the biex scale. Data and gates do not change. Approximate value fitted to screenshots from other software; it is not an official formula nor exactly equivalent to any commercial scale.',
   'Escala asi · cofactor:': 'Asi scale · cofactor:', 'asi': 'asi',
   'Escala asinh con cofactor propio: casi lineal abajo, comprimida arriba': 'Asinh scale with its own cofactor: almost linear at the bottom, compressed at the top',
   'Cofactor de la escala «asi»: asinh(valor / cofactor). Casi lineal cerca de 0 y comprimida arriba; pensada para SSC/FSC. Independiente de la escala biex. Los datos y los gates no cambian.': 'Cofactor of the “asi” scale: asinh(value / cofactor). Almost linear near 0 and compressed above; meant for SSC/FSC. Independent of the biex scale. Data and gates do not change.',
@@ -3528,7 +3559,7 @@ void main() {
 try { Plotly.setPlotConfig({ logging: 0 }); } catch (e) { /* Plotly no disponible */ }
 const $ = id => document.getElementById(id);
 const UNASSIGNED = '__UNASSIGNED__';
-const VIS = { dbins: 'auto', dsm: true, dpal: 'flow', dpts: false, hbins: 256, hnorm: 'count', hpop: true, hsm: false, msize: 2, mop: 0.8 };   // opciones de densidad e histograma
+const VIS = { dbins: 'auto', dsm: true, dpal: 'flow', dpts: false, hbins: 256, hnorm: 'count', hpop: true, hsm: false, msize: 2, mop: 0.8, kbw: 3, kn: 12, kbar: true, klines: true, kpal: 'mono' };   // opciones de densidad, KDE e histograma
 const DENS_PAL = { flow: [[0, '#1a1aa6'], [0.2, '#0a8cff'], [0.4, '#00d9a0'], [0.6, '#b4e000'], [0.8, '#ff9a00'], [1, '#c00000']], viridis: 'Viridis', blues: [[0, '#cfe1f5'], [0.25, '#6baed6'], [0.5, '#2171b5'], [0.75, '#08306b'], [1, '#000000']] };
 let RENDER_CAP = 150000;          // tope de puntos DIBUJADOS por gráfico (Infinity = todos). Nunca afecta a conteos ni a compuertas.
 let RENDER_PCT = 0;               // 0 = usar RENDER_CAP; >0 = fracción de los eventos de cada gráfico (50 %, 20 %, 10 %, 5 %)
@@ -4036,7 +4067,7 @@ function ensurePanels(k) {
   while (S.panels.length < k) {
     const i = S.panels.length;
     const x = i === 0 ? xd : (others.length ? others[(i - 1) % others.length] : xd);
-    S.panels.push({ x, y: yd, xs: guessScale(x), ys: guessScale(yd), mode: 'scatter', rev: 0, pop: '' });
+    S.panels.push({ x, y: yd, xs: defaultScale(x), ys: defaultScale(yd), mode: defaultMode(), rev: 0, pop: '' });
   }
   S.panels.length = k;
   for (const key of Object.keys(S.sel)) if (/^p\d+$/.test(key) && +key.slice(1) >= k) delete S.sel[key];
@@ -4052,16 +4083,16 @@ function buildPanelsDom() {
     card.className = 'card';
     card.innerHTML = `
       <div class="card-h"><span>Panel ${i + 1}</span>
-        <select data-k="mode" class="mode" title="Modo de gráfico"><option value="scatter">Puntos</option><option value="density">Densidad</option><option value="hist">Histograma</option></select>
+        <select data-k="mode" class="mode" title="Modo de gráfico"><option value="scatter">Puntos</option><option value="density">Densidad</option><option value="kde">Puntos + densidad (KDE)</option><option value="hist">Histograma</option></select>
         <button data-fs="p${i}" title="Ver en grande">⤢</button></div>
       <div class="popbar"><label for="pp${i}" title="${esc(t('pop.tip'))}">${esc(t('pop.label'))}</label><select data-k="pop" class="pop" id="pp${i}" title="${esc(t('pop.tip'))}"></select></div>
       <div class="gdiv" id="g-p${i}"></div>
       <div class="shown" id="sh-p${i}"></div>
       <div class="axes">
         <div class="ax"><b>X:</b><select data-k="x">${opts}</select>
-          <span class="sc"><label><input type="radio" name="xs${i}" value="linear"> lin</label><label><input type="radio" name="xs${i}" value="log"> log</label><label title="Escala biexponencial (arcsinh): muestra valores negativos de datos compensados"><input type="radio" name="xs${i}" value="biex"> biex</label><label title="Escala asinh con cofactor propio: casi lineal abajo, comprimida arriba"><input type="radio" name="xs${i}" value="asi"> asi</label></span></div>
+          <span class="sc"><label><input type="radio" name="xs${i}" value="linear"> lin</label><label><input type="radio" name="xs${i}" value="log"> log</label><label title="Escala biexponencial (arcsinh): muestra valores negativos de datos compensados"><input type="radio" name="xs${i}" value="biex"> biex</label><label title="Escala asinh con cofactor propio: casi lineal abajo, comprimida arriba"><input type="radio" name="xs${i}" value="asi"> asinh</label></span></div>
         <div class="ax"><b>Y:</b><select data-k="y">${opts}</select>
-          <span class="sc"><label><input type="radio" name="ys${i}" value="linear"> lin</label><label><input type="radio" name="ys${i}" value="log"> log</label><label title="Escala biexponencial (arcsinh): muestra valores negativos de datos compensados"><input type="radio" name="ys${i}" value="biex"> biex</label><label title="Escala asinh con cofactor propio: casi lineal abajo, comprimida arriba"><input type="radio" name="ys${i}" value="asi"> asi</label></span></div>
+          <span class="sc"><label><input type="radio" name="ys${i}" value="linear"> lin</label><label><input type="radio" name="ys${i}" value="log"> log</label><label title="Escala biexponencial (arcsinh): muestra valores negativos de datos compensados"><input type="radio" name="ys${i}" value="biex"> biex</label><label title="Escala asinh con cofactor propio: casi lineal abajo, comprimida arriba"><input type="radio" name="ys${i}" value="asi"> asinh</label></span></div>
       </div>`;
     grid.appendChild(card);
     fillPopSelect(card.querySelector('select[data-k=pop]'), cfg);
@@ -4168,6 +4199,8 @@ function binCounts1D(vals, lo, hi, nb) {
   return out;
 }
 
+/** Largo aproximado (px) del área de trazado de un eje del gráfico i (descontando márgenes). */
+function axLen(i, ax) { const el = document.getElementById('g-p' + i); const v = el ? (ax === 'x' ? el.clientWidth - 90 : el.clientHeight - 90) : 0; return v > 60 ? v : 300; }
 function figPanel(i, big) {
   const cfg = S.panels[i], L = baseLayout(big);
   L.uirevision = [cfg.x, cfg.y, cfg.xs, cfg.ys, cfg.mode, big ? 'b' : 's', cfg.rev].join('|');
@@ -4206,7 +4239,7 @@ function figPanel(i, big) {
     }
     L.dragmode = 'select'; L.selectdirection = 'h'; L.showlegend = per.size > 0;     // arrastrar = elegir un rango de X (como compuerta); zoom y desplazamiento siguen en la barra de herramientas
     L.showlegend = per.size > 0 || hasSel; L.legend = { orientation: 'h', y: 1.02, x: 0, font: { size: 9 } }; L.margin.t = (per.size || hasSel) ? 26 : L.margin.t;
-    L.xaxis = { ...L.xaxis, title: axTitle(tlab(cfg.x, cfg.xs)), type: 'linear', range: [lo, hi], ...axisExtra(cfg.xs, [lo, hi], cfg.x) };
+    L.xaxis = { ...L.xaxis, title: axTitle(tlab(cfg.x, cfg.xs)), type: 'linear', range: [lo, hi], ...axisExtra(cfg.xs, [lo, hi], cfg.x, axLen(i, 'x')) };
     L.yaxis = { ...L.yaxis, title: axTitle(pct ? t('hist.pct') : t('hist.events')), type: 'linear', rangemode: 'tozero' };
     return { data, layout: L, ids: null, info: shownInfo(f.length, f.length) + ' · ' + t('hist.sel.hint'), hist: true };
   }
@@ -4216,7 +4249,7 @@ function figPanel(i, big) {
   const capN = RENDER_PCT ? Math.ceil(f.length * RENDER_PCT) : RENDER_CAP, useGl = big || i < GL_PANELS || GLPon;
   let cap = useGl ? capN : Math.min(capN, SVG_CAP);
   if (!GLPon && GLP.flag && GLP.fail) cap = Math.min(cap, 500000);      // respaldo scattergl tras un fallo/pérdida de contexto: no dibujar millones con Plotly
-  const forced = cfg.mode === 'density';          // modo Densidad: mapa de calor 100 % + (opcional) puntos de poblaciones; admite lazo/caja
+  const kde = cfg.mode === 'kde', forced = cfg.mode === 'density';          // «kde» = dotplot normal + contornos de densidad encima          // modo Densidad: mapa de calor 100 % + (opcional) puntos de poblaciones; admite lazo/caja
   const dens = forced || (!GLPon && useGl && !Number.isFinite(cap) && f.length > DENSITY_MIN);     // «Todos» con millones de eventos: densidad 100 % + puntos asignados
   const idx = GLPon ? new Int32Array(0) : perfT('muestreo', () => dens ? ((forced && !VIS.dpts) ? new Int32Array(0) : sampleFiltered(Math.min(500000, Math.max(cap, 1)), f, true)) : sampleFiltered(cap, f), r => fmtInt(r.length) + ' pts'), m = idx.length;
   const px = new Float32Array(GLPon ? 0 : m), py = new Float32Array(GLPon ? 0 : m);
@@ -4226,20 +4259,23 @@ function figPanel(i, big) {
     px[k] = lgx ? Math.max(a, 1) : bxx ? Math.asinh((a - shx) / wx) : a; py[k] = lgy ? Math.max(b, 1) : bxy ? Math.asinh((b - shy) / wy) : b;
   } });
   const rxs = axisRange(cfg.x, cfg.xs), rys = axisRange(cfg.y, cfg.ys);
-  L.xaxis = { ...L.xaxis, title: axTitle(chLabel(cfg.x)), type: lgx ? 'log' : 'linear', range: rxs, ...axisExtra(cfg.xs, rxs, cfg.x) };
-  L.yaxis = { ...L.yaxis, title: axTitle(chLabel(cfg.y)), type: lgy ? 'log' : 'linear', range: rys, ...axisExtra(cfg.ys, rys, cfg.y) };
+  L.xaxis = { ...L.xaxis, title: axTitle(cfg.xs === 'asi' ? tlab(cfg.x, 'asi') : chLabel(cfg.x)), type: lgx ? 'log' : 'linear', range: rxs, ...axisExtra(cfg.xs, rxs, cfg.x, axLen(i, 'x')) };
+  L.yaxis = { ...L.yaxis, title: axTitle(cfg.ys === 'asi' ? tlab(cfg.y, 'asi') : chLabel(cfg.y)), type: lgy ? 'log' : 'linear', range: rys, ...axisExtra(cfg.ys, rys, cfg.y, axLen(i, 'y')) };
   const ov = gateOverlays(cfg, 'scatter', true);
   if (ov.shapes) { L.shapes = ov.shapes; L.annotations = ov.annotations; }
   const data = [];
+  const kdeSpec = kde && rxs && rys ? { f, X, Y, xk: cfg.x, yk: cfg.y, rx: rxs, ry: rys, lgx, lgy, sx: lgx ? 1 : bxx ? 2 : 0, sy: lgy ? 1 : bxy ? 2 : 0, shx, shy, wx, wy, nb: KDE_NB,
+    kde: { bw: VIS.kbw, n: VIS.kn, bar: VIS.kbar, lines: VIS.klines }, tx, ty, fallback: () => null } : null;
   if (GLPon) {
     const spec = perfT('muestreo (anidado)', () => glpPrepare(cfg, f, cap, { lgx, lgy, bxx, bxy, shx, shy, rxs, rys }), r => fmtInt(r.total) + ' pts');
     data.push(glpGhost(spec, lgx, lgy)); L.hovermode = false;
-    return { data, layout: L, ids: null, edit: ov.edit, full: true, info: shownInfo(spec.total, f.length, false), glp: spec };
+    return { data, layout: L, ids: null, edit: ov.edit, full: true, info: shownInfo(spec.total, f.length, false), glp: spec, dens: kdeSpec };
   }
-  let densSpec = null;
+  let densSpec = kdeSpec;
   if (dens && rxs && rys) {
     const nbD = VIS.dbins === 'auto' ? (big ? 400 : 320) : +VIS.dbins;
     densSpec = { f, X, Y, xk: cfg.x, yk: cfg.y, rx: rxs, ry: rys, lgx, lgy, sx: lgx ? 1 : bxx ? 2 : 0, sy: lgy ? 1 : bxy ? 2 : 0, shx, shy, wx, wy, nb: nbD,
+      kde: null, tx, ty,
       fallback: () => densityTrace(f, X, Y, rxs, rys, tx, ty, lgx, lgy, big) };
   }
   if (dens) {
@@ -4392,7 +4428,7 @@ function drawFig(gd, fig, key, cfg) {
   const tDraw = PERF ? performance.now() : 0;
   if (fig.glp) { gd._glpWant = true; gd._glp = null; if (gd._glpCv) gd._glpCv.style.visibility = 'hidden'; } else if (gd._glpWant || gd._glpCv || gd._glp) glpDetach(gd);
   const densTok = gd._densTok = (gd._densTok || 0) + 1;
-  const pre = fig.dens ? glpDensImage(fig.dens).then(img => { if (img) fig.layout.images = (fig.layout.images || []).concat([img]); else fig.data.unshift(fig.dens.fallback()); }).catch(() => { fig.data.unshift(fig.dens.fallback()); }) : null;
+  const pre = fig.dens && fig.dens.kde ? kdeBuild(fig.dens).then(tr => { fig.data.unshift(tr); }).catch(e => { console.error(e); }) : fig.dens ? glpDensImage(fig.dens).then(img => { if (img) fig.layout.images = (fig.layout.images || []).concat([img]); else fig.data.unshift(fig.dens.fallback()); }).catch(() => { fig.data.unshift(fig.dens.fallback()); }) : null;
   const doReact = () => densTok !== gd._densTok ? undefined : Plotly.react(gd, fig.data, fig.layout, fig.glp ? glpConfig(pcfg) : pcfg);
   const done = Promise.resolve(pre ? pre.then(doReact) : doReact()).then(r => { if (PERF) perfMark('Plotly.react (dibujo)', performance.now() - tDraw); return fig.glp && densTok === gd._densTok ? glpAttach(gd, fig.glp) : r; }).catch(e => console.error(e));
   const installH = () => {
@@ -4439,7 +4475,7 @@ function drawFig(gd, fig, key, cfg) {
   return done;
 }
 function renderPanel(i) { if (!GLP.batch) GLP.epoch++; return drawFig($('g-p' + i), figPanel(i, false), 'p' + i); }
-function renderPanels() { const ps = []; GLP.epoch++; GLP.batch = true; try { for (let i = 0; i < S.panels.length; i++) ps.push(renderPanel(i)); } finally { GLP.batch = false; } S.dirtyPanels = false; return Promise.all(ps); }
+function renderPanels() { updateKdeCtl(); const ps = []; GLP.epoch++; GLP.batch = true; try { for (let i = 0; i < S.panels.length; i++) ps.push(renderPanel(i)); } finally { GLP.batch = false; } S.dirtyPanels = false; return Promise.all(ps); }
 
 /* ------------------------------------------------------------
    Análisis avanzado: caja por población, superficie de densidad y dispersión 3D
@@ -5002,8 +5038,8 @@ function renderQuad() {
   }
   const L = baseLayout(false), rx = axisRange(q.x, q.xs), ry = axisRange(q.y, q.ys);
   L.uirevision = [q.x, q.y, q.xs, q.ys].join('|'); L.margin = { l: 62, r: 14, t: 14, b: 46 };
-  L.xaxis = { ...L.xaxis, title: axTitle(chLabel(q.x)), type: q.xs === 'log' ? 'log' : 'linear', range: rx, ...axisExtra(q.xs, rx, q.x) };
-  L.yaxis = { ...L.yaxis, title: axTitle(chLabel(q.y)), type: q.ys === 'log' ? 'log' : 'linear', range: ry, ...axisExtra(q.ys, ry, q.y) };
+  L.xaxis = { ...L.xaxis, title: axTitle(q.xs === 'asi' ? `asinh(${chLabel(q.x)}/${S.asiC})` : chLabel(q.x)), type: q.xs === 'log' ? 'log' : 'linear', range: rx, ...axisExtra(q.xs, rx, q.x) };
+  L.yaxis = { ...L.yaxis, title: axTitle(q.ys === 'asi' ? `asinh(${chLabel(q.y)}/${S.asiC})` : chLabel(q.y)), type: q.ys === 'log' ? 'log' : 'linear', range: ry, ...axisExtra(q.ys, ry, q.y) };
   L.dragmode = 'zoom';
   const ln = { color: '#222', width: 1.6, dash: 'dash' }, tx = plotCo(cx, q.xs, 'scatter', q.x), ty = plotCo(cy, q.ys, 'scatter', q.y);
   L.shapes = [{ type: 'line', xref: 'x', yref: 'paper', x0: tx, x1: tx, y0: 0, y1: 1, line: ln }, { type: 'line', xref: 'paper', yref: 'y', x0: 0, x1: 1, y0: ty, y1: ty, line: ln }];
@@ -5787,7 +5823,7 @@ function captureProfile(name) {
     panels: S.panels.map(p => ({ x: p.x, xStain: stainOf(p.x), y: p.y, yStain: stainOf(p.y), xs: p.xs, ys: p.ys, mode: p.mode })),
     color: { by: S.colorBy, channel: S.colorChan, channelStain: stainOf(S.colorChan), base: S.baseColor, showGates: S.showGates },
     maturation: { show: mat.checked, x: $('mat-x').value, xStain: stainOf($('mat-x').value), y: $('mat-y').value, yStain: stainOf($('mat-y').value), xs: radioVal('mat-xs'), ys: radioVal('mat-ys-path') },
-    embN: +$('emb-n').value, biexW: S.biexW, asiC: S.asiC,
+    embN: +$('emb-n').value, biexW: S.biexW, asiC: S.asiC, kde: kdeSettings(),
   };
 }
 /** Canal del archivo actual que corresponde al del perfil: mismo nombre; si no existe, mismo anticuerpo. */
@@ -5814,6 +5850,7 @@ function applyProfile(pf, opts) {
   const k = Math.max(1, Math.min(MAX_PANELS, pf.panels.length));
   if (pf.biexW > 0) { S.biexW = pf.biexW; $('biex-w').value = pf.biexW; $('biex-w-val').textContent = pf.biexW; }
   if (pf.asiC > 0) setAsiC(pf.asiC);
+  if (pf.kde) setKde(pf.kde);
   if (pf.panels.length > MAX_PANELS) warns.push(`El perfil tiene ${pf.panels.length} gráficos; se cargaron los primeros ${MAX_PANELS}.`);
   $('num-panels').value = k; $('num-panels-val').textContent = k; $('num-panels-n').value = k;
   S.panels = []; ensurePanels(k);
@@ -5822,7 +5859,7 @@ function applyProfile(pf, opts) {
     if (x) cfg.x = x; if (y) cfg.y = y;
     cfg.xs = x ? normScale(p.xs) : guessScale(cfg.x);
     cfg.ys = y ? normScale(p.ys) : guessScale(cfg.y);
-    cfg.mode = ['scatter', 'density', 'hist'].includes(p.mode) ? p.mode : 'scatter';
+    cfg.mode = ['scatter', 'density', 'kde', 'hist'].includes(p.mode) ? p.mode : 'scatter';
   });
   const c = pf.color;
   if (c) {
@@ -5870,7 +5907,7 @@ function updateProfBadge() {
 function profMsg(t, warn) { const e = $('prof-msg'); e.textContent = t; e.className = 'prof-msg' + (warn ? ' warn' : ''); }
 function profSummary(pf) {
   const pairs = pf.panels.slice(0, 3).map(p => {
-    const md = p.mode === 'hist' ? ' [hist]' : p.mode === 'density' ? ' [dens]' : '';
+    const md = p.mode === 'hist' ? ' [hist]' : p.mode === 'density' ? ' [dens]' : p.mode === 'kde' ? ' [kde]' : '';
     return `${p.x}${p.xStain ? ' (' + p.xStain + ')' : ''}${p.xs === 'log' || isAsh(p.xs) ? ' ' + p.xs : ''} × ${p.y}${p.ys === 'log' || isAsh(p.ys) ? ' ' + p.ys : ''}${md}`;
   });
   return `${pf.panels.length} gráfico${pf.panels.length > 1 ? 's' : ''} · ` + pairs.join(' · ') + (pf.panels.length > 3 ? ' …' : '');
@@ -5955,16 +5992,32 @@ function biexTicks(range, c) {
   const lab = x => x === 0 ? '0' : (x < 0 ? '−' : '') + (Math.abs(x) >= 1000 ? (Math.abs(x) / 1000) + 'k' : Math.abs(x));
   return { tickmode: 'array', tickvals: v.map(x => axv(x + bxShift(c), 'biex', c)), ticktext: v.map(lab) };
 }
-/** Marcas del eje «asi»: valores ORIGINALES (0, 5000, 10000, 25000, 50000…) colocados en asinh(valor/c); nunca la unidad transformada. */
-function asiTicks(range) {
-  const vals = [0, 5000, 10000, 25000, 50000, 100000, 150000, 200000, 250000];
+/** Marcas del eje «asi»: valores ORIGINALES colocados en asinh(valor/c); nunca la unidad transformada.
+    `len` = largo del eje en px: las marcas intermedias se omiten si quedan a menos de ~18 px de otra ya puesta. */
+function asiTicks(range, len) {
+  const major = [0, 5000, 10000, 25000, 50000, 100000, 150000, 200000, 250000], minor = [2000, 15000, 75000];
   const lo = range ? Math.min(range[0], range[1]) : -Infinity, hi = range ? Math.max(range[0], range[1]) : Infinity;
-  const v = vals.filter(x => { const t = axv(x, 'asi'); return t >= lo && t <= hi; });
+  const pxPer = range && len > 0 ? len / (hi - lo) : 0, MIN_PX = 18, kept = [];
+  const place = x => { const t = axv(x, 'asi'); if (t < lo || t > hi) return; if (pxPer && kept.some(k => Math.abs(k.t - t) * pxPer < MIN_PX)) return; kept.push({ x, t }); };
+  major.forEach(place); minor.forEach(place);
+  kept.sort((a, b) => a.x - b.x);
   const lab = x => x >= 1000 ? (x / 1000) + 'k' : String(x);
-  return { tickmode: 'array', tickvals: v.map(x => axv(x, 'asi')), ticktext: v.map(lab) };
+  return { tickmode: 'array', tickvals: kept.map(k => k.t), ticktext: kept.map(k => lab(k.x)) };
 }
-const axisExtra = (sc, range, c) => sc === 'biex' ? biexTicks(range, c) : sc === 'asi' ? asiTicks(range) : {};
+const axisExtra = (sc, range, c, len) => sc === 'biex' ? biexTicks(range, c) : sc === 'asi' ? asiTicks(range, len) : {};
 /** Recalcula los gates cuando cambia el ancho biex (los contornos están en unidades crudas). */
+/** Ajustes del modo KDE (se guardan en perfiles y estrategias) y su aplicación a los controles. */
+const kdeSettings = () => ({ bw: VIS.kbw, n: VIS.kn, bar: VIS.kbar, lines: VIS.klines, pal: VIS.kpal });
+function setKde(k) {
+  if (!k || typeof k !== 'object') return;
+  const cl = (v, a, b, d) => Number.isFinite(+v) ? Math.max(a, Math.min(b, Math.round(+v))) : d;
+  VIS.kbw = cl(k.bw, 1, 10, 3); VIS.kn = cl(k.n, 6, 24, 12); VIS.kbar = k.bar !== false; VIS.klines = k.lines !== false && k.lines !== 0; VIS.kpal = ['mono', 'flow', 'viridis', 'blues'].includes(k.pal) ? k.pal : 'mono';
+  if ($('v-kbw')) { $('v-kbw').value = VIS.kbw; $('v-kbw-val').textContent = VIS.kbw; $('v-kn').value = VIS.kn; $('v-kn-val').textContent = VIS.kn; $('v-kbar').checked = VIS.kbar; $('v-klines').checked = VIS.klines; $('v-kpal').value = VIS.kpal; }
+}
+/** Los ajustes del KDE solo afectan a los gráficos en ese modo: se redibujan solo esos. */
+function renderKdePanels() { if (!S.n) return; S.panels.forEach((p, i) => { if (p.mode === 'kde') renderPanel(i); }); }
+/** Los controles del KDE solo se ven cuando algún gráfico está en ese modo. */
+function updateKdeCtl() { const b = $('kde-box'); if (b) b.style.display = S.panels.some(p => p.mode === 'kde') ? '' : 'none'; }
 /** Fija el cofactor de «asi» (rango del slider 1000–100000) sin redibujar. */
 function setAsiC(v) { v = Math.max(1000, Math.min(100000, +v || 27000)); S.asiC = v; if ($('asi-c')) $('asi-c').value = v; if ($('asi-c-val')) $('asi-c-val').textContent = v; }
 function onBiexChange() {
@@ -6036,7 +6089,7 @@ function captureRegions() {
     const g = S.selGeom[key], d = graphDesc(key);
     const ok = d.portable && !!g, simp = g ? simplifyPoly(g.poly, d.xs, d.ys, d.x, d.y) : [];
     const rnd = v => +v.toPrecision(6), sx = ok ? shiftOf(d.x) : 0, sy = ok ? shiftOf(d.y) : 0;
-    out.push({ ...d, kind: g ? g.kind : 'ids', poly: ok ? simp.map(([x, y]) => [rnd(x - sx), rnd(y - sy)]) : simp, portable: ok, raw: ok });
+    out.push({ ...d, kind: g ? g.kind : 'ids', poly: ok ? simp.map(([x, y]) => [rnd(x - sx), rnd(y - sy)]) : simp, portable: ok, raw: ok, ...(ok && (d.xs === 'asi' || d.ys === 'asi') ? { ac: S.asiC } : {}) });
   }
   return out;
 }
@@ -6065,10 +6118,13 @@ function gateEventIndices(g) {
   const hid = new Uint8Array(S.popNames.length);
   for (let p = 0; p < hid.length; p++) hid[p] = (p === 0 ? g.scope.hiddenUnassigned : g.scope.hidden.includes(S.popNames[p])) ? 1 : 0;
   const regs = g.regions.map(r => {
-    const P = regionPoly(r).map(([x, y]) => [axv(x, r.xs, r.x), axv(y, r.ys, r.y)]);
+    // «asi»: el contorno se evalúa con el cofactor con el que se dibujó (r.ac), así un lazo no cambia de forma si luego se mueve el slider
+    const tf = (sc, col) => sc === 'asi' && r.ac > 0 ? (v => Math.asinh(v / r.ac)) : (v => axv(v, sc, col));
+    const fx = tf(r.xs, r.x), fy = tf(r.ys, r.y);
+    const P = regionPoly(r).map(([x, y]) => [fx(x), fy(y)]);
     let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
     for (const [x, y] of P) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
-    return { X: S.cols[r.x], Y: S.cols[r.y], xs: r.xs, ys: r.ys, cx: r.x, cy: r.y, P, x0, x1, y0, y1 };
+    return { X: S.cols[r.x], Y: S.cols[r.y], xs: r.xs, ys: r.ys, cx: r.x, cy: r.y, fx, fy, P, x0, x1, y0, y1 };
   });
   const out = [], pm = g.restrict && g.parent ? popMemberMask(g.parent) : null;     // compuertas hijas: solo eventos de la población padre
   for (let i = 0; i < S.n; i++) {
@@ -6077,8 +6133,8 @@ function gateEventIndices(g) {
     let ok = true;
     for (const r of regs) {
       let x = r.X[i], y = r.Y[i];
-      if (r.xs !== 'linear') x = axv(x, r.xs, r.cx);
-      if (r.ys !== 'linear') y = axv(y, r.ys, r.cy);
+      if (r.xs !== 'linear') x = r.fx(x);
+      if (r.ys !== 'linear') y = r.fy(y);
       if (x < r.x0 || x > r.x1 || y < r.y0 || y > r.y1 || !pointInPoly(x, y, r.P)) { ok = false; break; }
     }
     if (ok) out.push(i);
@@ -6094,6 +6150,7 @@ function applyStrategyCore(st) {
   Object.assign(S.colorMap, st.colors || {});
   if (st.biexW > 0) { S.biexW = st.biexW; $('biex-w').value = st.biexW; $('biex-w-val').textContent = st.biexW; }
   if (st.asiC > 0) setAsiC(st.asiC);
+  if (st.kde) setKde(st.kde);
   for (const g of st.gates) {
     const regs = []; let ok = true;
     for (const r of g.regions) {
@@ -6430,7 +6487,7 @@ function captureStrategy(name) {
   return {
     app: 'infinitwo-estrategia', version: 1, name, creado: new Date().toISOString(), compensacion: !!S.compApplied,
     origen: { archivo: S.fileName, eventos: S.n, canales: S.names.map(c => ({ canal: c, anticuerpo: stainOf(c) })) },
-    gates: JSON.parse(JSON.stringify(S.gates)), colors, biexW: S.biexW, asiC: S.asiC,
+    gates: JSON.parse(JSON.stringify(S.gates)), colors, biexW: S.biexW, asiC: S.asiC, kde: kdeSettings(),
   };
 }
 function updateStratBadge() {
@@ -6616,6 +6673,14 @@ function init() {
       const el = $(id), [key, cast] = map[id];
       el.addEventListener('change', () => { VIS[key] = cast ? cast(el.value) : el.checked; if (S.n) renderPanels(); });
     } }
+  { let kt; const kdeLive = (id, key, lab) => $(id).addEventListener('input', e => { VIS[key] = +e.target.value; $(lab).textContent = VIS[key]; clearTimeout(kt); kt = setTimeout(renderKdePanels, 120); });
+    kdeLive('v-kbw', 'kbw', 'v-kbw-val'); kdeLive('v-kn', 'kn', 'v-kn-val');
+    $('v-kbar').addEventListener('change', e => { VIS.kbar = e.target.checked; renderKdePanels(); });
+    $('v-klines').addEventListener('change', e => { VIS.klines = e.target.checked; renderKdePanels(); });
+    $('v-kpal').addEventListener('change', e => { VIS.kpal = e.target.value; renderKdePanels(); }); }
+  $('v-autodens').checked = PREF.autoDens; $('v-sscale').value = PREF.scatScale;
+  $('v-autodens').addEventListener('change', e => { PREF.autoDens = e.target.checked; try { localStorage.setItem(PREF_AUTODENS, PREF.autoDens ? '1' : '0'); } catch (x) { /* noop */ } });
+  $('v-sscale').addEventListener('change', e => { PREF.scatScale = e.target.value === 'asi' ? 'asi' : 'linear'; try { localStorage.setItem(PREF_SCATSC, PREF.scatScale); } catch (x) { /* noop */ } });
   $('v-cols').addEventListener('change', e => { try { localStorage.setItem('infinitwo_cols', e.target.value); } catch (x) { /* noop */ } window.applyPlotLayout(); });
   /** Ajusta cada gráfico al tamaño real de su contenedor. Si Plotly se quedó con un tamaño viejo
      (p. ej. tras cambiar el zoom del navegador), fuerza un autosize completo. */
@@ -6694,7 +6759,8 @@ function init() {
   $('num-panels').addEventListener('input', e => setPanelCount(e.target.value, false));
   let npT; $('num-panels-n').addEventListener('input', e => { clearTimeout(npT); npT = setTimeout(() => setPanelCount(e.target.value, true), 350); });
   $('num-panels-n').addEventListener('change', e => setPanelCount(e.target.value, false));
-  { let at; $('asi-c').addEventListener('input', e => { setAsiC(e.target.value); clearTimeout(at); at = setTimeout(onBiexChange, 150); }); }
+  { let at; $('asi-c').addEventListener('input', e => { setAsiC(e.target.value); clearTimeout(at); at = setTimeout(onBiexChange, 150); });
+    $('asi-c-reset').addEventListener('click', () => { setAsiC(27000); onBiexChange(); }); }
   { let bt; $('biex-w').addEventListener('input', e => { S.biexW = +e.target.value; $('biex-w-val').textContent = S.biexW; clearTimeout(bt); bt = setTimeout(onBiexChange, 150); }); }
   $('show-maturation').addEventListener('change', e => {
     $('mat-wrap').style.display = e.target.checked ? 'block' : 'none';
@@ -7234,7 +7300,8 @@ const dwFid = f => { let i = DW.fids.get(f); if (!i) DW.fids.set(f, i = ++DW.fid
 /** Conteos 2D (Uint32Array nb×nb) calculados en el Worker; en caché por población/ejes/rango/bins. Devuelve null si no hay Worker. */
 function dwCounts(d) {
   const w = dwWorker(); if (!w) return Promise.resolve(null);
-  const key = [dwFid(d.f), d.f.length, d.xk, d.yk, d.sx, d.sy, d.rx.join(','), d.ry.join(','), d.nb, d.shx, d.shy, d.wx, d.wy].join('|'), hit = DW.cache.get(key);
+  const key = [dwFid(d.f), d.f.length, d.xk, d.yk, dwFid(d.X), dwFid(d.Y),   // identidad de las columnas: una recompensación con los mismos nombres no reutiliza la imagen vieja
+     d.sx, d.sy, d.rx.join(','), d.ry.join(','), d.nb, d.shx, d.shy, d.wx, d.wy].join('|'), hit = DW.cache.get(key);
   if (hit) { DW.cache.delete(key); DW.cache.set(key, hit); return Promise.resolve(hit); }
   dwSend('f:' + dwFid(d.f), d.f); dwSend('c:' + d.xk, d.X); dwSend('c:' + d.yk, d.Y);
   const id = ++DW.id;
@@ -7281,6 +7348,63 @@ async function glpDensImage(d) {
   return { source: cv.toDataURL('image/png'), xref: 'x', yref: 'y', x: ex(d.rx[0], d.lgx), y: ex(d.ry[1], d.lgy), sizex: d.rx[1] - d.rx[0], sizey: d.ry[1] - d.ry[0],      // en ejes log Plotly espera el tamaño en unidades del rango (log10), no en datos
     
     xanchor: 'left', yanchor: 'top', sizing: 'stretch', layer: 'below', opacity: 1 };
+}
+
+/* ---- Densidad rellena (KDE): conteos 2D del Worker (o del hilo principal) + filtro gaussiano separable + traza «contour» ---- */
+const KDE_NB = 200, KDE_START = 0.025;       // grilla fija y primer nivel (2,5 % del máximo): por debajo el relleno es transparente
+/** Suavizado gaussiano separable (dos pasadas 1D) con sigma en celdas; el borde se trata como ceros (los eventos fuera del rango no se cuentan). */
+function kdeSmooth(z, nb, sigma) {
+  const R = Math.max(1, Math.ceil(3 * sigma)), k = new Float32Array(2 * R + 1); let s = 0;
+  for (let i = -R; i <= R; i++) { k[i + R] = Math.exp(-0.5 * (i / sigma) * (i / sigma)); s += k[i + R]; }
+  for (let i = 0; i < k.length; i++) k[i] /= s;
+  const tmp = new Float32Array(nb * nb), out = new Float32Array(nb * nb);
+  for (let r = 0; r < nb; r++) { const o = r * nb; for (let c = 0; c < nb; c++) { let a = 0; const i0 = Math.max(-R, -c), i1 = Math.min(R, nb - 1 - c); for (let i = i0; i <= i1; i++) a += z[o + c + i] * k[i + R]; tmp[o + c] = a; } }
+  for (let r = 0; r < nb; r++) { const i0 = Math.max(-R, -r), i1 = Math.min(R, nb - 1 - r); for (let c = 0; c < nb; c++) { let a = 0; for (let i = i0; i <= i1; i++) a += tmp[(r + i) * nb + c] * k[i + R]; out[r * nb + c] = a; } }
+  return out;
+}
+/** Respaldo sin Worker: cuenta TODOS los eventos de f en la grilla nb×nb (tx/ty = transformación del eje). */
+function kdeCountSync(d) {
+  const nb = d.nb, z = new Uint32Array(nb * nb), [x0, x1] = d.rx, [y0, y1] = d.ry, wx = (x1 - x0) / nb, wy = (y1 - y0) / nb;
+  for (let k = 0; k < d.f.length; k++) {
+    const e = d.f[k], a = d.tx(d.X[e]), b = d.ty(d.Y[e]);
+    if (a < x0 || a >= x1 || b < y0 || b >= y1) continue;
+    z[(((b - y0) / wy) | 0) * nb + (((a - x0) / wx) | 0)]++;
+  }
+  return z;
+}
+const KDE_VIRIDIS = [[0, '#440154'], [0.125, '#482878'], [0.25, '#3e4989'], [0.375, '#31688e'], [0.5, '#26828e'], [0.625, '#1f9e89'], [0.75, '#35b779'], [0.875, '#6ece58'], [1, '#fde725']];
+/** Escala monocromática a partir del color de los puntos: tinte claro → color base → tono oscuro, con transparencia para que el dotplot se siga viendo debajo. */
+function kdeMonoPalette() {
+  const base = glpRGB(S.baseColor || '#1f77b4'), mix = (c, t, k) => c.map((v, i) => Math.round(v + (t[i] - v) * k)), css = (c, al) => `rgba(${c[0]},${c[1]},${c[2]},${al})`;
+  const white = [255, 255, 255], black = [0, 0, 0], dark = !!glpTheme().get();
+  const lo = dark ? mix(base, black, 0.15) : mix(base, white, 0.78), hi = dark ? mix(base, white, 0.55) : mix(base, black, 0.45);
+  return [[0, css(lo, 0.35)], [0.35, css(mix(lo, base, 0.5), 0.5)], [0.65, css(base, 0.65)], [1, css(hi, 0.9)]];
+}
+/** Paleta del KDE reescalada a [KDE_START, 1] con el tramo inferior transparente (sin celdas nulas: con huecos el contorno de Plotly tarda segundos). */
+function kdePalette() {
+  let pal = VIS.kpal === 'mono' ? kdeMonoPalette() : DENS_PAL[VIS.kpal === 'dens' ? VIS.dpal : VIS.kpal] || DENS_PAL.flow; if (pal === 'Viridis') pal = glpTheme().get() ? DENS_HEAT : KDE_VIRIDIS;
+  const out = [[0, 'rgba(255,255,255,0)'], [KDE_START * 0.999, 'rgba(255,255,255,0)']];
+  for (const [t, c] of pal) out.push([KDE_START + t * (1 - KDE_START), c]);
+  out[2][0] = KDE_START;
+  return out;
+}
+/** Traza Plotly «contour» rellena a partir de los conteos; la densidad se normaliza a 0–1 (máximo = 1). Por debajo del 2,5 % del máximo el relleno es transparente. */
+function kdeTrace(zc, d) {
+  const o = d.kde, nb = d.nb, z = kdeSmooth(Float32Array.from(zc), nb, Math.max(0.5, o.bw));
+  let mx = 0; for (let i = 0; i < z.length; i++) if (z[i] > mx) mx = z[i];
+  const rows = [], inv = mx > 0 ? 1 / mx : 0;
+  for (let r = 0; r < nb; r++) { const row = new Array(nb); for (let c = 0; c < nb; c++) row[c] = z[r * nb + c] * inv; rows.push(row); }
+  const wx = (d.rx[1] - d.rx[0]) / nb, wy = (d.ry[1] - d.ry[0]) / nb;
+  const cx = Array.from({ length: nb }, (_, c) => { const v = d.rx[0] + (c + 0.5) * wx; return d.lgx ? Math.pow(10, v) : v; });
+  const cy = Array.from({ length: nb }, (_, c) => { const v = d.ry[0] + (c + 0.5) * wy; return d.lgy ? Math.pow(10, v) : v; });
+  return { type: 'contour', x: cx, y: cy, z: rows, hoverinfo: 'skip', zmin: 0, zmax: 1, colorscale: kdePalette(),
+    autocontour: false, contours: { coloring: 'fill', start: KDE_START, end: 1, size: (1 - KDE_START) / Math.max(1, o.n), showlines: !!o.lines }, line: { width: o.lines ? 0.6 : 0, color: 'rgba(0,0,0,.35)' },
+    showscale: !!o.bar, colorbar: { title: { text: t('kde.cbar'), side: 'right' }, thickness: 12, len: 0.85, tickformat: '.1f', outlinewidth: 0 } };
+}
+/** KDE de un gráfico: los conteos (100 % de la población) salen del Worker y están en caché; cambiar el suavizado solo repite el filtro. */
+async function kdeBuild(d) {
+  const z = await dwCounts(d);
+  return kdeTrace(z || kdeCountSync(d), d);
 }
 
 /** Lazo en el Worker: copia (una vez) f, X e Y al Worker y devuelve los ids dentro del polígono; null si no hay Worker. */
