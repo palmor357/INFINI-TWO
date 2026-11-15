@@ -1009,10 +1009,11 @@ body .loading,body .modal,body .fs-overlay{backdrop-filter:none!important;-webki
         </div>
         <div class="np-custom" style="margin-top:10px" title="Cuántos eventos se DIBUJAN por gráfico. Los conteos, porcentajes y compuertas siempre usan el 100 % de los eventos cargados.">
           <label for="render-cap">Eventos a mostrar</label>
-          <select id="render-cap"><option value="auto">Automático (según tu equipo)</option><option value="10000">10.000</option><option value="50000">50.000</option><option value="150000" selected>150.000</option><option value="500000">500.000</option><option value="1000000">1.000.000</option><option value="all">Todos</option></select>
+          <select id="render-cap"><option value="auto">Automático (según tu equipo)</option><option value="10000">10.000</option><option value="50000">50.000</option><option value="150000" selected>150.000</option><option value="500000">500.000</option><option value="1000000">1.000.000</option><option value="2000000">2.000.000</option><option value="all">Todos</option></select>
         </div>
         <div id="render-auto" class="perf-warn" style="background:#e8f3ff;border-color:#9cc4ee;color:#1f5f99"></div>
         <div id="render-warn" class="perf-warn"></div>
+        <div id="render-full-box" style="display:none;margin:6px 0"><button class="btn btn-light btn-sm" id="btn-render-full" title="Dibuja todos los eventos (puede ser lento)">⏬ Completar al 100 % de los eventos</button> <span class="info-note" id="render-full-note" style="margin:0"></span></div>
         <div class="vis-box" style="margin-top:10px;font-size:12px">
           <b>Densidad</b>
           <div class="np-custom"><label for="v-dbins">Resolución</label><select id="v-dbins"><option value="auto" selected>Automática</option><option value="200">200 × 200</option><option value="400">400 × 400</option><option value="600">600 × 600</option><option value="800">800 × 800</option></select></div>
@@ -2800,6 +2801,8 @@ const I18N = {
     'warn.render.big': '⚠ Dibujar tantos puntos puede ser lento y usar mucha memoria. Los conteos y porcentajes no cambian: siempre usan el 100 % de los eventos.',
     'warn.load': '⚠ Cargar todos los eventos de un archivo grande (millones) puede tardar y usar varios GB de memoria RAM.',
     'load.draw': 'Dibujando gráficos…',
+    'full.confirm': '⚠ Dibujar los {n} eventos como puntos puede ser MUY lento, congelar la pestaña o agotar la memoria (baja de rendimiento). Los conteos no cambian. ¿Continuar? Para volver, elige otro valor en «Eventos a mostrar».',
+    'full.on': 'Dibujando el 100 % (elige otro valor en «Eventos a mostrar» para volver).',
     'tour.1.h': '1 · Dibuja una compuerta', 'tour.1.p': 'Carga un archivo .fcs/.csv. En un gráfico de puntos elige lazo o caja, rodea una población, escribe su nombre en la barra lateral y pulsa «Asignar población».',
     'tour.2.h': '2 · Elige la población de cada gráfico', 'tour.2.p': 'Cada gráfico tiene un selector «Población»: déjalo en «Todos los eventos» o elige una compuerta para ver solo sus eventos. Lo que dibujes allí queda como hijo de esa población.',
     'tour.3.h': '3 · Revisa la jerarquía', 'tour.3.p': 'En «Poblaciones» ves el árbol con eventos, % del padre y % del total. Clic derecho (o 📈) en una población crea un gráfico solo con sus eventos.',
@@ -2821,6 +2824,8 @@ const I18N = {
     'warn.render.big': '⚠ Drawing this many points can be slow and memory-hungry. Counts and percentages do not change: they always use 100% of the events.',
     'warn.load': '⚠ Loading every event of a large file (millions) can take a while and use several GB of RAM.',
     'load.draw': 'Drawing plots…',
+    'full.confirm': '⚠ Drawing all {n} events as points can be VERY slow, freeze the tab or run out of memory (performance drop). Counts do not change. Continue? To go back, pick another value in “Events to show”.',
+    'full.on': 'Drawing 100 % (pick another value in “Events to show” to go back).',
     'tour.1.h': '1 · Draw a gate', 'tour.1.p': 'Load a .fcs/.csv file. On a dot plot pick lasso or box, enclose a population, type its name in the side panel and press “Assign population”.',
     'tour.2.h': '2 · Choose each plot’s population', 'tour.2.p': 'Every plot has a “Population” selector: leave “All events” or pick a gate to see only its events. Gates drawn there become children of that population.',
     'tour.3.h': '3 · Check the hierarchy', 'tour.3.p': 'Under “Populations” you get the tree with events, % of parent and % of total. Right-click (or 📈) a population to create a plot with only its events.',
@@ -2893,7 +2898,7 @@ const ES_EN = {
   '▶ Predecir con el módulo local': '▶ Predict with the local module', '🎯 Traspasar a los gráficos de análisis': '🎯 Transfer to the analysis plots', 'Asigna a': 'Assigns to', 'cada evento cargado': 'every loaded event',
   'el tipo celular que le da EverFlowNet (B_lym, T_lym, NK, Mono…) como población, con su color, para refinar los gráficos: ocultar o resaltar tipos, y dibujar lazos dentro de ellos.': 'the cell type given by EverFlowNet (B_lym, T_lym, NK, Mono…) as a population, with its color, to refine the plots: hide or highlight types and draw lassos inside them.',
   'Confianza mínima por evento': 'Minimum confidence per event', '0 % (asignar todos)': '0% (assign all)', '🎯 Traspasar a los gráficos': '🎯 Transfer to the plots',
-  '3 · Servidor Python': '3 · Python server', '🚧 Servidor Python no disponible, en construcción.': '🚧 Python server unavailable, under construction.', 'Esta función aún no está habilitada; el resto de la predicción tabular funciona con normalidad en el navegador.': 'This feature is not enabled yet; the rest of the tabular prediction works normally in the browser.', 'opcional · fusión profunda + consenso con tu FusionPredictor': 'optional · deep fusion + consensus with your FusionPredictor', '○ Sin servidor (opcional)': '○ No server (optional)',
+  '3 · Servidor Python': '3 · Python server', '⏬ Completar al 100 % de los eventos': '⏬ Complete to 100 % of events', 'Dibuja todos los eventos (puede ser lento)': 'Draws every event (may be slow)', '🚧 Servidor Python no disponible, en construcción.': '🚧 Python server unavailable, under construction.', 'Esta función aún no está habilitada; el resto de la predicción tabular funciona con normalidad en el navegador.': 'This feature is not enabled yet; the rest of the tabular prediction works normally in the browser.', 'opcional · fusión profunda + consenso con tu FusionPredictor': 'optional · deep fusion + consensus with your FusionPredictor', '○ Sin servidor (opcional)': '○ No server (optional)',
   'Probar conexión': 'Test connection', '✓ Verificar contra Python (rápido)': '✓ Check against Python (fast)', '▶ Predicción completa con Python': '▶ Full prediction with Python',
   'Carga un archivo para ver su información.': 'Load a file to see its information.', 'Resumen del archivo': 'File summary', 'Canales y anticuerpos': 'Channels and antibodies',
   'Matriz de compensación': 'Compensation matrix', 'Todos los metadatos': 'All metadata', '⬇ CSV': '⬇ CSV', '⬇ JSON': '⬇ JSON', '⧉ Copiar': '⧉ Copy',
@@ -3099,6 +3104,7 @@ const UNASSIGNED = '__UNASSIGNED__';
 const VIS = { dbins: 'auto', dsm: true, dpal: 'flow', dpts: false, hbins: 256, hnorm: 'count', hpop: true, hsm: false, msize: 2, mop: 0.8 };   // opciones de densidad e histograma
 const DENS_PAL = { flow: [[0, '#1a1aa6'], [0.2, '#0a8cff'], [0.4, '#00d9a0'], [0.6, '#b4e000'], [0.8, '#ff9a00'], [1, '#c00000']], viridis: 'Viridis', blues: [[0, '#cfe1f5'], [0.25, '#6baed6'], [0.5, '#2171b5'], [0.75, '#08306b'], [1, '#000000']] };
 let RENDER_CAP = 150000;          // tope de puntos DIBUJADOS por gráfico (Infinity = todos). Nunca afecta a conteos ni a compuertas.
+let FULL100 = false;              // el usuario pidió dibujar el 100 % (a pedido, con aviso de rendimiento)
 let DENSITY_MIN = 1000000;       // «Todos» con más eventos que esto: mapa de densidad 100 % + puntos de poblaciones asignadas
 const GL_PANELS = 8, SVG_CAP = 20000;
 const MAX_PANELS = 16;            // tope de gráficos: cada uno usa un contexto WebGL y los navegadores admiten unos 16
@@ -4266,6 +4272,9 @@ function updateRenderWarn() {
     else if ((!Number.isFinite(RENDER_CAP) ? S.n : RENDER_CAP) >= 500000 && S.n >= 500000) msg = t('warn.render.big');
   }
   el.textContent = msg; el.classList.toggle('show', !!msg);
+  const fb = $('render-full-box');
+  if (fb) { fb.style.display = (S.n > 0 && (FULL100 || (Number.isFinite(RENDER_CAP) && RENDER_CAP < S.n))) ? 'block' : 'none';
+    $('btn-render-full').style.display = FULL100 ? 'none' : ''; $('render-full-note').textContent = FULL100 ? t('full.on') : ''; }
 }
 function updateLoadWarn() {
   const el = $('load-warn'), v = +$('maxev').value;
@@ -4275,7 +4284,7 @@ function updateLoadWarn() {
    Modo automático de «Eventos a mostrar»: mide cuántos puntos por segundo dibuja WebGL en este equipo
    y reparte ese presupuesto entre los gráficos que usan WebGL. Solo afecta al dibujo, nunca a los conteos.
    ------------------------------------------------------------ */
-const BENCH_KEY = 'infinitwo_bench_v1', CAP_OPTS = [10000, 50000, 150000, 500000, 1000000];
+const BENCH_KEY = 'infinitwo_bench_v1', CAP_OPTS = [10000, 50000, 150000, 500000, 1000000, 2000000];
 const AUTO = { rate: 0 };
 const benchSig = () => navigator.userAgent + '|' + (window.devicePixelRatio || 1);
 function benchLoad() {
@@ -4306,7 +4315,7 @@ async function benchGL() {
 function autoCapFor(rate, nGl) {
   const mem = navigator.deviceMemory || 8;
   let per = rate ? rate * 2 / Math.max(1, nGl) : 50000;
-  per = Math.min(per, mem < 4 ? 150000 : mem < 8 ? 500000 : 1000000);
+  per = Math.min(per, mem < 4 ? 150000 : mem < 8 ? 500000 : 2000000);   // 2 M solo si el equipo (≥8 GB) y la GPU medida lo permiten
   let cap = CAP_OPTS[0]; for (const o of CAP_OPTS) if (per >= o) cap = o;
   return cap;
 }
@@ -4315,13 +4324,14 @@ function applyAutoCap() {
   const sel = $('render-cap'), box = $('render-auto');
   if (!sel || sel.value !== 'auto') { if (box) box.classList.remove('show'); return; }
   const nGl = Math.max(1, Math.min(S.panels.length || +$('num-panels').value || 4, GL_PANELS));
-  RENDER_CAP = autoCapFor(AUTO.rate, nGl);
+  if (!FULL100) RENDER_CAP = autoCapFor(AUTO.rate, nGl);
   box.innerHTML = (AUTO.rate ? esc(t('auto.info', { cap: fmtInt(RENDER_CAP), n: nGl, rate: fmtInt(Math.round(AUTO.rate / 1000)) })) : esc(t('auto.nogl', { cap: fmtInt(RENDER_CAP) })))
     + ` <a href="#" class="auto-redo" onclick="return false">${esc(t('auto.redo'))}</a>`;
   box.classList.add('show');
   updateRenderWarn();
 }
 async function setRenderCap(v, redraw) {
+  FULL100 = false; DENSITY_MIN = 1000000;
   try { localStorage.setItem('infinitwo_rcap', v); } catch (e) { /* noop */ }
   if (v === 'auto') {
     let b = benchLoad();
@@ -6008,6 +6018,11 @@ function init() {
   };
   // Eventos a mostrar (solo afecta al dibujo) y gráficos 1:1
   $('render-cap').addEventListener('change', e => setRenderCap(e.target.value, true));
+  $('btn-render-full').addEventListener('click', async () => {
+    if (!S.n || !confirm(t('full.confirm', { n: fmtInt(S.n) }))) return;
+    FULL100 = true; RENDER_CAP = Infinity; DENSITY_MIN = Infinity;
+    updateRenderWarn(); await withLoading(t('load.draw'), '', () => renderAll());
+  });
   $('render-auto').addEventListener('click', e => { if (e.target.closest('.auto-redo')) { try { localStorage.removeItem(BENCH_KEY); } catch (x) { /* noop */ } setRenderCap('auto', true); } });
   { let v = '150000'; try { v = localStorage.getItem('infinitwo_rcap') || v; } catch (e) { /* noop */ }
     if ([...$('render-cap').options].some(o => o.value === v)) { $('render-cap').value = v; setRenderCap(v, false); } }
