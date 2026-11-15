@@ -1009,11 +1009,11 @@ body .loading,body .modal,body .fs-overlay{backdrop-filter:none!important;-webki
         </div>
         <div class="np-custom" style="margin-top:10px" title="Cuántos eventos se DIBUJAN por gráfico. Los conteos, porcentajes y compuertas siempre usan el 100 % de los eventos cargados.">
           <label for="render-cap">Eventos a mostrar</label>
-          <select id="render-cap"><option value="auto">Automático (según tu equipo)</option><option value="10000">10.000</option><option value="50000">50.000</option><option value="150000" selected>150.000</option><option value="500000">500.000</option><option value="1000000">1.000.000</option><option value="2000000">2.000.000</option><option value="all">Todos</option></select>
+          <select id="render-cap"><option value="auto" selected>Automático (según tu equipo)</option><option value="50000">50.000</option><option value="150000">150.000</option><option value="250000">250.000</option><option value="500000">500.000</option><option value="1000000">1.000.000</option><option value="2000000">2.000.000</option><option value="5000000">5.000.000</option><option value="pct50">50 % de los eventos</option><option value="pct20">20 % de los eventos</option><option value="pct10">10 % de los eventos</option><option value="pct5">5 % de los eventos</option><option value="all">Todos</option></select>
         </div>
         <div id="render-auto" class="perf-warn" style="background:#e8f3ff;border-color:#9cc4ee;color:#1f5f99"></div>
         <div id="render-warn" class="perf-warn"></div>
-        <div id="render-full-box" style="display:none;margin:6px 0"><button class="btn btn-light btn-sm" id="btn-render-full" title="Dibuja todos los eventos (puede ser lento)">⏬ Completar al 100 % de los eventos</button> <span class="info-note" id="render-full-note" style="margin:0"></span></div>
+        <div style="margin:6px 0;display:flex;gap:6px"><button class="btn btn-light btn-sm" id="btn-cap-less">◂ menos</button><button class="btn btn-light btn-sm" id="btn-cap-more">Mostrar más ▸</button></div>
         <div class="vis-box" style="margin-top:10px;font-size:12px">
           <b>Densidad</b>
           <div class="np-custom"><label for="v-dbins">Resolución</label><select id="v-dbins"><option value="auto" selected>Automática</option><option value="200">200 × 200</option><option value="400">400 × 400</option><option value="600">600 × 600</option><option value="800">800 × 800</option></select></div>
@@ -2801,8 +2801,9 @@ const I18N = {
     'warn.render.big': '⚠ Dibujar tantos puntos puede ser lento y usar mucha memoria. Los conteos y porcentajes no cambian: siempre usan el 100 % de los eventos.',
     'warn.load': '⚠ Cargar todos los eventos de un archivo grande (millones) puede tardar y usar varios GB de memoria RAM.',
     'load.draw': 'Dibujando gráficos…',
-    'full.confirm': '⚠ Dibujar los {n} eventos como puntos puede ser MUY lento, congelar la pestaña o agotar la memoria (baja de rendimiento). Los conteos no cambian. ¿Continuar? Para volver, elige otro valor en «Eventos a mostrar».',
-    'full.on': 'Dibujando el 100 % (elige otro valor en «Eventos a mostrar» para volver).',
+    'glp.camera': 'Descargar como imagen PNG (alta resolución)',
+    'glp.auto': 'Automático: {cap} puntos por gráfico ({n} gráficos; tu equipo dibuja ≈{rate} M puntos/s; presupuesto {ms} ms por cuadro).',
+    'glp.frame': '{pts} puntos × {n} gráficos · {ms} ms/cuadro',
     'tour.1.h': '1 · Dibuja una compuerta', 'tour.1.p': 'Carga un archivo .fcs/.csv. En un gráfico de puntos elige lazo o caja, rodea una población, escribe su nombre en la barra lateral y pulsa «Asignar población».',
     'tour.2.h': '2 · Elige la población de cada gráfico', 'tour.2.p': 'Cada gráfico tiene un selector «Población»: déjalo en «Todos los eventos» o elige una compuerta para ver solo sus eventos. Lo que dibujes allí queda como hijo de esa población.',
     'tour.3.h': '3 · Revisa la jerarquía', 'tour.3.p': 'En «Poblaciones» ves el árbol con eventos, % del padre y % del total. Clic derecho (o 📈) en una población crea un gráfico solo con sus eventos.',
@@ -2824,8 +2825,9 @@ const I18N = {
     'warn.render.big': '⚠ Drawing this many points can be slow and memory-hungry. Counts and percentages do not change: they always use 100% of the events.',
     'warn.load': '⚠ Loading every event of a large file (millions) can take a while and use several GB of RAM.',
     'load.draw': 'Drawing plots…',
-    'full.confirm': '⚠ Drawing all {n} events as points can be VERY slow, freeze the tab or run out of memory (performance drop). Counts do not change. Continue? To go back, pick another value in “Events to show”.',
-    'full.on': 'Drawing 100 % (pick another value in “Events to show” to go back).',
+    'glp.camera': 'Download plot as PNG (high resolution)',
+    'glp.auto': 'Automatic: {cap} points per plot ({n} plots; your device draws ≈{rate} M points/s; budget {ms} ms per frame).',
+    'glp.frame': '{pts} points × {n} plots · {ms} ms/frame',
     'tour.1.h': '1 · Draw a gate', 'tour.1.p': 'Load a .fcs/.csv file. On a dot plot pick lasso or box, enclose a population, type its name in the side panel and press “Assign population”.',
     'tour.2.h': '2 · Choose each plot’s population', 'tour.2.p': 'Every plot has a “Population” selector: leave “All events” or pick a gate to see only its events. Gates drawn there become children of that population.',
     'tour.3.h': '3 · Check the hierarchy', 'tour.3.p': 'Under “Populations” you get the tree with events, % of parent and % of total. Right-click (or 📈) a population to create a plot with only its events.',
@@ -2898,7 +2900,7 @@ const ES_EN = {
   '▶ Predecir con el módulo local': '▶ Predict with the local module', '🎯 Traspasar a los gráficos de análisis': '🎯 Transfer to the analysis plots', 'Asigna a': 'Assigns to', 'cada evento cargado': 'every loaded event',
   'el tipo celular que le da EverFlowNet (B_lym, T_lym, NK, Mono…) como población, con su color, para refinar los gráficos: ocultar o resaltar tipos, y dibujar lazos dentro de ellos.': 'the cell type given by EverFlowNet (B_lym, T_lym, NK, Mono…) as a population, with its color, to refine the plots: hide or highlight types and draw lassos inside them.',
   'Confianza mínima por evento': 'Minimum confidence per event', '0 % (asignar todos)': '0% (assign all)', '🎯 Traspasar a los gráficos': '🎯 Transfer to the plots',
-  '3 · Servidor Python': '3 · Python server', '⏬ Completar al 100 % de los eventos': '⏬ Complete to 100 % of events', 'Dibuja todos los eventos (puede ser lento)': 'Draws every event (may be slow)', '🚧 Servidor Python no disponible, en construcción.': '🚧 Python server unavailable, under construction.', 'Esta función aún no está habilitada; el resto de la predicción tabular funciona con normalidad en el navegador.': 'This feature is not enabled yet; the rest of the tabular prediction works normally in the browser.', 'opcional · fusión profunda + consenso con tu FusionPredictor': 'optional · deep fusion + consensus with your FusionPredictor', '○ Sin servidor (opcional)': '○ No server (optional)',
+  '3 · Servidor Python': '3 · Python server', '◂ menos': '◂ less', 'Mostrar más ▸': 'Show more ▸', '50 % de los eventos': '50 % of events', '20 % de los eventos': '20 % of events', '10 % de los eventos': '10 % of events', '5 % de los eventos': '5 % of events', '🚧 Servidor Python no disponible, en construcción.': '🚧 Python server unavailable, under construction.', 'Esta función aún no está habilitada; el resto de la predicción tabular funciona con normalidad en el navegador.': 'This feature is not enabled yet; the rest of the tabular prediction works normally in the browser.', 'opcional · fusión profunda + consenso con tu FusionPredictor': 'optional · deep fusion + consensus with your FusionPredictor', '○ Sin servidor (opcional)': '○ No server (optional)',
   'Probar conexión': 'Test connection', '✓ Verificar contra Python (rápido)': '✓ Check against Python (fast)', '▶ Predicción completa con Python': '▶ Full prediction with Python',
   'Carga un archivo para ver su información.': 'Load a file to see its information.', 'Resumen del archivo': 'File summary', 'Canales y anticuerpos': 'Channels and antibodies',
   'Matriz de compensación': 'Compensation matrix', 'Todos los metadatos': 'All metadata', '⬇ CSV': '⬇ CSV', '⬇ JSON': '⬇ JSON', '⧉ Copiar': '⧉ Copy',
@@ -3092,6 +3094,272 @@ function setLang(l) {
 document.addEventListener('DOMContentLoaded', () => { applyLang(); });
 
 </script>
+<script id="glpoints-js">
+/*GLP-BEGIN*/
+/* ------------------------------------------------------------
+   GLPoints — renderer WebGL2 mínimo para nubes de puntos (INFINI-TWO, GPL-3.0).
+   - UN contexto WebGL2 compartido, que dibuja en un canvas offscreen y copia con drawImage al canvas 2D de cada panel
+     (evita el límite de ~16 contextos del navegador).
+   - Cada canal se sube UNA vez como Float32Array (carga perezosa, por tramos, con evicción LRU bajo un presupuesto de memoria).
+   - X e Y son atributos elegidos; la muestra/filtro es un buffer de índices (drawElements UNSIGNED_INT).
+   - La población de cada evento va en un buffer uint8 y los colores en una paleta de 256 entradas.
+   - El vertex shader aplica lineal / log10(max(v,1)) / asinh((v-shift)/biexW), igual que el código de los gráficos.
+   Sin dependencias. Todo el texto visible lo pone quien lo usa (aquí no hay cadenas de interfaz).
+   ------------------------------------------------------------ */
+const GPU_BUFFER_BUDGET_MB = 512;         // presupuesto conservador de buffers en GPU (canales + clases + índices)
+const GLP_CHUNK = 1 << 20;                // elementos por tramo de subida (bufferSubData) para no congelar el hilo principal
+class GLPointsError extends Error { constructor(kind, msg) { super(msg || kind); this.kind = kind; } }   // kind: 'budget' | 'oom' | 'lost' | 'stale' | 'nogl'
+
+class GLIndexSet {
+  /** Buffer de índices (uint32) con capacidad fija; se puede AÑADIR al final (muestras anidadas) sin reenviar lo anterior. */
+  constructor(gp, capacity) {
+    this.gp = gp; this.cap = capacity; this.count = 0; this.bytes = capacity * 4; this.stale = false;
+    this.buf = gp._newBuffer(this.bytes, gp.gl.ELEMENT_ARRAY_BUFFER, 'idx');
+    gp._indexBytes += this.bytes; gp._sets.add(this);
+  }
+  /** Escribe `arr` (Int32Array/Uint32Array) a partir de la posición `start` (en elementos), por tramos; cede el hilo entre tramos grandes. */
+  async write(arr, start = 0, yieldFn = null) {
+    const gp = this.gp, gl = gp.gl;
+    if (this.stale || !this.buf) throw new GLPointsError('stale');
+    if (start + arr.length > this.cap) throw new GLPointsError('budget', 'GLIndexSet: capacidad superada');
+    const u = arr instanceof Uint32Array ? arr : new Uint32Array(arr.buffer, arr.byteOffset, arr.length);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buf);
+    for (let o = 0; o < u.length; o += GLP_CHUNK) {
+      gl.bufferSubData(gl.ELEMENT_ARRAY_BUFFER, (start + o) * 4, u.subarray(o, Math.min(u.length, o + GLP_CHUNK)));
+      if (u.length > 2 * GLP_CHUNK && o + GLP_CHUNK < u.length) await (yieldFn ? yieldFn() : new Promise(r => setTimeout(r, 0)));
+      if (this.stale) throw new GLPointsError('stale');
+    }
+    gp._checkError();
+    this.count = Math.max(this.count, start + u.length);
+  }
+  setCount(n) { this.count = Math.min(n, this.cap); }
+  dispose() {
+    const gp = this.gp; if (!gp._sets.delete(this)) return;
+    gp._indexBytes -= this.bytes; if (this.buf && !this.stale) gp.gl.deleteBuffer(this.buf); this.buf = null; this.count = 0;
+  }
+}
+
+class GLPoints {
+  static supported() {
+    try { const c = document.createElement('canvas'), g = c.getContext('webgl2'); if (!g) return false; const l = g.getExtension('WEBGL_lose_context'); if (l) l.loseContext(); return true; } catch (e) { return false; }
+  }
+  static shared() { if (!GLPoints._inst) GLPoints._inst = new GLPoints(); return GLPoints._inst; }
+
+  constructor() {
+    this.canvas = document.createElement('canvas'); this.canvas.width = 2; this.canvas.height = 2;
+    this.budget = GPU_BUFFER_BUDGET_MB * 1048576;
+    this._cache = new Map();           // clave -> { buf, bytes, last, arr, kind }
+    this._sets = new Set(); this._indexBytes = 0; this._pin = new Set(); this._tick = 0;
+    this.lost = false; this._h = { lost: [], restored: [] };
+    this.canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); this._onLost(); }, false);
+    this.canvas.addEventListener('webglcontextrestored', () => { try { this._init(); } catch (e) { this.lost = true; return; } this.lost = false; this._h.restored.forEach(f => f()); }, false);
+    this._init();
+  }
+  on(ev, fn) { if (this._h[ev]) this._h[ev].push(fn); return this; }
+  _init() {
+    const gl = this.canvas.getContext('webgl2', { alpha: true, antialias: false, depth: false, stencil: false, premultipliedAlpha: true, preserveDrawingBuffer: false, powerPreference: 'high-performance' });
+    if (!gl) throw new GLPointsError('nogl', 'WebGL2 no disponible');
+    this.gl = gl;
+    const ri = gl.getExtension('WEBGL_debug_renderer_info');
+    this.gpu = ri ? gl.getParameter(ri.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER);
+    this.software = /swiftshader|llvmpipe|software|softpipe/i.test(this.gpu || '');
+    this.timer = gl.getExtension('EXT_disjoint_timer_query_webgl2');
+    this.maxPoint = gl.getParameter(gl.ALIASED_POINT_SIZE_RANGE)[1];
+    const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new GLPointsError('nogl', gl.getShaderInfoLog(s)); return s; };
+    const vs = sh(gl.VERTEX_SHADER, `#version 300 es
+precision highp float; precision highp int;
+layout(location=0) in float aX;
+layout(location=1) in float aY;
+layout(location=2) in uint aC;
+layout(location=3) in float aV;
+uniform vec4 uView; uniform ivec2 uSc; uniform vec2 uSh; uniform float uW; uniform float uSize; uniform float uOp;
+uniform int uMode; uniform vec4 uSolid; uniform vec2 uVr; uniform sampler2D uPal;
+out vec4 vCol;
+float tf(float v, int s, float sh) {
+  if (s == 1) return log(max(v, 1.0)) * 0.4342944819;
+  if (s == 2) return asinh((v - sh) / uW);
+  return v;
+}
+void main() {
+  float x = tf(aX, uSc.x, uSh.x), y = tf(aY, uSc.y, uSh.y);
+  gl_Position = vec4((x - uView.x) / (uView.y - uView.x) * 2.0 - 1.0, (y - uView.z) / (uView.w - uView.z) * 2.0 - 1.0, 0.0, 1.0);
+  gl_PointSize = uSize;
+  vec4 c;
+  if (uMode == 0) c = texelFetch(uPal, ivec2(int(aC), 0), 0);
+  else if (uMode == 1) c = texelFetch(uPal, ivec2(int(clamp((aV - uVr.x) / (uVr.y - uVr.x), 0.0, 1.0) * 255.0), 1), 0);
+  else c = uSolid;
+  float a = c.a * uOp;
+  vCol = vec4(c.rgb * a, a);
+}`);
+    const fs = sh(gl.FRAGMENT_SHADER, `#version 300 es
+precision mediump float;
+in vec4 vCol; uniform float uRound; out vec4 o;
+void main() {
+  if (uRound > 0.5 && length(gl_PointCoord - 0.5) > 0.5) discard;
+  o = vCol;
+}`);
+    const p = gl.createProgram(); gl.attachShader(p, vs); gl.attachShader(p, fs); gl.linkProgram(p);
+    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new GLPointsError('nogl', gl.getProgramInfoLog(p));
+    this.prog = p; this.u = {};
+    for (const n of ['uView', 'uSc', 'uSh', 'uW', 'uSize', 'uOp', 'uMode', 'uSolid', 'uVr', 'uPal', 'uRound']) this.u[n] = gl.getUniformLocation(p, n);
+    this.vao = gl.createVertexArray();
+    this.pal = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, this.pal);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, 256, 2, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(256 * 2 * 4));
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.enable(gl.BLEND); gl.blendFuncSeparate(gl.ONE, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+    gl.disable(gl.DEPTH_TEST);
+  }
+  _onLost() {
+    this.lost = true; this._cache.clear();
+    for (const s of this._sets) { s.stale = true; s.buf = null; s.count = 0; }
+    this._h.lost.forEach(f => f());
+  }
+  _checkError() {
+    const e = this.gl.getError();
+    if (e === this.gl.OUT_OF_MEMORY) { this._evictAll(); throw new GLPointsError('oom'); }
+  }
+  _bytesUsed() { let b = this._indexBytes; for (const v of this._cache.values()) b += v.bytes; return b; }
+  /** Libera lo menos usado (salvo lo fijado en el dibujo en curso) hasta que quepan `need` bytes. */
+  _reserve(need) {
+    if (need > this.budget) throw new GLPointsError('budget');
+    let used = this._bytesUsed();
+    if (used + need <= this.budget) return;
+    const order = [...this._cache.entries()].filter(([k]) => !this._pin.has(k)).sort((a, b) => a[1].last - b[1].last);
+    for (const [k, v] of order) { this.gl.deleteBuffer(v.buf); this._cache.delete(k); used -= v.bytes; if (used + need <= this.budget) return; }
+    throw new GLPointsError('budget');
+  }
+  _evictAll() { for (const v of this._cache.values()) this.gl.deleteBuffer(v.buf); this._cache.clear(); }
+  _newBuffer(bytes, target, kind) {
+    if (this.lost) throw new GLPointsError('lost');
+    this._reserve(bytes + (kind === 'idx' ? 0 : 0));
+    const gl = this.gl, b = gl.createBuffer();
+    gl.bindBuffer(target, b); gl.bufferData(target, bytes, gl.DYNAMIC_DRAW); this._checkError();
+    return b;
+  }
+  drop(key) { const v = this._cache.get(key); if (v) { this.gl.deleteBuffer(v.buf); this._cache.delete(key); } }
+  dropPrefix(pre) { for (const k of [...this._cache.keys()]) if (k.startsWith(pre)) this.drop(k); }
+  /** ¿Está el canal (u otro array) ya en GPU y es el mismo array? */
+  has(key, arr) { const v = this._cache.get(key); return !!v && v.arr === arr; }
+  /** Sube (si hace falta) un Float32Array (canal) o Uint8Array (clases) con clave estable. Carga perezosa, por tramos. */
+  async ensure(key, arr, yieldFn = null) {
+    if (this.lost) throw new GLPointsError('lost');
+    let v = this._cache.get(key);
+    if (v && v.arr === arr) { v.last = ++this._tick; return v; }
+    if (v) this.drop(key);
+    const gl = this.gl, f32 = arr instanceof Float32Array, bytes = arr.byteLength;
+    this._reserve(bytes);
+    const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf); gl.bufferData(gl.ARRAY_BUFFER, bytes, gl.STATIC_DRAW); this._checkError();
+    v = { buf, bytes, last: ++this._tick, arr, f32 }; this._cache.set(key, v);
+    const step = f32 ? GLP_CHUNK : GLP_CHUNK * 4;
+    for (let o = 0; o < arr.length; o += step) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.bufferSubData(gl.ARRAY_BUFFER, o * arr.BYTES_PER_ELEMENT, arr.subarray(o, Math.min(arr.length, o + step)));
+      if (arr.length > 2 * step && o + step < arr.length) { await (yieldFn ? yieldFn() : new Promise(r => setTimeout(r, 0))); if (this.lost) throw new GLPointsError('lost'); }
+    }
+    this._checkError();
+    return v;
+  }
+  /** Actualiza un tramo del buffer de clases (p. ej. al cambiar una compuerta) sin reenviar todo. */
+  updateRange(key, arr, from, to) {
+    const v = this._cache.get(key); if (!v || v.arr !== arr) return false;
+    const gl = this.gl; gl.bindBuffer(gl.ARRAY_BUFFER, v.buf);
+    gl.bufferSubData(gl.ARRAY_BUFFER, from * arr.BYTES_PER_ELEMENT, arr.subarray(from, to)); this._checkError(); return true;
+  }
+  newIndexSet(capacity) { return new GLIndexSet(this, capacity); }
+
+  /**
+   * Dibuja y copia al canvas 2D `target` (que se redimensiona a w·dpr × h·dpr).
+   * p = { target, w, h, dpr, bg (color CSS o null), xKey, yKey, sx, sy ('lin'|'log'|'biex'), shx, shy, biexW,
+   *       view:[x0,x1,y0,y1] (unidades transformadas: log10 para log, asinh para biex),
+   *       palette:Uint8Array(256·4 RGBA) , lut:Uint8Array(256·4)|null, size (px CSS), opacity,
+   *       passes:[{ index:GLIndexSet, count?, classKey?, colorKey?, vr?:[lo,hi], solid?:[r,g,b,a] 0..1 }] }
+   */
+  draw(p) {
+    if (this.lost) throw new GLPointsError('lost');
+    const gl = this.gl, dpr = p.dpr || 1, W = Math.max(1, Math.round(p.w * dpr)), H = Math.max(1, Math.round(p.h * dpr));
+    if (this.canvas.width !== W || this.canvas.height !== H) { this.canvas.width = W; this.canvas.height = H; }
+    this._pin.clear(); this._pin.add(p.xKey); this._pin.add(p.yKey);
+    for (const q of p.passes) { if (q.classKey) this._pin.add(q.classKey); if (q.colorKey) this._pin.add(q.colorKey); }
+    gl.viewport(0, 0, W, H); gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.useProgram(this.prog); gl.bindVertexArray(this.vao);
+    const X = this._cache.get(p.xKey), Y = this._cache.get(p.yKey);
+    if (!X || !Y) throw new GLPointsError('stale', 'canal sin subir');
+    X.last = Y.last = ++this._tick;
+    const sc = { lin: 0, log: 1, biex: 2 };
+    gl.uniform4f(this.u.uView, p.view[0], p.view[1], p.view[2], p.view[3]);
+    gl.uniform2i(this.u.uSc, sc[p.sx] | 0, sc[p.sy] | 0); gl.uniform2f(this.u.uSh, p.shx || 0, p.shy || 0); gl.uniform1f(this.u.uW, p.biexW || 150);
+    const size = Math.min(this.maxPoint, Math.max(1, (p.size || 2) * dpr));
+    gl.uniform1f(this.u.uSize, size); gl.uniform1f(this.u.uRound, size > 2.5 ? 1 : 0); gl.uniform1f(this.u.uOp, p.opacity == null ? 1 : p.opacity);
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, this.pal); gl.uniform1i(this.u.uPal, 0);
+    if (p.palette) gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, 256, 1, gl.RGBA, gl.UNSIGNED_BYTE, p.palette);
+    if (p.lut) gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 1, 256, 1, gl.RGBA, gl.UNSIGNED_BYTE, p.lut);
+    gl.bindBuffer(gl.ARRAY_BUFFER, X.buf); gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 1, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, Y.buf); gl.enableVertexAttribArray(1); gl.vertexAttribPointer(1, 1, gl.FLOAT, false, 0, 0);
+    for (const q of p.passes) {
+      const ix = q.index; if (!ix || ix.stale || !ix.buf) throw new GLPointsError('stale', 'índice sin subir');
+      const n = Math.min(q.count == null ? ix.count : q.count, ix.count); if (!n) continue;
+      let mode = 2;
+      if (q.classKey) { const C = this._cache.get(q.classKey); if (!C) throw new GLPointsError('stale', 'clases sin subir'); C.last = ++this._tick;
+        gl.bindBuffer(gl.ARRAY_BUFFER, C.buf); gl.enableVertexAttribArray(2); gl.vertexAttribIPointer(2, 1, gl.UNSIGNED_BYTE, 0, 0); mode = 0; }
+      else { gl.disableVertexAttribArray(2); gl.vertexAttribI4ui(2, 0, 0, 0, 0); }
+      if (q.colorKey) { const V = this._cache.get(q.colorKey); if (!V) throw new GLPointsError('stale', 'canal de color sin subir'); V.last = ++this._tick;
+        gl.bindBuffer(gl.ARRAY_BUFFER, V.buf); gl.enableVertexAttribArray(3); gl.vertexAttribPointer(3, 1, gl.FLOAT, false, 0, 0); mode = 1;
+        gl.uniform2f(this.u.uVr, q.vr[0], q.vr[1]); }
+      else { gl.disableVertexAttribArray(3); gl.vertexAttrib1f(3, 0); }
+      if (!q.classKey && !q.colorKey) { const s = q.solid || [0.5, 0.5, 0.5, 1]; gl.uniform4f(this.u.uSolid, s[0], s[1], s[2], s[3]); }
+      gl.uniform1i(this.u.uMode, mode);
+      gl.uniform1f(this.u.uOp, q.op != null ? q.op : (p.opacity == null ? 1 : p.opacity));
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ix.buf);
+      gl.drawElements(gl.POINTS, n, gl.UNSIGNED_INT, 0);
+    }
+    if (p.target) {
+      const t = p.target; if (t.width !== W || t.height !== H) { t.width = W; t.height = H; }
+      const c = t.getContext('2d'); c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, W, H);
+      if (p.bg) { c.fillStyle = p.bg; c.fillRect(0, 0, W, H); }
+      c.drawImage(this.canvas, 0, 0);
+    }
+    this._pin.clear();
+  }
+  /** Fuerza la espera de la GPU (un readPixels de 1×1 obliga a terminar los comandos; gl.finish() en Chrome no bloquea de verdad). */
+  sync() { const px = new Uint8Array(4); this.gl.readPixels(0, 0, 1, 1, this.gl.RGBA, this.gl.UNSIGNED_BYTE, px); return px; }
+  /** Tiempo de GPU de una función de dibujo (ms): EXT_disjoint_timer_query_webgl2 si existe; si no, readPixels + performance.now(). */
+  async time(drawFn) {
+    const gl = this.gl;
+    if (this.timer) {
+      const q = gl.createQuery(); gl.beginQuery(this.timer.TIME_ELAPSED_EXT, q); drawFn(); gl.endQuery(this.timer.TIME_ELAPSED_EXT);
+      const t0 = performance.now();
+      while (performance.now() - t0 < 1500) {
+        if (gl.getQueryParameter(q, gl.QUERY_RESULT_AVAILABLE)) {
+          const bad = gl.getParameter(this.timer.GPU_DISJOINT_EXT), ns = gl.getQueryParameter(q, gl.QUERY_RESULT); gl.deleteQuery(q);
+          if (!bad) return { ms: ns / 1e6, via: 'timer' };
+          break;
+        }
+        await new Promise(r => setTimeout(r, 2));
+      }
+    }
+    this.sync(); const t1 = performance.now(); drawFn(); this.sync();
+    return { ms: performance.now() - t1, via: 'readPixels' };
+  }
+  /** Prueba sintética (para ?perf=1): sube x/y e índices 0..N-1, dibuja 3 veces y devuelve medianas. */
+  static async bench(x, y) {
+    const gp = GLPoints.shared(), N = x.length, t0 = performance.now();
+    await gp.ensure('__bx', x); await gp.ensure('__by', y);
+    const ix = gp.newIndexSet(N), seq = new Uint32Array(N); for (let i = 0; i < N; i++) seq[i] = i;
+    await ix.write(seq); gp.sync();
+    const upload = performance.now() - t0, pal = new Uint8Array(256 * 4); pal.set([30, 90, 200, 255]);
+    const tgt = document.createElement('canvas'), ts = [];
+    const pass = [{ index: ix, classKey: null, solid: [0.1, 0.35, 0.8, 1] }];
+    const run = () => gp.draw({ target: tgt, w: 700, h: 500, dpr: 1, bg: '#E5ECF6', xKey: '__bx', yKey: '__by', sx: 'lin', sy: 'lin', view: [0, 1000, 0, 1000], palette: pal, size: 2, opacity: 0.7, passes: pass });
+    for (let r = 0; r < 3; r++) ts.push((await gp.time(run)).ms);
+    ts.sort((a, b) => a - b);
+    ix.dispose(); gp.dropPrefix('__b');
+    return { glpoints: Math.round(upload + ts[1]), upload: Math.round(upload), draw: Math.round(ts[1] * 10) / 10 };
+  }
+}
+/*GLP-END*/
+</script>
 <script>
 'use strict';
 /* ============================================================
@@ -3104,9 +3372,80 @@ const UNASSIGNED = '__UNASSIGNED__';
 const VIS = { dbins: 'auto', dsm: true, dpal: 'flow', dpts: false, hbins: 256, hnorm: 'count', hpop: true, hsm: false, msize: 2, mop: 0.8 };   // opciones de densidad e histograma
 const DENS_PAL = { flow: [[0, '#1a1aa6'], [0.2, '#0a8cff'], [0.4, '#00d9a0'], [0.6, '#b4e000'], [0.8, '#ff9a00'], [1, '#c00000']], viridis: 'Viridis', blues: [[0, '#cfe1f5'], [0.25, '#6baed6'], [0.5, '#2171b5'], [0.75, '#08306b'], [1, '#000000']] };
 let RENDER_CAP = 150000;          // tope de puntos DIBUJADOS por gráfico (Infinity = todos). Nunca afecta a conteos ni a compuertas.
-let FULL100 = false;              // el usuario pidió dibujar el 100 % (a pedido, con aviso de rendimiento)
+let RENDER_PCT = 0;               // 0 = usar RENDER_CAP; >0 = fracción de los eventos de cada gráfico (50 %, 20 %, 10 %, 5 %)
 let DENSITY_MIN = 1000000;       // «Todos» con más eventos que esto: mapa de densidad 100 % + puntos de poblaciones asignadas
 const GL_PANELS = 8, SVG_CAP = 20000;
+
+/* ------------------------------------------------------------
+   Instrumentación de rendimiento (solo con ?perf=1): tiempos por etapa y prueba sintética scattergl vs GLPoints.
+   Sin ?perf=1 no hace nada (perfT ejecuta la función tal cual).
+   ------------------------------------------------------------ */
+const PERF = /[?&]perf=1(&|$)/.test(location.search);
+const PERF_STAGES = {};               // etapa -> { ms (último), n (veces), tot (acumulado), extra }
+function perfMark(stage, ms, extra) {
+  if (!PERF) return;
+  const r = PERF_STAGES[stage] || (PERF_STAGES[stage] = { ms: 0, n: 0, tot: 0, extra: '' });
+  r.ms = ms; r.n++; r.tot += ms; if (extra !== undefined) r.extra = extra;
+  perfRender();
+}
+function perfT(stage, fn, extra) {
+  if (!PERF) return fn();
+  const t0 = performance.now(), r = fn();
+  perfMark(stage, performance.now() - t0, typeof extra === 'function' ? extra(r) : extra);
+  return r;
+}
+function perfGpuName() {
+  try {
+    const c = document.createElement('canvas'), g = c.getContext('webgl2') || c.getContext('webgl');
+    if (!g) return 'sin WebGL';
+    const e = g.getExtension('WEBGL_debug_renderer_info');
+    return (e ? g.getParameter(e.UNMASKED_RENDERER_WEBGL) : g.getParameter(g.RENDERER)) + ' · ' + (c.getContext ? (g instanceof WebGL2RenderingContext ? 'WebGL2' : 'WebGL1') : '');
+  } catch (e) { return 'desconocida'; }
+}
+let perfBox = null;
+function perfRender() {
+  if (!PERF) return;
+  if (!perfBox) {
+    perfBox = document.createElement('div');
+    perfBox.id = 'perf-box';
+    perfBox.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:99999;background:rgba(10,20,30,.92);color:#cfe;font:11px/1.35 monospace;padding:8px 10px;border-radius:6px;max-width:520px;max-height:60vh;overflow:auto';
+    document.body.appendChild(perfBox);
+    perfBox.addEventListener('click', e => { if (e.target.id === 'perf-bench') perfBench(); });
+  }
+  const rows = Object.entries(PERF_STAGES).map(([k, r]) => `<tr><td>${k}</td><td align=right>${r.ms.toFixed(1)} ms</td><td align=right>×${r.n}</td><td>${r.extra || ''}</td></tr>`).join('');
+  perfBox.innerHTML = `<b>?perf=1</b> · ${perfGpuName()} · dpr ${window.devicePixelRatio || 1}<br><table style="border-spacing:8px 1px">${rows}</table>`
+    + `<button id="perf-bench" style="margin-top:4px">Prueba sintética 1 M / 2 M / 5 M / 10 M</button><div id="perf-out" style="white-space:pre"></div>`;
+}
+/** Prueba sintética: dibuja N puntos aleatorios con scattergl (y con GLPoints si existe) y mide el tiempo hasta el cuadro pintado. */
+async function perfBench(sizes) {
+  const out = () => document.getElementById('perf-out'), res = [];
+  const log = line => { if (out()) out().textContent += line + '\n'; console.log('[perf]', line); };
+  if (out()) out().textContent = '';
+  for (const N of (sizes || [1e6, 2e6, 5e6, 1e7])) {
+    const x = new Float32Array(N), y = new Float32Array(N);
+    for (let i = 0; i < N; i++) { x[i] = Math.random() * 1000; y[i] = Math.random() * 1000; }
+    const row = { N };
+    const div = document.createElement('div');
+    div.style.cssText = 'position:fixed;left:-9999px;top:0;width:700px;height:500px';
+    document.body.appendChild(div);
+    try {
+      let best = Infinity;
+      for (let r = 0; r < 2; r++) {
+        const t0 = performance.now();
+        await Plotly.react(div, [{ type: 'scattergl', mode: 'markers', x, y, marker: { size: 2, opacity: 0.7 } }], { margin: { l: 30, r: 10, t: 10, b: 30 } });
+        await nextPaint(); best = Math.min(best, performance.now() - t0);
+      }
+      row.scattergl = Math.round(best);
+    } catch (e) { row.scattergl = 'error: ' + e.message; }
+    try { Plotly.purge(div); } catch (e) { /* noop */ } div.remove();
+    if (typeof GLPoints !== 'undefined' && GLPoints.bench) { try { Object.assign(row, await GLPoints.bench(x, y)); } catch (e) { row.glpoints = 'error: ' + e.message; } }
+    res.push(row);
+    log(`${(N / 1e6)} M · scattergl ${row.scattergl} ms` + (row.glpoints !== undefined ? ` · GLPoints ${row.glpoints} ms (subida ${row.upload} ms, dibujo ${row.draw} ms)` : ''));
+  }
+  window.__perfBench = res; return res;
+}
+if (PERF) { window.__perf = { stages: PERF_STAGES, bench: perfBench, gpu: perfGpuName }; document.addEventListener('DOMContentLoaded', perfRender); }
+
 const MAX_PANELS = 16;            // tope de gráficos: cada uno usa un contexto WebGL y los navegadores admiten unos 16
 const PLOT_BG = '#E5ECF6';
 const tick = () => new Promise(r => setTimeout(r, 0));
@@ -3277,21 +3616,52 @@ function sampleFiltered(cap, base, soloAsignados) {
   return out;
 }
 /** Eventos del gráfico `i` dentro del polígono (unidades de dato crudas, como lo guarda geomRaw): cuenta el 100 %, no solo los puntos dibujados. */
-function idsInGeom(i, g) {
-  const cfg = S.panels[i], base = panelEvents(cfg), X = S.cols[cfg.x], Y = S.cols[cfg.y];
-  if (!X || !Y || !g || !g.poly || g.poly.length < 3) return new Int32Array(0);
-  const poly = g.poly.length > 24 ? simplifyPoly(g.poly, cfg.xs, cfg.ys, cfg.x, cfg.y) : g.poly;   // el mismo polígono que se guarda en la estrategia
-  const P = poly.map(([x, y]) => [axv(x, cfg.xs, cfg.x), axv(y, cfg.ys, cfg.y)]);
-  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
-  for (const [x, y] of P) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
-  const lin = cfg.xs === 'linear' && cfg.ys === 'linear', out = new Int32Array(base.length); let c = 0;
+let _geomScratch = new Int32Array(0);       // búfer reutilizable: el lazo sobre millones de eventos no reserva un Int32Array del tamaño del gráfico en cada uso
+/** Bucle del lazo (función pura: se ejecuta tal cual en el hilo principal y, copiada con toString(), dentro del Worker).
+    p: { px, py (polígono transformado), nP, cx, cy (0 lineal · 1 log · 2 biex), shx, shy, W, x0, x1, y0, y1 (caja transformada), rxl, rxh, ryl, ryh (caja cruda conservadora) } */
+function geomRun(base, X, Y, p, out) {
+  const { px, py, nP, cx, cy, shx, shy, W, x0, x1, y0, y1, rxl, rxh, ryl, ryh } = p; let c = 0;
   for (let k = 0; k < base.length; k++) {
-    const e = base[k]; let x = X[e], y = Y[e];
-    if (lin) { if (x < x0 || x > x1 || y < y0 || y > y1) continue; }
-    else { x = cfg.xs === 'linear' ? x : axv(x, cfg.xs, cfg.x); y = cfg.ys === 'linear' ? y : axv(y, cfg.ys, cfg.y); if (x < x0 || x > x1 || y < y0 || y > y1) continue; }
-    if (pointInPoly(x, y, P)) out[c++] = e;
+    const e = base[k], vx = X[e];
+    if (!(vx >= rxl && vx <= rxh)) continue;                          // prefiltro por caja en valores crudos (sin funciones trascendentes)
+    const vy = Y[e]; if (!(vy >= ryl && vy <= ryh)) continue;
+    const x = cx === 0 ? vx : cx === 1 ? Math.log10(Math.max(vx, 1)) : Math.asinh((vx - shx) / W);
+    const y = cy === 0 ? vy : cy === 1 ? Math.log10(Math.max(vy, 1)) : Math.asinh((vy - shy) / W);
+    if (x < x0 || x > x1 || y < y0 || y > y1) continue;
+    let inside = false;                                               // pointInPoly, sin arrays anidados
+    for (let a = 0, b = nP - 1; a < nP; b = a++) {
+      const xi = px[a], yi = py[a], xj = px[b], yj = py[b];
+      if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) inside = !inside;
+    }
+    if (inside) out[c++] = e;
   }
-  return out.slice(0, c);
+  return c;
+}
+/** Prepara el polígono (transformado) y las cotas del lazo; null si no hay nada que calcular. */
+function geomPrep(i, g) {
+  const cfg = S.panels[i], base = panelEvents(cfg), X = S.cols[cfg.x], Y = S.cols[cfg.y];
+  if (!X || !Y || !g || !g.poly || g.poly.length < 3) return null;
+  const poly = g.poly.length > 24 ? simplifyPoly(g.poly, cfg.xs, cfg.ys, cfg.x, cfg.y) : g.poly;   // el mismo polígono que se guarda en la estrategia
+  const nP = poly.length, px = new Float64Array(nP), py = new Float64Array(nP);
+  for (let q = 0; q < nP; q++) { px[q] = axv(poly[q][0], cfg.xs, cfg.x); py[q] = axv(poly[q][1], cfg.ys, cfg.y); }
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  for (let q = 0; q < nP; q++) { if (px[q] < x0) x0 = px[q]; if (px[q] > x1) x1 = px[q]; if (py[q] < y0) y0 = py[q]; if (py[q] > y1) y1 = py[q]; }
+  // Cotas crudas CONSERVADORAS (la decisión exacta se toma luego en el espacio transformado)
+  const code = s => s === 'log' ? 1 : s === 'biex' ? 2 : 0, cx = code(cfg.xs), cy = code(cfg.ys), shx = bxShift(cfg.x), shy = bxShift(cfg.y), W = S.biexW;
+  const wid = v => 1e-6 * (Math.abs(v) + 1);
+  const lo = (t, c, sh) => c === 1 ? (t > 0 ? Math.pow(10, t) * (1 - 1e-9) : -Infinity) : c === 2 ? W * Math.sinh(t) + sh - wid(W * Math.sinh(t) + sh) : t;
+  const hi = (t, c, sh) => c === 1 ? (t >= 0 ? Math.pow(10, t) * (1 + 1e-9) : -Infinity) : c === 2 ? W * Math.sinh(t) + sh + wid(W * Math.sinh(t) + sh) : t;
+  return { cfg, base, X, Y, p: { px, py, nP, cx, cy, shx, shy, W, x0, x1, y0, y1, rxl: lo(x0, cx, shx), rxh: hi(x1, cx, shx), ryl: lo(y0, cy, shy), ryh: hi(y1, cy, shy) } };
+}
+function idsInGeom(i, g) {
+  const P = geomPrep(i, g); if (!P) return new Int32Array(0);
+  if (_geomScratch.length < P.base.length) _geomScratch = new Int32Array(Math.max(P.base.length, 1024));
+  return _geomScratch.slice(0, geomRun(P.base, P.X, P.Y, P.p, _geomScratch));
+}
+/** Lazo/caja interactivo: en un Web Worker (no congela la interfaz con millones de eventos); sin Worker, el mismo cálculo en el hilo principal. */
+function idsInGeomAsync(i, g) {
+  const P = geomPrep(i, g); if (!P) return Promise.resolve(new Int32Array(0));
+  return glpLassoWorker(P).then(ids => ids || idsInGeom(i, g));
 }
 
 /* ------------------------------------------------------------
@@ -3470,7 +3840,8 @@ async function ingest(parsed, name, maxEv, opts) {
   S.dirtyAdv = true;
   $('lbl-tsne').textContent = 't-SNE poblaciones';
   $('lbl-umap').textContent = 'UMAP poblaciones';
-  await renderAll();
+  dwClear(); await glpNewFile();
+  await renderAll(); glpReportFrame();
   if (S.tab === 'avanzado') computeEmbeddings();
 }
 
@@ -3674,23 +4045,36 @@ function figPanel(i, big) {
   }
   // Puntos (scattergl). Se dibuja una muestra determinista (que prioriza las poblaciones asignadas); los conteos usan SIEMPRE el 100 %.
   // Los navegadores admiten ~16 contextos WebGL: solo los primeros GL_PANELS gráficos (y la vista ampliada) usan WebGL; los demás usan SVG con una muestra menor
-  const useGl = big || i < GL_PANELS, cap = useGl ? RENDER_CAP : Math.min(RENDER_CAP, SVG_CAP);
+  const GLPon = glpOK() && cfg.mode !== 'density' && !!axisRange(cfg.x, cfg.xs) && !!axisRange(cfg.y, cfg.ys);   // puntos con GLPoints (WebGL2 propio)
+  const capN = RENDER_PCT ? Math.ceil(f.length * RENDER_PCT) : RENDER_CAP, useGl = big || i < GL_PANELS || GLPon;
+  let cap = useGl ? capN : Math.min(capN, SVG_CAP);
+  if (!GLPon && GLP.flag && GLP.fail) cap = Math.min(cap, 500000);      // respaldo scattergl tras un fallo/pérdida de contexto: no dibujar millones con Plotly
   const forced = cfg.mode === 'density';          // modo Densidad: mapa de calor 100 % + (opcional) puntos de poblaciones; admite lazo/caja
-  const dens = forced || (useGl && !Number.isFinite(cap) && f.length > DENSITY_MIN);     // «Todos» con millones de eventos: densidad 100 % + puntos asignados
-  const idx = dens ? ((forced && !VIS.dpts) ? new Int32Array(0) : sampleFiltered(Math.min(500000, Math.max(cap, 1)), f, true)) : sampleFiltered(cap, f), m = idx.length;
-  const px = new Float32Array(m), py = new Float32Array(m);
+  const dens = forced || (!GLPon && useGl && !Number.isFinite(cap) && f.length > DENSITY_MIN);     // «Todos» con millones de eventos: densidad 100 % + puntos asignados
+  const idx = GLPon ? new Int32Array(0) : perfT('muestreo', () => dens ? ((forced && !VIS.dpts) ? new Int32Array(0) : sampleFiltered(Math.min(500000, Math.max(cap, 1)), f, true)) : sampleFiltered(cap, f), r => fmtInt(r.length) + ' pts'), m = idx.length;
+  const px = new Float32Array(GLPon ? 0 : m), py = new Float32Array(GLPon ? 0 : m);
   const bxx = cfg.xs === 'biex', bxy = cfg.ys === 'biex', shx = bxShift(cfg.x), shy = bxShift(cfg.y);
-  for (let k = 0; k < m; k++) {
+  if (!GLPon) perfT('transformación', () => { for (let k = 0; k < m; k++) {
     const a = X[idx[k]], b = Y[idx[k]];
     px[k] = lgx ? Math.max(a, 1) : bxx ? Math.asinh((a - shx) / S.biexW) : a; py[k] = lgy ? Math.max(b, 1) : bxy ? Math.asinh((b - shy) / S.biexW) : b;
-  }
+  } });
   const rxs = axisRange(cfg.x, cfg.xs), rys = axisRange(cfg.y, cfg.ys);
   L.xaxis = { ...L.xaxis, title: axTitle(chLabel(cfg.x)), type: lgx ? 'log' : 'linear', range: rxs, ...axisExtra(cfg.xs, rxs, cfg.x) };
   L.yaxis = { ...L.yaxis, title: axTitle(chLabel(cfg.y)), type: lgy ? 'log' : 'linear', range: rys, ...axisExtra(cfg.ys, rys, cfg.y) };
   const ov = gateOverlays(cfg, 'scatter', true);
   if (ov.shapes) { L.shapes = ov.shapes; L.annotations = ov.annotations; }
   const data = [];
-  if (dens && rxs && rys) data.push(densityTrace(f, X, Y, rxs, rys, tx, ty, lgx, lgy, big));
+  if (GLPon) {
+    const spec = perfT('muestreo (anidado)', () => glpPrepare(cfg, f, cap, { lgx, lgy, bxx, bxy, shx, shy, rxs, rys }), r => fmtInt(r.total) + ' pts');
+    data.push(glpGhost(spec, lgx, lgy)); L.hovermode = false;
+    return { data, layout: L, ids: null, edit: ov.edit, full: true, info: shownInfo(spec.total, f.length, false), glp: spec };
+  }
+  let densSpec = null;
+  if (dens && rxs && rys) {
+    const nbD = VIS.dbins === 'auto' ? (big ? 400 : 320) : +VIS.dbins;
+    densSpec = { f, X, Y, xk: cfg.x, yk: cfg.y, rx: rxs, ry: rys, lgx, lgy, sx: lgx ? 1 : bxx ? 2 : 0, sy: lgy ? 1 : bxy ? 2 : 0, shx, shy, nb: nbD,
+      fallback: () => densityTrace(f, X, Y, rxs, rys, tx, ty, lgx, lgy, big) };
+  }
   if (dens) {
     // Backgating sobre la densidad: los eventos seleccionados (naranja), la población en backgating y el cluster FlowSOM (rojo) se dibujan como puntos encima
     const HI_CAP = 250000;
@@ -3715,7 +4099,7 @@ function figPanel(i, big) {
     hovertemplate: `${chLabel(cfg.x)}${bxx ? ' (biex)' : ''}: %{x:.1f}<br>${chLabel(cfg.y)}${bxy ? ' (biex)' : ''}: %{y:.1f}<br>ID: %{customdata}<extra></extra>`,
   });
   else data.push({ type: useGl ? 'scattergl' : 'scatter', mode: 'markers', x: [rxs ? (lgx ? Math.pow(10, rxs[0]) : rxs[0]) : 0], y: [rys ? (lgy ? Math.pow(10, rys[0]) : rys[0]) : 0], marker: { opacity: 0, size: 2 }, hoverinfo: 'skip' });   // traza vacía: mantiene activo el lazo
-  return { data, layout: L, ids: idx, edit: ov.edit, full: true, info: shownInfo(m, f.length, dens) };
+  return { data, layout: L, ids: idx, edit: ov.edit, full: true, info: shownInfo(m, f.length, dens), dens: densSpec };
 }
 /** Texto «mostrando X de N eventos» de cada gráfico. */
 function shownInfo(m, total, dens) {
@@ -3838,8 +4222,14 @@ function drawFig(gd, fig, key, cfg) {
   // cajas, y sus botones «acercar/alejar» se llevaban los clics pensados para tomar un vértice o agregar uno con doble clic.
   const editing = !!(S.editGates && gd._edit && gd._edit.length);
   const pcfg = { ...(cfg || PLOT_CONFIG), ...(editing ? { doubleClick: false, displayModeBar: false } : { doubleClick: 'reset+autosize', displayModeBar: 'hover' }) };
-  const done = Promise.resolve(Plotly.react(gd, fig.data, fig.layout, pcfg)).catch(e => console.error(e));
-  if (!gd._h) {
+  const tDraw = PERF ? performance.now() : 0;
+  if (fig.glp) { gd._glpWant = true; gd._glp = null; if (gd._glpCv) gd._glpCv.style.visibility = 'hidden'; } else if (gd._glpWant || gd._glpCv || gd._glp) glpDetach(gd);
+  const densTok = gd._densTok = (gd._densTok || 0) + 1;
+  const pre = fig.dens ? glpDensImage(fig.dens).then(img => { if (img) fig.layout.images = (fig.layout.images || []).concat([img]); else fig.data.unshift(fig.dens.fallback()); }).catch(() => { fig.data.unshift(fig.dens.fallback()); }) : null;
+  const doReact = () => densTok !== gd._densTok ? undefined : Plotly.react(gd, fig.data, fig.layout, fig.glp ? glpConfig(pcfg) : pcfg);
+  const done = Promise.resolve(pre ? pre.then(doReact) : doReact()).then(r => { if (PERF) perfMark('Plotly.react (dibujo)', performance.now() - tDraw); return fig.glp && densTok === gd._densTok ? glpAttach(gd, fig.glp) : r; }).catch(e => console.error(e));
+  const installH = () => {
+  if (gd._h || typeof gd.on !== 'function') return;
     gd._h = true;
     gd.on('plotly_selected', ev => {
       // Plotly vuelve a emitir 'plotly_selected' (sin lassoPoints/range, 0 puntos) cuando redibujamos
@@ -3849,11 +4239,16 @@ function drawFig(gd, fig, key, cfg) {
       let ids;
       if (gd._full && g && /^p\d+$/.test(gd._key)) {
         // Gráfico de puntos de un panel: la selección se calcula sobre el 100 % de los eventos del gráfico (no solo los puntos dibujados)
-        const pi = +gd._key.slice(1), pcfg = S.panels[pi];
-        ids = idsInGeom(pi, g);
+        const pi = +gd._key.slice(1), pcfg = S.panels[pi], tok = gd._selTok = (gd._selTok || 0) + 1, t0 = PERF ? performance.now() : 0;
         S.selPop[gd._key] = pcfg.pop || '';
         // La compuerta que se dibuje queda como hija de la población mostrada en este gráfico
         const pp = $('parent-pop'); if (pp && [...pp.options].some(o => o.value === (pcfg.pop || ''))) pp.value = pcfg.pop || '';
+        idsInGeomAsync(pi, g).then(r => {
+          if (tok !== gd._selTok) return;                              // otra selección o «deseleccionar» llegó antes
+          if (PERF) perfMark('lazo (100 %, Worker)', performance.now() - t0, fmtInt(r.length) + ' eventos');
+          S.sel[gd._key] = r; S.selGeom[gd._key] = g; onSelChange();
+        });
+        return;
       } else {
         if (!gd._ids || !ev.points) return;
         ids = [];
@@ -3861,12 +4256,13 @@ function drawFig(gd, fig, key, cfg) {
       }
       S.sel[gd._key] = ids; S.selGeom[gd._key] = g; onSelChange();
     });
-    gd.on('plotly_deselect', () => { S.sel[gd._key] = null; delete S.selGeom[gd._key]; onSelChange(); });
-  }
+    gd.on('plotly_deselect', () => { gd._selTok = (gd._selTok || 0) + 1; S.sel[gd._key] = null; delete S.selGeom[gd._key]; onSelChange(); });
+  };
+  installH(); done.then(installH);
   return done;
 }
-function renderPanel(i) { return drawFig($('g-p' + i), figPanel(i, false), 'p' + i); }
-function renderPanels() { const ps = []; for (let i = 0; i < S.panels.length; i++) ps.push(renderPanel(i)); S.dirtyPanels = false; return Promise.all(ps); }
+function renderPanel(i) { if (!GLP.batch) GLP.epoch++; return drawFig($('g-p' + i), figPanel(i, false), 'p' + i); }
+function renderPanels() { const ps = []; GLP.epoch++; GLP.batch = true; try { for (let i = 0; i < S.panels.length; i++) ps.push(renderPanel(i)); } finally { GLP.batch = false; } S.dirtyPanels = false; return Promise.all(ps); }
 
 /* ------------------------------------------------------------
    Análisis avanzado: caja por población, superficie de densidad y dispersión 3D
@@ -4268,13 +4664,11 @@ function updateRenderWarn() {
   const el = $('render-warn'); if (!el) return;
   let msg = '';
   if (S.n > 0) {
-    if (!Number.isFinite(RENDER_CAP) && S.n > DENSITY_MIN) msg = t('warn.render.dens', { n: fmtInt(S.n) });
+    if (glpOK()) { if (GLP.lastMs > FRAME_BUDGET_MS) msg = t('warn.render.big'); }       // ms reales por encima del presupuesto: se avisa, pero se deja continuar
+    else if (!Number.isFinite(RENDER_CAP) && S.n > DENSITY_MIN) msg = t('warn.render.dens', { n: fmtInt(S.n) });
     else if ((!Number.isFinite(RENDER_CAP) ? S.n : RENDER_CAP) >= 500000 && S.n >= 500000) msg = t('warn.render.big');
   }
   el.textContent = msg; el.classList.toggle('show', !!msg);
-  const fb = $('render-full-box');
-  if (fb) { fb.style.display = (S.n > 0 && (FULL100 || (Number.isFinite(RENDER_CAP) && RENDER_CAP < S.n))) ? 'block' : 'none';
-    $('btn-render-full').style.display = FULL100 ? 'none' : ''; $('render-full-note').textContent = FULL100 ? t('full.on') : ''; }
 }
 function updateLoadWarn() {
   const el = $('load-warn'), v = +$('maxev').value;
@@ -4284,7 +4678,7 @@ function updateLoadWarn() {
    Modo automático de «Eventos a mostrar»: mide cuántos puntos por segundo dibuja WebGL en este equipo
    y reparte ese presupuesto entre los gráficos que usan WebGL. Solo afecta al dibujo, nunca a los conteos.
    ------------------------------------------------------------ */
-const BENCH_KEY = 'infinitwo_bench_v1', CAP_OPTS = [10000, 50000, 150000, 500000, 1000000, 2000000];
+const BENCH_KEY = 'infinitwo_bench_v1', CAP_OPTS = [10000, 50000, 150000, 500000, 1000000];
 const AUTO = { rate: 0 };
 const benchSig = () => navigator.userAgent + '|' + (window.devicePixelRatio || 1);
 function benchLoad() {
@@ -4315,31 +4709,31 @@ async function benchGL() {
 function autoCapFor(rate, nGl) {
   const mem = navigator.deviceMemory || 8;
   let per = rate ? rate * 2 / Math.max(1, nGl) : 50000;
-  per = Math.min(per, mem < 4 ? 150000 : mem < 8 ? 500000 : 2000000);   // 2 M solo si el equipo (≥8 GB) y la GPU medida lo permiten
+  per = Math.min(per, mem < 4 ? 150000 : mem < 8 ? 500000 : 1000000);
   let cap = CAP_OPTS[0]; for (const o of CAP_OPTS) if (per >= o) cap = o;
   return cap;
 }
 /** Recalcula el tope en modo automático (al cambiar el nº de gráficos o terminar la medición). */
 function applyAutoCap() {
+  if (glpOK()) return glpApplyCap();
   const sel = $('render-cap'), box = $('render-auto');
   if (!sel || sel.value !== 'auto') { if (box) box.classList.remove('show'); return; }
   const nGl = Math.max(1, Math.min(S.panels.length || +$('num-panels').value || 4, GL_PANELS));
-  if (!FULL100) RENDER_CAP = autoCapFor(AUTO.rate, nGl);
+  RENDER_CAP = autoCapFor(AUTO.rate, nGl);
   box.innerHTML = (AUTO.rate ? esc(t('auto.info', { cap: fmtInt(RENDER_CAP), n: nGl, rate: fmtInt(Math.round(AUTO.rate / 1000)) })) : esc(t('auto.nogl', { cap: fmtInt(RENDER_CAP) })))
     + ` <a href="#" class="auto-redo" onclick="return false">${esc(t('auto.redo'))}</a>`;
   box.classList.add('show');
   updateRenderWarn();
 }
 async function setRenderCap(v, redraw) {
-  FULL100 = false; DENSITY_MIN = 1000000;
-  try { localStorage.setItem('infinitwo_rcap', v); } catch (e) { /* noop */ }
+  RENDER_PCT = 0; DENSITY_MIN = 1000000;
   if (v === 'auto') {
-    let b = benchLoad();
-    if (!b) b = await withLoading(t('auto.measuring'), '', benchGL);
-    AUTO.rate = b.rate; applyAutoCap();
-  } else { RENDER_CAP = v === 'all' ? Infinity : +v; applyAutoCap(); }
+    if (glpOK()) await glpEnsureBench();
+    else { let b = benchLoad(); if (!b) b = await withLoading(t('auto.measuring'), '', benchGL); AUTO.rate = b.rate; }
+    applyAutoCap();
+  } else applyAutoCap();
   updateRenderWarn();
-  if (S.n && redraw) await withLoading(t('load.draw'), '', () => renderAll());
+  if (S.n && redraw) { if (glpOK()) GLP.meas = { ms: 0, n: 0, pts: 0 }; await withLoading(t('load.draw'), '', () => renderAll()); glpReportFrame(); }
 }
 /** Tutorial de 3 pasos (primera visita; se reabre con ❓). */
 const TOUR_KEY = 'infinitwo_tour_v1';
@@ -6018,14 +6412,9 @@ function init() {
   };
   // Eventos a mostrar (solo afecta al dibujo) y gráficos 1:1
   $('render-cap').addEventListener('change', e => setRenderCap(e.target.value, true));
-  $('btn-render-full').addEventListener('click', async () => {
-    if (!S.n || !confirm(t('full.confirm', { n: fmtInt(S.n) }))) return;
-    FULL100 = true; RENDER_CAP = Infinity; DENSITY_MIN = Infinity;
-    updateRenderWarn(); await withLoading(t('load.draw'), '', () => renderAll());
-  });
-  $('render-auto').addEventListener('click', e => { if (e.target.closest('.auto-redo')) { try { localStorage.removeItem(BENCH_KEY); } catch (x) { /* noop */ } setRenderCap('auto', true); } });
-  { let v = '150000'; try { v = localStorage.getItem('infinitwo_rcap') || v; } catch (e) { /* noop */ }
-    if ([...$('render-cap').options].some(o => o.value === v)) { $('render-cap').value = v; setRenderCap(v, false); } }
+  $('btn-cap-more').addEventListener('click', () => glpStep(1)); $('btn-cap-less').addEventListener('click', () => glpStep(-1));
+  $('render-auto').addEventListener('click', e => { if (e.target.closest('.auto-redo')) { try { localStorage.removeItem(BENCH_KEY); localStorage.removeItem(GLP_BENCH_KEY); } catch (x) { /* noop */ } GLP.bench = null; GLP.derate = 1; if (glpOK()) glpEnsureBench(true).then(() => setRenderCap($('render-cap').value, true)); else setRenderCap('auto', true); } });
+  setRenderCap('auto', false);
   $('maxev').addEventListener('change', updateLoadWarn); updateLoadWarn();
   for (const id of XIDS) $(id).addEventListener('change', () => { if (id === 'bx-ch') $('bx-sc').value = isFluor($('bx-ch').value) ? 'log' : 'linear'; if (S.n && S.tab === 'avanzado') renderExtra(/^(bx|rd)-/.test(id) ? 'perf' : 'd3'); });
   { const map = { 'v-dbins': ['dbins', String], 'v-dsm': ['dsm', null], 'v-msize': ['msize', Number], 'v-mop': ['mop', Number], 'v-dpal': ['dpal', String], 'v-dpts': ['dpts', null], 'v-hbins': ['hbins', Number], 'v-hnorm': ['hnorm', String], 'v-hpop': ['hpop', null], 'v-hsm': ['hsm', null] };
@@ -6188,6 +6577,525 @@ function init() {
 }
 document.addEventListener('DOMContentLoaded', init);
 
+</script>
+<script id="glp-app-js">
+/*GLPAPP-BEGIN*/
+/* ------------------------------------------------------------
+   Integración de GLPoints con los gráficos de puntos (figPanel / drawFig).
+   Plotly sigue dibujando ejes, cuadrícula, compuertas y el lazo; los puntos van en un canvas debajo de su SVG.
+   Activo por defecto (respaldo automático a scattergl si no hay WebGL2 o falla); ?glp=0 lo desactiva.
+   ------------------------------------------------------------ */
+const GLP = { flag: false, ok: null, fail: false, epoch: 0, batch: false, pop8: null, pop8Ep: -1, pop8Src: null, pop8Dirty: null, ord: null, ordRk: null, nest: new WeakMap(), fid: 0, gds: new Set(), pendRefine: 0, wantReport: false, rgb: new Map(), derived: new Map() };
+(function () {
+  let v = null;
+  try { v = new URLSearchParams(location.search).get('glp'); if (v === null) v = localStorage.getItem('infinitwo_glp'); } catch (e) { /* noop */ }
+  GLP.flag = v !== '0';              // activo por defecto; ?glp=0 (o localStorage infinitwo_glp=0) lo desactiva
+})();
+/** ¿Se dibujan los puntos con GLPoints? (flag + WebGL2 + sin fallo previo + ≤255 poblaciones) */
+function glpOK() {
+  if (!GLP.flag || GLP.fail || (typeof S !== 'undefined' && S.popNames && S.popNames.length > 255)) return false;
+  try {
+    if (GLP.ok === null) GLP.ok = GLPoints.supported();
+    if (GLP.ok && !GLP.hooked) { GLP.hooked = true; GLPoints.shared().on('lost', () => setTimeout(glpOnLost, 100)).on('restored', () => setTimeout(glpOnRestored, 100)); }
+    return GLP.ok && !GLPoints.shared().lost;
+  } catch (e) { GLP.fail = true; return false; }
+}
+function glpRGB(c) {
+  let v = GLP.rgb.get(c); if (v) return v;
+  const k = glpRGB.cv || (glpRGB.cv = document.createElement('canvas')); k.width = k.height = 1;
+  const x = k.getContext('2d', { willReadFrequently: true }); x.clearRect(0, 0, 1, 1); x.fillStyle = '#000'; x.fillStyle = c; x.fillRect(0, 0, 1, 1);
+  const d = x.getImageData(0, 0, 1, 1).data; v = [d[0], d[1], d[2]]; GLP.rgb.set(c, v); return v;
+}
+const glpTheme = () => window.infiniTwoTema || { get: () => false, pcol: c => c, neon: null };
+/** Paleta RGBA de 256 entradas (r,g,b,a) a partir de [[css, alpha]…]. */
+function glpPalette(list) {
+  const pal = new Uint8Array(256 * 4);
+  list.forEach((e, k) => { if (k > 255) return; const rgb = glpRGB(e[0]); pal[k * 4] = rgb[0]; pal[k * 4 + 1] = rgb[1]; pal[k * 4 + 2] = rgb[2]; pal[k * 4 + 3] = Math.round(255 * e[1]); });
+  return pal;
+}
+/** Población de cada evento como uint8 (clase para el shader). Se actualiza EN SITIO y se anota el rango que cambió (GLP.pop8Dirty),
+    de modo que un cambio de compuerta solo reenvía ese tramo del buffer de la GPU. */
+function glpPop8() {
+  if (GLP.pop8 && GLP.pop8Ep === GLP.epoch && GLP.pop8.length === S.n) return GLP.pop8;
+  const p = S.pop, n = S.n; let a = GLP.pop8;
+  if (!a || a.length !== n || GLP.pop8Src !== p) { a = new Uint8Array(n); for (let i = 0; i < n; i++) a[i] = p[i] > 255 ? 255 : p[i]; GLP.pop8Dirty = null; }
+  else {
+    let lo = -1, hi = -1;
+    for (let i = 0; i < n; i++) { const v = p[i] > 255 ? 255 : p[i]; if (a[i] !== v) { a[i] = v; if (lo < 0) lo = i; hi = i; } }
+    if (lo >= 0) { const d = GLP.pop8Dirty; GLP.pop8Dirty = d ? [Math.min(d[0], lo), Math.max(d[1], hi)] : [lo, hi]; }
+  }
+  GLP.pop8 = a; GLP.pop8Src = p; GLP.pop8Ep = GLP.epoch; return a;
+}
+/** Eventos ordenados por S.rk (una sola vez; radix sort de 3×11 bits sobre los bits del float, que son monótonos para valores ≥ 0). */
+function glpOrder() {
+  const rk = S.rk, n = S.n;
+  if (GLP.ord && GLP.ordRk === rk && GLP.ord.length === n) return GLP.ord;
+  const key = new Uint32Array(rk.buffer, rk.byteOffset, n); let a = new Int32Array(n), b = new Int32Array(n);
+  for (let i = 0; i < n; i++) a[i] = i;
+  for (let pass = 0; pass < 3; pass++) {
+    const sh = pass * 11, cnt = new Uint32Array(2049);
+    for (let i = 0; i < n; i++) cnt[((key[a[i]] >>> sh) & 2047) + 1]++;
+    for (let k = 0; k < 2048; k++) cnt[k + 1] += cnt[k];
+    for (let i = 0; i < n; i++) { const e = a[i]; b[cnt[(key[e] >>> sh) & 2047]++] = e; }
+    const t = a; a = b; b = t;
+  }
+  GLP.ord = a; GLP.ordRk = rk; return a;
+}
+/** Cuántos eventos asignados (A) y sin asignar (B) entran en un nivel k: hasta el 60 % para los asignados (igual que sampleFiltered). */
+function glpTake(totA, totB, k) { const a = Math.min(totA, Math.ceil(k * 0.6)); return [a, Math.min(totB, Math.max(0, k - a))]; }
+/**
+ * Muestras ANIDADAS: las listas A y B (eventos del gráfico, en el orden fijo de S.rk) crecen por el final;
+ * el nivel k son los primeros takeA(k) de A y takeB(k) de B. Subir de nivel solo AÑADE índices, sin remuestrear.
+ */
+function glpNestedFor(f) {
+  let e = GLP.nest.get(f);
+  if (!e || e.popVer !== S.popVer || e.rk !== S.rk || e.n !== S.n) {
+    let totA = 0; for (let k = 0; k < f.length; k++) if (S.pop[f[k]]) totA++;
+    let mask = null; if (f.length !== S.n) { mask = new Uint8Array(S.n); for (let k = 0; k < f.length; k++) mask[f[k]] = 1; }
+    e = { popVer: S.popVer, rk: S.rk, n: S.n, totA, totB: f.length - totA, A: new Int32Array(totA), B: new Int32Array(f.length - totA), nA: 0, nB: 0, pos: 0, mask, id: ++GLP.fid };
+    GLP.nest.set(f, e);
+  }
+  return e;
+}
+function glpFill(e, needA, needB) {
+  if (e.nA >= needA && e.nB >= needB) return;
+  const ord = glpOrder(), pop = S.pop, mask = e.mask, n = S.n; let { pos, nA, nB } = e; const A = e.A, B = e.B;
+  while (pos < n && (nA < needA || nB < needB)) { const id = ord[pos++]; if (mask && !mask[id]) continue; if (pop[id]) A[nA++] = id; else B[nB++] = id; }
+  e.pos = pos; e.nA = nA; e.nB = nB;
+}
+function glpSplit(idx, test) {
+  let c = 0; for (let k = 0; k < idx.length; k++) if (test(idx[k])) c++;
+  const a = new Int32Array(idx.length - c), b = new Int32Array(c); let ia = 0, ib = 0;
+  for (let k = 0; k < idx.length; k++) { const e = idx[k]; if (test(e)) b[ib++] = e; else a[ia++] = e; }
+  return [a, b];
+}
+function glpLUT(dark) {
+  const stops = dark ? [[0, '#2d3bff'], [0.2, '#1f8bff'], [0.4, '#16d6e8'], [0.6, '#3df59a'], [0.8, '#ffe45c'], [1, '#ff5f5f']] : null, lut = new Uint8Array(256 * 4);
+  for (let k = 0; k < 256; k++) {
+    const t = k / 255; let rgb;
+    if (!stops) rgb = glpRGB(viridisColor(t));
+    else { let j = 0; while (j < stops.length - 2 && t > stops[j + 1][0]) j++; const a = glpRGB(stops[j][1]), b = glpRGB(stops[j + 1][1]), f = Math.max(0, Math.min(1, (t - stops[j][0]) / (stops[j + 1][0] - stops[j][0]))); rgb = a.map((v, q) => v + (b[q] - v) * f); }
+    lut[k * 4] = rgb[0]; lut[k * 4 + 1] = rgb[1]; lut[k * 4 + 2] = rgb[2]; lut[k * 4 + 3] = 255;
+  }
+  return lut;
+}
+/** Canal de color (log10 si es fluorescente) como Float32Array por evento, en caché mientras no cambie S.cols[chan]. */
+function glpColorArr(chan) {
+  const src = S.cols[chan], c = GLP.derived.get(chan);
+  if (c && c.src === src) return c.arr;
+  let arr = src; if (isFluor(chan)) { arr = new Float32Array(src.length); for (let i = 0; i < src.length; i++) arr[i] = Math.log10(Math.max(src[i], 1)); }
+  GLP.derived.set(chan, { src, arr }); return arr;
+}
+/**
+ * Prepara (de forma síncrona, con el estado actual) todo lo que GLPoints necesita para dibujar un panel:
+ * canales, muestra anidada, clases, paletas y pasadas. Replica buildMarker/popColor (colores, opacidades, backgating, selección temporal).
+ * El orden de dibujo es: primero los eventos sin asignar (B) y encima los asignados (A).
+ */
+function glpPrepare(cfg, f, cap, o) {
+  const th = glpTheme(), dark = !!th.get(), col = c => dark ? th.pcol(c) : c;
+  const mop = dark ? Math.min(1, VIS.mop + 0.12) : VIS.mop;
+  const hasTemp = S.tempSet.size > 0, nPan = glpPanelCount();
+  const e = glpNestedFor(f), k = Math.min(Number.isFinite(cap) ? cap : f.length, f.length), [tA, tB] = glpTake(e.totA, e.totB, k);
+  glpFill(e, tA, tB);
+  const At = e.A.subarray(0, tA), Bt = e.B.subarray(0, tB);
+  // refinamiento progresivo: se dibuja primero el nivel automático y se completa hasta k en tiempo ocioso
+  const k0 = (!hasTemp && GLP.bench) ? Math.min(k, glpAutoCap(nPan)) : k, [a0, b0] = glpTake(e.totA, e.totB, k0);
+  const spec = { x: cfg.x, y: cfg.y, xa: S.cols[cfg.x], ya: S.cols[cfg.y], sx: o.lgx ? 'log' : o.bxx ? 'biex' : 'lin', sy: o.lgy ? 'log' : o.bxy ? 'biex' : 'lin',
+    shx: o.shx, shy: o.shy, biexW: S.biexW, view: [o.rxs[0], o.rxs[1], o.rys[0], o.rys[1]], pal: null, size: Math.max(VIS.msize, 1), dark, passes: [], lut: null, colorbar: null,
+    total: tA + tB, sig: hasTemp ? null : [e.id, S.popVer, tA, tB, a0, b0].join('|') };
+  const baseOp = hasTemp ? 0.15 : 1, add = (idxArr, extra) => { if (idxArr.length) spec.passes.push(Object.assign({ idx: idxArr, op: 1, n0: idxArr.length }, extra)); };
+  let base;                                    // { clsKey, cls, pal } | { colorKey, colorArr, vr }
+  if (S.bgPop) {
+    const bi = S.popNames.indexOf(S.bgPop), a = new Uint8Array(S.n); if (bi >= 0) for (let i = 0; i < S.n; i++) a[i] = S.pop[i] === bi ? 1 : 0;
+    base = { clsKey: 'cls:bg', cls: a, pal: glpPalette([['lightgray', hasTemp ? 1 : 0.1], [col('red'), 1]]) };
+  } else if (S.fsBg && S.fs) {
+    const fi = S.fsNames.indexOf(S.fsBg), a = new Uint8Array(S.n); if (fi >= 0) for (let i = 0; i < S.n; i++) a[i] = S.fs[i] === fi ? 1 : 0;
+    base = { clsKey: 'cls:fsbg', cls: a, pal: glpPalette([['lightgray', hasTemp ? 1 : 0.1], [col('red'), 1]]) };
+  } else if (S.colorBy === 'channel' && S.colorChan && S.cols[S.colorChan]) {
+    const arr = glpColorArr(S.colorChan); let lo = Infinity, mx = -Infinity;
+    for (const L of [Bt, At]) for (let q = 0; q < L.length; q++) { const v = arr[L[q]]; if (v < lo) lo = v; if (v > mx) mx = v; }
+    if (!(mx > lo)) { lo = Math.min(lo, mx) - 0.5; mx = lo + 1; }
+    base = { colorKey: 'col:' + S.colorChan, colorArr: arr, vr: [lo, mx] }; spec.lut = glpLUT(dark);
+    spec.colorbar = { lo, hi: mx, title: chLabel(S.colorChan) };
+  } else if (S.colorBy === 'flowsom_cluster' && S.fs) {
+    const a = new Uint8Array(S.n), L = ALPHABET.length; for (let i = 0; i < S.n; i++) { const q = S.fs[i]; a[i] = q >= 0 ? (q % L) + 1 : 0; }
+    base = { clsKey: 'cls:fs', cls: a, pal: glpPalette([[col(S.baseColor), hasTemp ? 1 : mop]].concat(ALPHABET.map(c => [col(c), hasTemp ? 1 : mop]))) };
+  } else {
+    base = { clsKey: 'cls:pop', cls: glpPop8(), pal: glpPalette(S.popNames.map((_, p) => [col(popColor(p)), hasTemp ? 1 : mop])) };
+  }
+  spec.pal = base.pal || null;
+  const bop = base.colorKey ? mop : 1;
+  if (hasTemp) {
+    const all = new Int32Array(tA + tB); all.set(Bt); all.set(At, tB);
+    const [a, b] = glpSplit(all, q => S.tempSet.has(q));
+    add(a, Object.assign({ op: hasTemp ? baseOp : bop }, base));
+    add(b, { solid: glpRGB(col(gateHighlightColor(S.baseColor))).map(v => v / 255).concat([0.95]), op: 1 });
+  } else { add(Bt, Object.assign({ op: bop, n0: b0 }, base)); add(At, Object.assign({ op: bop, n0: a0 }, base)); }
+  return spec;
+}
+/** Traza «fantasma»: mantiene activo el lazo/caja de Plotly (y la barra de color en el modo «colorear por canal»). */
+function glpGhost(spec, lgx, lgy) {
+  const v = spec.view, mk = { opacity: 0, size: 1 };
+  if (spec.colorbar) Object.assign(mk, { color: [spec.colorbar.lo], cmin: spec.colorbar.lo, cmax: spec.colorbar.hi, colorscale: 'Viridis', showscale: true, colorbar: { title: { text: spec.colorbar.title }, len: 0.8 } });
+  return { type: 'scatter', mode: 'markers', x: [lgx ? Math.pow(10, v[0]) : v[0]], y: [lgy ? Math.pow(10, v[2]) : v[2]], marker: mk, hoverinfo: 'skip', showlegend: false };
+}
+/* ----- DOM: canvas alineado al área de trazado, bajo las capas SVG de Plotly ----- */
+function glpCanvas(gd) {
+  let cv = gd._glpCv;
+  if (!cv || !cv.isConnected) {
+    const sc = gd.querySelector('.svg-container'); if (!sc) return null;
+    cv = document.createElement('canvas'); cv.className = 'glp-canvas'; cv.style.cssText = 'position:absolute;pointer-events:none';
+    sc.insertBefore(cv, sc.firstChild); gd._glpCv = cv;
+  }
+  return cv;
+}
+function glpFreeIdx(gd) { if (gd._glpIdx) { for (const s of gd._glpIdx) { try { s.dispose(); } catch (e) { /* noop */ } } gd._glpIdx = null; } }
+function glpDetach(gd) {
+  gd._glpTok = (gd._glpTok || 0) + 1; gd._glp = null; gd._glpWant = false; gd._glpSig = null; glpFreeIdx(gd); GLP.gds.delete(gd);
+  if (gd._glpCv) { gd._glpCv.remove(); gd._glpCv = null; }
+  if (gd._glpPaper !== undefined) { gd.style.background = ''; gd._glpPaper = gd._glpBg = undefined; }
+}
+const INTERACT_QUIET_MS = 150;        // reposo tras zoom/pan/arrastre para volver a la muestra completa
+/** Dibuja los puntos (usa los rangos actuales de los ejes de Plotly). `target`/`scale` permiten renderizar a resolución de exportación;
+    `reduced` dibuja solo una submuestra (INTERACT_MAX) durante zoom/pan/arrastre. */
+function glpDraw(gd, target, scale, reduced) {
+  const spec = gd._glp, FL = gd._fullLayout; if (!spec || !FL || !FL._size || !FL.xaxis || !FL.yaxis || !spec.passes.every(q => q.set && !q.set.stale)) return false;
+  const sz = FL._size, gp = GLPoints.shared(), cv = target || glpCanvas(gd); if (!cv) return false;
+  const sc = scale || 1, xr = FL.xaxis.range, yr = FL.yaxis.range;
+  if (!target) { cv.style.left = sz.l + 'px'; cv.style.top = sz.t + 'px'; cv.style.width = sz.w + 'px'; cv.style.height = sz.h + 'px'; cv.style.visibility = ''; }
+  let frac = 1; if (reduced && !target) { const tot = spec.passes.reduce((a, q) => a + q.set.count, 0); frac = Math.min(1, glpInteractMax() / Math.max(1, tot)); }
+  const meas = !target && GLP.meas, t0 = PERF || meas ? performance.now() : 0;
+  if (meas) gp.sync();
+  gp.draw({ target: cv, w: sz.w * sc, h: sz.h * sc, dpr: target ? 1 : (window.devicePixelRatio || 1), bg: target ? null : (gd._glpBg || null),
+    xKey: 'c:' + spec.x, yKey: 'c:' + spec.y, sx: spec.sx, sy: spec.sy, shx: spec.shx, shy: spec.shy, biexW: spec.biexW,
+    view: [xr[0], xr[1], yr[0], yr[1]], palette: spec.pal, lut: spec.lut, size: spec.size * sc, opacity: 1,
+    passes: spec.passes.map(q => ({ index: q.set, count: frac < 1 ? Math.ceil(q.set.count * frac) : undefined, classKey: q.clsKey, colorKey: q.colorKey, vr: q.vr, solid: q.solid, op: q.op })) });
+  if (meas) { gp.sync(); const n = spec.passes.reduce((s, q) => s + q.set.count, 0); meas.ms += performance.now() - t0; meas.n++; meas.pts = Math.max(meas.pts, n); }
+  if (PERF && !target) perfMark(reduced ? 'GLPoints dibujo interactivo' : 'GLPoints dibujo (CPU)', performance.now() - t0, fmtInt(spec.passes.reduce((a, q) => a + Math.ceil(q.set.count * frac), 0)) + ' pts');
+  return true;
+}
+function glpSched(gd, interactive) {
+  if (interactive === true) gd._glpInt = performance.now(); else if (interactive === 'end') gd._glpInt = 0;
+  if (gd._glpRaf || !gd._glp) return;
+  gd._glpRaf = requestAnimationFrame(() => {
+    gd._glpRaf = 0; const red = gd._glpInt && performance.now() - gd._glpInt < INTERACT_QUIET_MS;
+    try { glpDraw(gd, null, 1, red); } catch (e) { if (!(e && (e.kind === 'stale' || e.kind === 'lost'))) console.error(e); }
+    clearTimeout(gd._glpQt); if (red) gd._glpQt = setTimeout(() => { gd._glpInt = 0; glpSched(gd); }, INTERACT_QUIET_MS);      // restaura la muestra completa tras el reposo
+  });
+}
+function glpHook(gd) {
+  if (gd._glpH) return; gd._glpH = true;
+  gd.on('plotly_relayouting', () => glpSched(gd, true));
+  gd.on('plotly_relayout', () => glpSched(gd, 'end'));            // al soltar: muestra completa de inmediato
+  gd.on('plotly_afterplot', () => glpSched(gd));
+}
+const glpIdle = () => new Promise(r => { if (window.requestIdleCallback) requestIdleCallback(() => r(), { timeout: 250 }); else setTimeout(r, 16); });
+/** Refinamiento progresivo: completa los índices hasta el nivel elegido en tiempo ocioso, doblando lo dibujado en cada tramo. */
+async function glpRefine(gd, spec, tok) {
+  const ps = spec.passes, todo = () => ps.some(q => q.set.count < q.idx.length);
+  if (!todo()) return;
+  GLP.pendRefine++;
+  try {
+    for (;;) {
+      await glpIdle(); if (tok !== gd._glpTok || !gd._glp) return;
+      for (const q of ps) {
+        const have = q.set.count, want = Math.min(q.idx.length, Math.max(have * 2, have + 250000));
+        if (want > have) await q.set.write(q.idx.subarray(have, want), have);
+        if (tok !== gd._glpTok) return;
+      }
+      glpDraw(gd);
+      if (!todo()) break;
+    }
+  } catch (e) {
+    if (tok === gd._glpTok && e && (e.kind === 'budget' || e.kind === 'oom') && GLP.retries < 3) { GLP.retries++; glpStepDown(); }
+    else if (e && e.kind !== 'stale' && e.kind !== 'lost') console.error(e);
+  } finally { if (--GLP.pendRefine <= 0) { GLP.pendRefine = 0; if (GLP.wantReport) { GLP.wantReport = false; glpMeasureFrame(); } } }
+}
+/** Sube canales/clases/índices (perezoso, por tramos) y dibuja. Reutiliza los buffers de índices si la muestra no cambió. */
+async function glpAttach(gd, spec) {
+  const tok = gd._glpTok = (gd._glpTok || 0) + 1, gp = GLPoints.shared(); gd._glp = null;
+  const t0 = PERF ? performance.now() : 0;
+  try {
+    await gp.ensure('c:' + spec.x, spec.xa); await gp.ensure('c:' + spec.y, spec.ya);
+    for (const q of spec.passes) {
+      if (q.cls) { await gp.ensure(q.clsKey, q.cls); if (q.clsKey === 'cls:pop' && GLP.pop8Dirty) { const d = GLP.pop8Dirty; GLP.pop8Dirty = null; gp.updateRange(q.clsKey, q.cls, d[0], d[1] + 1); } }
+      if (q.colorArr) await gp.ensure(q.colorKey, q.colorArr);
+    }
+    if (tok !== gd._glpTok) return;
+    const reuse = !!spec.sig && gd._glpSig === spec.sig && gd._glpIdx && gd._glpIdx.length === spec.passes.length && gd._glpIdx.every(s => !s.stale && s.buf);
+    if (reuse) spec.passes.forEach((q, i) => { q.set = gd._glpIdx[i]; });
+    else {
+      glpFreeIdx(gd); gd._glpSig = null; const sets = []; gd._glpIdx = sets;
+      for (const q of spec.passes) { const s = gp.newIndexSet(q.idx.length); sets.push(s); await s.write(q.idx.subarray(0, q.n0)); q.set = s; if (tok !== gd._glpTok) return; }
+      gd._glpSig = spec.sig;
+    }
+    if (PERF) perfMark('GLPoints subida', performance.now() - t0, (reuse ? 'índices reutilizados · ' : '') + fmtInt(spec.passes.reduce((a, q) => a + q.set.count, 0)) + ' índices');
+    gd._glp = spec; glpHook(gd); GLP.gds.add(gd); glpDraw(gd);
+    glpRefine(gd, spec, tok);                      // en segundo plano
+  } catch (e) {
+    if (tok !== gd._glpTok) return;
+    glpDetach(gd);
+    if (e && (e.kind === 'budget' || e.kind === 'oom') && GLP.retries < 3) { GLP.retries++; glpStepDown(); return; }   // memoria de GPU: baja un escalón de la escalera
+    console.error('GLPoints:', e); GLP.fail = true;
+    try { renderAll(); } catch (e2) { console.error(e2); }                 // respaldo: scattergl
+  }
+}
+/* ----- Exportación PNG: fondo + GLPoints a la resolución de exportación + PNG transparente de Plotly (ejes, cuadrícula, compuertas) ----- */
+async function glpExport(gd) {
+  const scale = 3, FL = gd._fullLayout, sz = FL._size, W = FL.width, H = FL.height;
+  if (!gd._glp) return Plotly.downloadImage(gd, { format: 'png', scale, filename: 'infinitwo_grafico' });
+  const url = await Plotly.toImage(gd, { format: 'png', width: W, height: H, scale });
+  const img = await new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = url; });
+  const out = document.createElement('canvas'); out.width = Math.round(W * scale); out.height = Math.round(H * scale);
+  const c = out.getContext('2d');
+  if (gd._glpPaper) { c.fillStyle = gd._glpPaper; c.fillRect(0, 0, out.width, out.height); }
+  if (gd._glpBg) { c.fillStyle = gd._glpBg; c.fillRect(Math.round(sz.l * scale), Math.round(sz.t * scale), Math.round(sz.w * scale), Math.round(sz.h * scale)); }
+  const tmp = document.createElement('canvas'); glpDraw(gd, tmp, scale);
+  c.drawImage(tmp, Math.round(sz.l * scale), Math.round(sz.t * scale));
+  c.drawImage(img, 0, 0, out.width, out.height);
+  out.toBlob(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'infinitwo_grafico.png'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); }, 'image/png');
+}
+function glpConfig(base) {
+  return Object.assign({}, base || PLOT_CONFIG, { modeBarButtonsToRemove: ['toImage'],
+    modeBarButtonsToAdd: [{ name: 'infinitwo-png', title: t('glp.camera'), icon: Plotly.Icons.camera, click: g => glpExport(g) }] });
+}
+
+/** Pérdida de contexto: se redibuja con scattergl (respaldo) y, al restaurarse, se vuelve a GLPoints (fase C: además baja un escalón de la escalera). */
+function glpOnLost() { try { if (typeof S !== 'undefined' && S.n) renderAll(); } catch (e) { console.error(e); } }
+function glpOnRestored() { try { if (typeof S !== 'undefined' && S.n) { GLP.derate *= 0.5; glpStepDown(true); } } catch (e) { console.error(e); } }
+
+/* ------------------------------------------------------------
+   Modo automático y escalera de «Eventos a mostrar»
+   El presupuesto es de TIEMPO de cuadro (constantes con nombre, fáciles de ajustar); la medición usa el pipeline real de GLPoints
+   (subida de índices + drawElements + copia al canvas 2D), no Plotly.
+   ------------------------------------------------------------ */
+const FRAME_BUDGET_MS = 50;           // redibujo estático de todos los gráficos
+const INTERACT_BUDGET_MS = 24;        // zoom/pan/lazo (16–33 ms)
+const INTERACT_FRAC = 0.2, INTERACT_MIN = 50000;      // submuestra durante la interacción: ≈20 % del nivel, mínimo 50 k
+const APP_VERSION = '2.1-glp';
+const GLP_BENCH_KEY = 'infinitwo_glpbench_v1';
+Object.assign(GLP, { bench: null, derate: 1, retries: 0, meas: null, frame: null, lastMs: 0, stepTimer: 0 });
+const glpBenchSig = () => { const gp = GLPoints.shared(); return (gp.gpu || '?') + '|' + (window.devicePixelRatio || 1) + '|' + APP_VERSION; };   // GPU + dpr + versión (no userAgent)
+function glpBenchLoad() {
+  try { const o = JSON.parse(localStorage.getItem(GLP_BENCH_KEY) || 'null'); if (o && o.sig === glpBenchSig() && o.slope > 0) return o; } catch (e) { /* noop */ }
+  return null;
+}
+/** Mide con datos sintéticos: ms por punto (pendiente entre dos tamaños), coste fijo por dibujo y velocidad de subida. */
+async function glpMeasure() {
+  const gp = GLPoints.shared(), tg = document.createElement('canvas'), dpr = window.devicePixelRatio || 1, pal = new Uint8Array(1024);
+  pal.set([30, 90, 200, 204, 200, 60, 60, 204, 60, 160, 60, 204, 220, 160, 20, 204]);
+  const run = async N => {
+    const x = new Float32Array(2 * N), y = new Float32Array(2 * N), c = new Uint8Array(2 * N);
+    for (let i = 0; i < 2 * N; i++) { x[i] = Math.random() * 1000; y[i] = Math.random() * 1000; c[i] = (Math.random() * 4) | 0; }
+    const t0 = performance.now();
+    await gp.ensure('__m:x', x); await gp.ensure('__m:y', y); await gp.ensure('__m:c', c);
+    const ix = gp.newIndexSet(N), seq = new Uint32Array(N); for (let i = 0; i < N; i++) seq[i] = 2 * i;       // índices ascendentes, como una muestra real
+    await ix.write(seq); gp.sync();
+    const up = performance.now() - t0;
+    const draw = () => gp.draw({ target: tg, w: 360, h: 300, dpr, bg: '#fff', xKey: '__m:x', yKey: '__m:y', sx: 'lin', sy: 'lin', view: [0, 1000, 0, 1000], palette: pal, size: Math.max(VIS.msize, 1), opacity: 1, passes: [{ index: ix, classKey: '__m:c', op: 1 }] });
+    const K = 4, draw4 = () => { for (let k = 0; k < K; k++) draw(); };       // varios dibujos seguidos y una sola espera: la latencia de sincronización no cuenta como coste fijo
+    await gp.time(draw4);
+    const ts = []; for (let r = 0; r < 5; r++) ts.push((await gp.time(draw4)).ms / K);
+    ts.sort((a, b) => a - b); ix.dispose(); gp.dropPrefix('__m');
+    return { N, ms: ts[2], up };
+  };
+  const big = gp.software ? 200000 : 1000000, a = await run(50000), b = await run(big);
+  const slope = Math.max(1e-6, (b.ms - a.ms) / (b.N - a.N)), fixed = Math.max(0, a.ms - slope * a.N);
+  const res = { slope, fixed, upPerM: b.up / (b.N / 1e6), sig: glpBenchSig(), t: Date.now() };
+  try { localStorage.setItem(GLP_BENCH_KEY, JSON.stringify(res)); } catch (e) { /* noop */ }
+  return res;
+}
+async function glpEnsureBench(force) {
+  if (!force && GLP.bench) return GLP.bench;
+  if (!force) { const c = glpBenchLoad(); if (c) return (GLP.bench = c); if (!S.n) return null; }      // sin archivo cargado no se mide (se mide al cargar)
+  if (!GLP.benchP) GLP.benchP = withLoading(t('auto.measuring'), '', glpMeasure).then(r => { GLP.bench = r; return r; }).finally(() => { GLP.benchP = null; });   // una sola medición a la vez
+  return GLP.benchP;
+}
+const glpPanelCount = () => Math.max(1, S.panels.length || +$('num-panels').value || 4);
+/** Nivel automático: lo que cabe en FRAME_BUDGET_MS repartido entre los gráficos (se redibujan todos a la vez), redondeado a 2 cifras. */
+function glpAutoCap(nPan) {
+  const b = GLP.bench; if (!b) return 250000;
+  const perPanel = FRAME_BUDGET_MS / Math.max(1, nPan) - b.fixed;
+  let cap = (perPanel > 0 ? perPanel / b.slope : 50000) * GLP.derate;
+  cap = Math.max(50000, cap); const p = Math.pow(10, Math.floor(Math.log10(cap)) - 1); cap = Math.floor(cap / p) * p;
+  return S.n ? Math.min(cap, S.n) : cap;
+}
+/** Puntos máximos mientras se hace zoom/pan/arrastre (≈20 % del nivel, mínimo 50 k, dentro del presupuesto interactivo). */
+function glpInteractMax() {
+  const b = GLP.bench, cur = Number.isFinite(RENDER_CAP) ? RENDER_CAP : (S.n || 1e6);
+  let lim = cur * INTERACT_FRAC; if (b) lim = Math.min(lim, Math.max(0, INTERACT_BUDGET_MS - b.fixed) / b.slope);
+  return Math.max(INTERACT_MIN, Math.floor(lim));
+}
+function glpApplyCap() {
+  const sel = $('render-cap'); if (!sel) return;
+  const v = sel.value, n = glpPanelCount(), m = /^pct(\d+)$/.exec(v);
+  RENDER_PCT = 0;
+  if (v === 'auto') RENDER_CAP = glpAutoCap(n);
+  else if (m) { RENDER_PCT = +m[1] / 100; RENDER_CAP = Infinity; }
+  else RENDER_CAP = v === 'all' ? Infinity : +v;
+  glpRenderBox(); updateRenderWarn();
+}
+function glpRenderBox() {
+  const box = $('render-auto'); if (!box) return;
+  const sel = $('render-cap'), b = GLP.bench, parts = [];
+  if (sel && sel.value === 'auto' && b) parts.push(esc(t('glp.auto', { cap: fmtInt(RENDER_CAP), n: glpPanelCount(), rate: (1000 / b.slope / 1e6).toFixed(1), ms: FRAME_BUDGET_MS })));
+  if (GLP.frame) parts.push(esc(t('glp.frame', { pts: fmtInt(GLP.frame.pts), n: GLP.frame.n, ms: GLP.frame.ms < 10 ? GLP.frame.ms.toFixed(1) : Math.round(GLP.frame.ms) })));
+  if (!parts.length) { box.classList.remove('show'); return; }
+  box.innerHTML = parts.join('<br>') + ` <a href="#" class="auto-redo" onclick="return false">${esc(t('auto.redo'))}</a>`; box.classList.add('show');
+}
+/** Tras un redibujo medido (GLP.meas activo): ms reales por cuadro y puntos dibujados por gráfico. */
+function glpReportFrame() {
+  GLP.meas = null;
+  if (GLP.pendRefine > 0) { GLP.wantReport = true; return; }        // se mide cuando termine el refinamiento (nivel final)
+  glpMeasureFrame();
+}
+/** Redibuja todos los gráficos con medición real (ms por cuadro y puntos por gráfico). */
+function glpMeasureFrame() {
+  const m = { ms: 0, n: 0, pts: 0 }; GLP.meas = m;
+  for (const gd of GLP.gds) { if (gd.isConnected && gd._glp) { try { glpDraw(gd); } catch (e) { /* noop */ } } }
+  GLP.meas = null; if (!m.n) return;
+  GLP.frame = { pts: m.pts, n: m.n, ms: m.ms }; GLP.lastMs = m.ms;
+  perfMark('ms/cuadro (todos los gráficos)', m.ms, fmtInt(m.pts) + ' pts × ' + m.n);
+  glpRenderBox(); updateRenderWarn();
+}
+/** Opciones de la escalera ≤ nº de eventos (las mayores o iguales se ocultan; «Todos» siempre está). */
+function glpFitLadder() {
+  const sel = $('render-cap'); if (!sel) return;
+  for (const o of sel.options) { if (/^\d+$/.test(o.value)) { const off = S.n > 0 && +o.value >= S.n; o.hidden = off; o.disabled = off; } }
+}
+function glpStep(dir) {
+  const sel = $('render-cap'); if (!sel) return;
+  const opts = [...sel.options].filter(o => !o.hidden && /^(\d+|all)$/.test(o.value)).map(o => ({ v: o.value, c: o.value === 'all' ? Infinity : +o.value })).sort((a, b) => a.c - b.c);
+  const cur = RENDER_PCT ? S.n * RENDER_PCT : RENDER_CAP; let next = null;
+  if (dir > 0) next = opts.find(o => o.c > cur); else { for (const o of opts) if (o.c < cur) next = o; if (!next && sel.value !== 'auto') next = { v: 'auto' }; }
+  if (!next) return;
+  sel.value = next.v; GLP.retries = 0; return setRenderCap(next.v, true);
+}
+/** Baja un escalón (memoria de GPU agotada o contexto perdido). Agrupa varias peticiones simultáneas. */
+function glpStepDown(force) {
+  if (GLP.stepTimer) return;
+  GLP.stepTimer = setTimeout(() => {
+    GLP.stepTimer = 0; const sel = $('render-cap'); if (!sel || !S.n) return;
+    if (sel.value === 'auto') GLP.derate = Math.min(GLP.derate, 1) * (force ? 1 : 0.5);
+    else { const opts = [...sel.options].filter(o => !o.hidden && /^\d+$/.test(o.value)).map(o => +o.value).sort((a, b) => a - b), cur = RENDER_PCT ? S.n * RENDER_PCT : (Number.isFinite(RENDER_CAP) ? RENDER_CAP : S.n);
+      const lower = opts.filter(c => c < cur); sel.value = lower.length ? String(lower[lower.length - 1]) : 'auto'; }
+    setRenderCap(sel.value, true);
+  }, 120);
+}
+/** Carga nueva: el nivel vuelve a «Automático» y se ajusta la escalera al nº de eventos. Se espera antes del primer dibujo. */
+async function glpNewFile() {
+  GLP.derate = 1; GLP.retries = 0; GLP.frame = null; glpFitLadder();
+  const sel = $('render-cap'); if (!sel) return;
+  sel.value = 'auto'; if (glpOK()) GLP.meas = { ms: 0, n: 0, pts: 0 };
+  await setRenderCap('auto', false);
+}
+
+/* ------------------------------------------------------------
+   Densidad al 100 % en un Web Worker: un solo Uint32Array de conteos (≈320–400 bins), en caché por población/ejes/rango,
+   mostrada como IMAGEN anclada a los ejes (layout.images) en vez de un heatmap con arrays anidados.
+   Si no hay Worker (o falla), se usa el heatmap de siempre (densityTrace).
+   ------------------------------------------------------------ */
+const DENS_WORKER_SRC = () => `
+const store = new Map(); let scratch = new Int32Array(0);
+const geomRun = ${geomRun.toString()};
+onmessage = e => {
+  const m = e.data;
+  if (m.t === 'set') { store.set(m.k, m.a); return; }
+  if (m.t === 'clear') { store.clear(); return; }
+  if (m.t === 'lasso') {
+    const f = store.get(m.f), X = store.get(m.x), Y = store.get(m.y);
+    if (!f || !X || !Y) { postMessage({ id: m.id, err: 'sin datos' }); return; }
+    if (scratch.length < f.length) scratch = new Int32Array(f.length);
+    const c = geomRun(f, X, Y, m.p, scratch), ids = scratch.slice(0, c);
+    postMessage({ id: m.id, ids }, [ids.buffer]); return;
+  }
+  if (m.t !== 'dens') return;
+  const f = store.get(m.f), X = store.get(m.x), Y = store.get(m.y);
+  if (!f || !X || !Y) { postMessage({ id: m.id, err: 'sin datos' }); return; }
+  const nb = m.nb, z = new Uint32Array(nb * nb), x0 = m.rx[0], x1 = m.rx[1], y0 = m.ry[0], y1 = m.ry[1], wx = (x1 - x0) / nb, wy = (y1 - y0) / nb;
+  const sx = m.sx, sy = m.sy, hx = m.hx, hy = m.hy, W = m.W;
+  for (let k = 0; k < f.length; k++) {
+    const e0 = f[k]; let a = X[e0], b = Y[e0];
+    a = sx === 0 ? a : sx === 1 ? Math.log10(Math.max(a, 1)) : Math.asinh((a - hx) / W);
+    b = sy === 0 ? b : sy === 1 ? Math.log10(Math.max(b, 1)) : Math.asinh((b - hy) / W);
+    if (a < x0 || a >= x1 || b < y0 || b >= y1) continue;
+    z[(((b - y0) / wy) | 0) * nb + (((a - x0) / wx) | 0)]++;
+  }
+  postMessage({ id: m.id, z }, [z.buffer]);
+};`;
+const DW = { w: null, bad: false, id: 0, pend: new Map(), sent: new Map(), cache: new Map(), fids: new WeakMap(), fid: 0 };
+function dwWorker() {
+  if (DW.bad) return null; if (DW.w) return DW.w;
+  try {
+    const w = new Worker(URL.createObjectURL(new Blob([DENS_WORKER_SRC()], { type: 'text/javascript' })));
+    w.onmessage = e => { const p = DW.pend.get(e.data.id); if (!p) return; DW.pend.delete(e.data.id); if (e.data.err) p.rej(new Error(e.data.err)); else p.res(e.data.z || e.data.ids); };
+    w.onerror = () => { DW.bad = true; DW.w = null; for (const p of DW.pend.values()) p.rej(new Error('worker')); DW.pend.clear(); };
+    DW.w = w; return w;
+  } catch (e) { DW.bad = true; return null; }
+}
+function dwClear() { DW.sent.clear(); DW.cache.clear(); if (DW.w) DW.w.postMessage({ t: 'clear' }); }
+function dwSend(key, arr) { if (DW.sent.get(key) === arr) return; DW.w.postMessage({ t: 'set', k: key, a: arr }); DW.sent.set(key, arr); }
+const dwFid = f => { let i = DW.fids.get(f); if (!i) DW.fids.set(f, i = ++DW.fid); return i; };
+/** Conteos 2D (Uint32Array nb×nb) calculados en el Worker; en caché por población/ejes/rango/bins. Devuelve null si no hay Worker. */
+function dwCounts(d) {
+  const w = dwWorker(); if (!w) return Promise.resolve(null);
+  const key = [dwFid(d.f), d.f.length, d.xk, d.yk, d.sx, d.sy, d.rx.join(','), d.ry.join(','), d.nb, d.shx, d.shy, S.biexW].join('|'), hit = DW.cache.get(key);
+  if (hit) { DW.cache.delete(key); DW.cache.set(key, hit); return Promise.resolve(hit); }
+  dwSend('f:' + dwFid(d.f), d.f); dwSend('c:' + d.xk, d.X); dwSend('c:' + d.yk, d.Y);
+  const id = ++DW.id;
+  return new Promise((res, rej) => {
+    DW.pend.set(id, { res, rej });
+    w.postMessage({ t: 'dens', id, f: 'f:' + dwFid(d.f), x: 'c:' + d.xk, y: 'c:' + d.yk, nb: d.nb, rx: d.rx, ry: d.ry, sx: d.sx, sy: d.sy, hx: d.shx, hy: d.shy, W: S.biexW });
+  }).then(z => { DW.cache.set(key, z); if (DW.cache.size > 24) DW.cache.delete(DW.cache.keys().next().value); return z; });
+}
+const DENS_HEAT = [[0, 'rgba(8,24,58,0)'], [0.03, '#233cff'], [0.25, '#1f8bff'], [0.45, '#16d6e8'], [0.65, '#3df59a'], [0.85, '#ffe45c'], [1, '#ff5f5f']];   // misma escala que el modo oscuro de Plotly
+/** Paleta de densidad (256 RGBA) a partir de la elección del usuario; en modo oscuro «viridis» usa la escala neón como el heatmap de Plotly. */
+function dwLUT(dark) {
+  let pal = DENS_PAL[VIS.dpal] || DENS_PAL.flow;
+  if (pal === 'Viridis') { if (dark) pal = DENS_HEAT; else { const l = glpLUT(false); return l; } }
+  const lut = new Uint8Array(1024), parse = c => { const m = /^rgba\((\d+),(\d+),(\d+),([\d.]+)\)$/.exec(c.replace(/\s/g, '')); return m ? [+m[1], +m[2], +m[3], Math.round(+m[4] * 255)] : glpRGB(c).concat([255]); };
+  for (let k = 0; k < 256; k++) {
+    const t = k / 255; let j = 0; while (j < pal.length - 2 && t > pal[j + 1][0]) j++;
+    const a = parse(pal[j][1]), b = parse(pal[j + 1][1]), f = Math.max(0, Math.min(1, (t - pal[j][0]) / (pal[j + 1][0] - pal[j][0])));
+    for (let q = 0; q < 4; q++) lut[k * 4 + q] = Math.round(a[q] + (b[q] - a[q]) * f);
+  }
+  return lut;
+}
+/** Imagen de densidad (layout.images) a partir de los conteos; null si no hay Worker (se usa el heatmap). */
+async function glpDensImage(d) {
+  const t0 = PERF ? performance.now() : 0;
+  const z = await dwCounts(d); if (!z) return null;
+  const nb = d.nb, zs = Float32Array.from(z);
+  if (VIS.dsm) {                                  // el mismo suavizado gaussiano separable [1 4 6 4 1]/16 que densityTrace
+    const kk = [1, 4, 6, 4, 1], tmp = new Float32Array(nb * nb);
+    for (let r = 0; r < nb; r++) for (let c = 0; c < nb; c++) { let a = 0; for (let q = -2; q <= 2; q++) { const cc = c + q; if (cc >= 0 && cc < nb) a += zs[r * nb + cc] * kk[q + 2]; } tmp[r * nb + c] = a / 16; }
+    for (let r = 0; r < nb; r++) for (let c = 0; c < nb; c++) { let a = 0; for (let q = -2; q <= 2; q++) { const rr = r + q; if (rr >= 0 && rr < nb) a += tmp[rr * nb + c] * kk[q + 2]; } zs[r * nb + c] = a / 16; }
+  }
+  const thr = VIS.dsm ? 0.2 : 0; let lo = Infinity, hi = -Infinity;
+  for (let i = 0; i < zs.length; i++) { const v = zs[i]; if (v > thr) { const l = Math.log10(1 + v); if (l < lo) lo = l; if (l > hi) hi = l; } }
+  const cv = document.createElement('canvas'); cv.width = cv.height = nb;
+  const ctx = cv.getContext('2d'), img = ctx.createImageData(nb, nb), lut = dwLUT(!!glpTheme().get()), span = (hi - lo) || 1;
+  for (let r = 0; r < nb; r++) for (let c = 0; c < nb; c++) {
+    const v = zs[r * nb + c]; if (!(v > thr)) continue;
+    const k = Math.max(0, Math.min(255, Math.round((Math.log10(1 + v) - lo) / span * 255))), o = ((nb - 1 - r) * nb + c) * 4;      // fila 0 de la imagen = arriba = y máximo
+    img.data[o] = lut[k * 4]; img.data[o + 1] = lut[k * 4 + 1]; img.data[o + 2] = lut[k * 4 + 2]; img.data[o + 3] = lut[k * 4 + 3];
+  }
+  ctx.putImageData(img, 0, 0);
+  const ex = (v, lg) => lg ? Math.pow(10, v) : v;
+  if (PERF) perfMark('densidad (Worker + imagen)', performance.now() - t0, nb + '×' + nb);
+  return { source: cv.toDataURL('image/png'), xref: 'x', yref: 'y', x: ex(d.rx[0], d.lgx), y: ex(d.ry[1], d.lgy), sizex: d.rx[1] - d.rx[0], sizey: d.ry[1] - d.ry[0],      // en ejes log Plotly espera el tamaño en unidades del rango (log10), no en datos
+    
+    xanchor: 'left', yanchor: 'top', sizing: 'stretch', layer: 'below', opacity: 1 };
+}
+
+/** Lazo en el Worker: copia (una vez) f, X e Y al Worker y devuelve los ids dentro del polígono; null si no hay Worker. */
+function glpLassoWorker(P) {
+  const w = dwWorker(); if (!w) return Promise.resolve(null);
+  const cfg = P.cfg; dwSend('f:' + dwFid(P.base), P.base); dwSend('c:' + cfg.x, P.X); dwSend('c:' + cfg.y, P.Y);
+  const id = ++DW.id;
+  return new Promise((res, rej) => { DW.pend.set(id, { res, rej }); w.postMessage({ t: 'lasso', id, f: 'f:' + dwFid(P.base), x: 'c:' + cfg.x, y: 'c:' + cfg.y, p: P.p }); }).catch(() => null);
+}
+/*GLPAPP-END*/
 </script>
 <script>
 'use strict';
@@ -6779,7 +7687,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (L.shapes) L.shapes = L.shapes.map(s => (s.type === 'path' && s.line) ? Object.assign({}, s, { line: Object.assign({}, s.line, { width: Math.max(2.2, s.line.width || 0) }) }) : s);
     return { data, layout: L };
   }
-  Plotly.react = function (gd, data, layout, cfg) { const o = dark ? darkify(data, layout) : celestify(data, layout); return R0(gd, o.data, o.layout, cfg); };
+  Plotly.react = function (gd, data, layout, cfg) {
+    const o = dark ? darkify(data, layout) : celestify(data, layout);
+    if (gd && gd._glpWant) {            // los puntos van en un canvas bajo el SVG: Plotly deja papel y área de trazado transparentes y los colores los pone el canvas/contenedor
+      gd._glpBg = o.layout.plot_bgcolor; gd._glpPaper = o.layout.paper_bgcolor;
+      o.layout = Object.assign({}, o.layout, { plot_bgcolor: 'rgba(0,0,0,0)', paper_bgcolor: 'rgba(0,0,0,0)' });
+      gd.style.background = /^rgba\(.*,\s*0\)$/.test(gd._glpPaper) ? '' : gd._glpPaper;
+    }
+    return R0(gd, o.data, o.layout, cfg);
+  };
   // título de cada panel: «eje X vs eje Y» (el número de panel queda como ayuda emergente)
   function retitle(i) { try { const g = document.getElementById('g-p' + i), c = g && g.closest('.card'), p = S.panels[i], sp = c && c.querySelector('.card-h span'); if (sp && p) { sp.textContent = chLabel(p.x) + ' vs ' + chLabel(p.y); sp.title = 'Panel ' + (i + 1); } } catch (e) { /* noop */ } }
   const _renderPanel = renderPanel; renderPanel = function (i) { const r = _renderPanel(i); retitle(i); return r; };
@@ -6790,7 +7706,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof S !== 'undefined' && S.n) { try { renderAll(); } catch (e) { console.error(e); } }
   }
   document.getElementById('btn-plot-theme').addEventListener('click', () => apply(!dark, true));
-  window.infiniTwoTema = { set: on => apply(!!on, true), get: () => dark };
+  window.infiniTwoTema = { set: on => apply(!!on, true), get: () => dark, pcol };
   apply(dark, false);
 })();
 /* ----- Temas de la interfaz (6 pasteles + oscuro); independiente del modo oscuro de los gráficos ----- */
