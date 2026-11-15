@@ -613,6 +613,8 @@ body.ui-dark .np-custom label{color:#9bb0c9}
   .tab{white-space:nowrap;flex:0 0 auto;padding:10px 14px}
   .tabpane{padding:6px;overflow-x:auto;border-radius:0 0 8px 8px}
   .grid2,.adv-split{grid-template-columns:1fr!important}
+  /* franja libre a la derecha de cada gráfico: ahí el dedo desplaza la página (dentro del gráfico arrastra/selecciona) */
+  .card>.gdiv,.card .gdiv{width:calc(100% - 22px)!important}
   .gdiv{height:min(320px,62vw)}
   .gdiv.tall{height:min(380px,72vw)}
   .axes{gap:6px}
