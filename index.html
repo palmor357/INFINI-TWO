@@ -78,6 +78,8 @@ input[type=color]{width:34px;height:22px;padding:0;border:1px solid #ccc;border-
 .pop-edit{background:#fff;color:#555;border:1px solid #c9b25a;border-radius:4px;cursor:pointer;padding:1px 3px;margin-right:3px;font-size:10px;line-height:1.3;flex-shrink:0}
 #pop-list{overflow-x:hidden}
 .pop-row .pop-cnt{padding:0 3px;font-size:12px}
+.pop-approx{color:#b36b00;font-weight:700;cursor:help}
+body.ui-dark .pop-approx{color:#ffb454}
 .pop-row .pop-del{flex-shrink:0}
 .pop-row .pop-name{min-width:0;text-align:left;overflow-wrap:anywhere}
 .pop-edit:hover{background:#fff3c4}
@@ -1184,6 +1186,7 @@ body .loading,body .modal,body .fs-overlay{backdrop-filter:none!important;-webki
               </select>
             </label>
             <button class="btn btn-sm btn-light" id="btn-refresh-emb" title="t-SNE y UMAP son lentos: no se recalculan solos. Usa este botón para actualizarlos.">⟳ Actualizar t-SNE / UMAP</button>
+            <button class="btn btn-sm btn-light" id="btn-cancel-emb" style="display:none" title="Detiene el cálculo de t-SNE / UMAP">Cancelar</button>
           </div>
         </div>
         <div class="grid2">
@@ -2336,7 +2339,9 @@ async function tsneRun(X, n, d, perplexity, rng, onProgress, isCancelled) {
   // Probabilidades condicionales (búsqueda binaria de beta)
   const target = Math.log(perplexity);
   const pc = new Float64Array(n * K);
+  t0 = performance.now();
   for (let i = 0; i < n; i++) {
+    if (performance.now() - t0 > 40) { if (isCancelled && isCancelled()) return null; await _tick(); t0 = performance.now(); }
     let dmin = Infinity;
     for (let k = 0; k < K; k++) if (nd[i * K + k] < dmin) dmin = nd[i * K + k];
     let beta = 1, bmin = -Infinity, bmax = Infinity;
@@ -2355,11 +2360,17 @@ async function tsneRun(X, n, d, perplexity, rng, onProgress, isCancelled) {
   }
   // Simetrización P_ij = (p_j|i + p_i|j) / 2n  → CSR
   const mp = new Map();
-  for (let i = 0; i < n; i++) for (let k = 0; k < K; k++) {
-    const j = nbr[i * K + k], v = pc[i * K + k];
-    const a = i * n + j, b = j * n + i;
-    mp.set(a, (mp.get(a) || 0) + v); mp.set(b, (mp.get(b) || 0) + v);
+  t0 = performance.now();
+  for (let i = 0; i < n; i++) {
+    if (performance.now() - t0 > 40) { if (isCancelled && isCancelled()) return null; await _tick(); t0 = performance.now(); }
+    for (let k = 0; k < K; k++) {
+      const j = nbr[i * K + k], v = pc[i * K + k];
+      const a = i * n + j, b = j * n + i;
+      mp.set(a, (mp.get(a) || 0) + v); mp.set(b, (mp.get(b) || 0) + v);
+    }
   }
+  if (isCancelled && isCancelled()) return null;
+  await _tick();
   const rowCount = new Int32Array(n + 1);
   for (const key of mp.keys()) rowCount[Math.floor(key / n) + 1]++;
   for (let i = 0; i < n; i++) rowCount[i + 1] += rowCount[i];
@@ -2937,7 +2948,7 @@ const I18N = {
     'info.all': 'Mostrando {n} de {n} eventos (100 %)',
     'info.some': 'Mostrando {m} de {n} eventos ({p} %) · conteos y compuertas sobre el 100 %',
     'info.dens': 'Densidad sobre los {n} eventos (100 %) + {m} puntos de poblaciones asignadas',
-    'tree.mkplot': 'Crear gráfico desde esta compuerta', 'tree.parent': 'padre', 'tree.total': 'total',
+    'tree.mkplot': 'Crear gráfico desde esta compuerta', 'pop.approx': 'Selección estimada por vecindad en t-SNE/UMAP. Los eventos en el borde pueden diferir de una compuerta dibujada en ejes reales. Para conteos clínicos, dibuja la compuerta en ejes reales.', 'emb.applying': 'Aplicando la selección a todos los eventos…', 'emb.eta': 'quedan ~{s} s', 'emb.events': 'eventos', 'emb.cancelled': 'Cálculo cancelado.', 'emb.pca': 'Selección exacta en PCA (todos los eventos proyectados con el mismo modelo).', 'tree.parent': 'padre', 'tree.total': 'total',
     'ctx.bg': 'Backgating (resaltar en rojo)', 'ctx.edit': 'Editar / reescribir el gate', 'ctx.del': 'Borrar población',
     'warn.render.dens': 'Se dibuja un mapa de densidad con los {n} eventos (100 %) más los puntos de las poblaciones asignadas. Los conteos y compuertas usan siempre el 100 %.',
     'warn.render.big': '⚠ Dibujar tantos puntos puede ser lento y usar mucha memoria. Los conteos y porcentajes no cambian: siempre usan el 100 % de los eventos.',
@@ -2966,7 +2977,7 @@ const I18N = {
     'info.all': 'Showing {n} of {n} events (100%)',
     'info.some': 'Showing {m} of {n} events ({p}%) · counts and gates use 100%',
     'info.dens': 'Density of all {n} events (100%) + {m} points from assigned populations',
-    'tree.mkplot': 'Create plot from this gate', 'tree.parent': 'parent', 'tree.total': 'total',
+    'tree.mkplot': 'Create plot from this gate', 'pop.approx': 'Estimated selection by neighbourhood in t-SNE/UMAP. Events at the border may differ from a gate drawn on real axes. For clinical counts, draw the gate on real axes.', 'emb.applying': 'Applying the selection to all events…', 'emb.eta': '~{s} s left', 'emb.events': 'events', 'emb.cancelled': 'Calculation cancelled.', 'emb.pca': 'Exact selection in PCA (all events projected with the same model).', 'tree.parent': 'parent', 'tree.total': 'total',
     'ctx.bg': 'Backgating (highlight in red)', 'ctx.edit': 'Edit / rewrite the gate', 'ctx.del': 'Delete population',
     'warn.render.dens': 'A density map of all {n} events (100%) is drawn, plus the points of assigned populations. Counts and gates always use 100%.',
     'warn.render.big': '⚠ Drawing this many points can be slow and memory-hungry. Counts and percentages do not change: they always use 100% of the events.',
@@ -4011,7 +4022,7 @@ async function ingest(parsed, name, maxEv, opts) {
   setLoading({ title: 'Dibujando gráficos…', sub: `${fmtInt(m)} eventos`, pct: null });
   await nextPaint();
   clearSelections(true);
-  $('btn-refresh-emb').disabled = false; setStat('tsne', ''); setStat('umap', '');
+  $('btn-refresh-emb').disabled = false; $('btn-cancel-emb').style.display = 'none'; setStat('tsne', ''); setStat('umap', '');
   setUpMsg(`✔ '${name}' cargado (${fmtInt(m)} eventos).`);
   $('empty-hint').style.display = 'none';
   updateSummary();
@@ -4357,7 +4368,7 @@ function getPCA() {
   const M = projMatrix(idx, cols), model = pcaFit(M, idx.length, cols.length, 2), P = pcaProject(M, idx.length, cols.length, model);
   const x = new Float64Array(idx.length), y = new Float64Array(idx.length);
   for (let k = 0; k < idx.length; k++) { x[k] = P[2 * k]; y[k] = P[2 * k + 1]; }
-  return (S.pcaCache = { key, idx, x, y });
+  return (S.pcaCache = { key, idx, x, y, model, cols });
 }
 function popTempMarker(idx) {
   const m = idx.length, pc = S.popNames.map((_, p) => popColor(p));
@@ -4385,6 +4396,94 @@ function figPCA(big, which) {
   const cc = S.cols[pch], lg = isFluor(pch), c = new Float32Array(P.idx.length);
   for (let k = 0; k < c.length; k++) c[k] = lg ? Math.log10(Math.max(cc[P.idx[k]], 1)) : cc[P.idx[k]];
   return { data: [{ type: 'scattergl', mode: 'markers', x: P.x, y: P.y, customdata: P.idx, marker: { color: c, colorscale: 'Viridis', showscale: true, size: 3, opacity: 0.7 }, hovertemplate: 'Val: %{marker.color:.2f}<br>ID: %{customdata}<extra></extra>' }], layout: L, ids: P.idx };
+}
+
+
+/* ---- Selección en PCA / t-SNE / UMAP: se dibuja una muestra, pero la selección cubre el 100 % de los eventos visibles ----
+   PCA: proyección exacta de todos los eventos con el mismo modelo. t-SNE/UMAP (no tienen proyección de datos nuevos):
+   cada evento toma la decisión de sus 5 vecinos más cercanos de la muestra en el espacio de marcadores (kd-tree). */
+function kdBuild(M, m, d, K = 5, slack = 4) {
+  const perm = new Int32Array(m), dimAt = new Int8Array(m), LEAF = 8;
+  for (let i = 0; i < m; i++) perm[i] = i;
+  const qsel = (lo, hi, kth, dim) => {
+    let l = lo, r = hi - 1;
+    while (l < r) {
+      const pv = M[perm[(l + r) >> 1] * d + dim]; let i = l, j = r;
+      while (i <= j) {
+        while (M[perm[i] * d + dim] < pv) i++;
+        while (M[perm[j] * d + dim] > pv) j--;
+        if (i <= j) { const t = perm[i]; perm[i] = perm[j]; perm[j] = t; i++; j--; }
+      }
+      if (kth <= j) r = j; else if (kth >= i) l = i; else break;
+    }
+  };
+  const rec = (lo, hi) => {
+    if (hi - lo <= LEAF) return;
+    let best = 0, bs = -1;
+    for (let c = 0; c < d; c++) { let mn = Infinity, mx = -Infinity; for (let k = lo; k < hi; k++) { const v = M[perm[k] * d + c]; if (v < mn) mn = v; if (v > mx) mx = v; } if (mx - mn > bs) { bs = mx - mn; best = c; } }
+    const mid = (lo + hi) >> 1; qsel(lo, hi, mid, best); dimAt[mid] = best;
+    rec(lo, mid); rec(mid + 1, hi);
+  };
+  rec(0, m);
+  const bd = new Float64Array(K), bi = new Int32Array(K), q = new Float64Array(d);
+  const push = p => {
+    let s2 = 0; const o = p * d;
+    for (let c = 0; c < d; c++) { const t = q[c] - M[o + c]; s2 += t * t; }
+    if (s2 >= bd[K - 1]) return;
+    let j = K - 1; while (j > 0 && bd[j - 1] > s2) { bd[j] = bd[j - 1]; bi[j] = bi[j - 1]; j--; }
+    bd[j] = s2; bi[j] = p;
+  };
+  const visit = (lo, hi) => {
+    if (hi - lo <= LEAF) { for (let s = lo; s < hi; s++) push(perm[s]); return; }
+    const mid = (lo + hi) >> 1, p = perm[mid], diff = q[dimAt[mid]] - M[p * d + dimAt[mid]];
+    push(p);
+    if (diff < 0) { visit(lo, mid); if (diff * diff * slack < bd[K - 1]) visit(mid + 1, hi); }       // poda aproximada (slack=4: vecino a ≤2× de la distancia óptima; slack=1 = exacta): basta para votar
+    else { visit(mid + 1, hi); if (diff * diff * slack < bd[K - 1]) visit(lo, mid); }
+  };
+  return { q, bi, K, query() { bd.fill(Infinity); bi.fill(-1); visit(0, m); } };
+}
+/** ids de la selección (sobre la muestra) → ids sobre todos los eventos visibles. g: geometría del lazo/caja en el espacio del gráfico. */
+async function selectAllEvents(kind, g, sampleIds, cancelled) {
+  ensureFilt();
+  const f = S.filt, out = [], t0 = performance.now(); let stop = false, tLast = t0;
+  showLoading({ title: t('emb.applying'), sub: fmtInt(f.length) + ' ' + t('emb.events'), pct: 0, cancel: () => { stop = true; } });
+  // cede el hilo cada ~40 ms (la interfaz sigue viva) y muestra % y tiempo restante estimado
+  const slice = async k => {
+    const now = performance.now(); if (now - tLast < 40) return false;
+    tLast = now; const fr = k / f.length, el = (now - t0) / 1000;
+    setLoading({ pct: fr, sub: `${Math.round(fr * 100)} % · ${fmtInt(f.length)} ${t('emb.events')}` + (el > 0.8 && fr > 0.02 ? ' · ' + t('emb.eta').replace('{s}', Math.max(1, Math.round(el * (1 - fr) / fr))) : '') });
+    await tick(); return stop || cancelled();
+  };
+  try {
+    if (kind === 'pca' || kind === 'pcach') {
+      const P = getPCA(); if (!P || !P.model || !g) return sampleIds;
+      const cols = P.cols, d = cols.length, CH = 5000, poly = g.poly;
+      for (let s = 0; s < f.length; s += CH) {
+        const e = Math.min(f.length, s + CH), idx = f.subarray ? f.subarray(s, e) : Int32Array.from(f.slice(s, e));
+        const Pr = pcaProject(projMatrix(idx, cols), idx.length, d, P.model);
+        for (let k = 0; k < idx.length; k++) if (pointInPoly(Pr[2 * k], Pr[2 * k + 1], poly)) out.push(idx[k]);
+        if (await slice(e)) return null;
+      }
+      return out;
+    }
+    const E = S.emb[kind]; if (!E || !E.M) return sampleIds;
+    const m = E.ids.length, d = E.cols.length, inSel = new Uint8Array(S.n), pos = new Int32Array(S.n).fill(-1);
+    for (const id of sampleIds) inSel[id] = 1;
+    for (let k = 0; k < m; k++) pos[E.ids[k]] = k;
+    const lab = new Uint8Array(m); for (let k = 0; k < m; k++) lab[k] = inSel[E.ids[k]];
+    const T = E.kd || (E.kd = kdBuild(E.M, m, d)), arrs = E.cols.map(c => S.cols[c]), need = (T.K >> 1) + 1;
+    for (let k = 0; k < f.length; k++) {
+      const i = f[k];
+      if (pos[i] >= 0) { if (lab[pos[i]]) out.push(i); }
+      else {
+        for (let c = 0; c < d; c++) T.q[c] = Math.log10(Math.max(arrs[c][i], 1));
+        T.query(); let v = 0; for (let j = 0; j < T.K; j++) if (T.bi[j] >= 0 && lab[T.bi[j]]) v++;
+        if (v >= need) out.push(i);
+      }
+      if ((k & 255) === 255 && await slice(k)) return null;
+    }
+    return out;
+  } finally { hideLoading(); }
 }
 
 /* ---- t-SNE / UMAP (se calculan aparte y se guardan; los colores se actualizan solos) ---- */
@@ -4466,6 +4565,16 @@ function drawFig(gd, fig, key, cfg) {
         if (!gd._ids || !ev.points) return;
         ids = [];
         for (const pt of ev.points) { const v = gd._ids[pt.pointIndex !== undefined ? pt.pointIndex : pt.pointNumber]; if (v !== undefined) ids.push(v); }
+        if (g && /^(pca|pcach|tsne|umap)$/.test(gd._key) && S.n > ids.length) {
+          // la muestra dibujada no es todo: la selección se extiende al 100 % de los eventos visibles
+          const tok = gd._selTok = (gd._selTok || 0) + 1, key = gd._key, sIds = ids;
+          selectAllEvents(key, g, sIds, () => tok !== gd._selTok).then(r => {
+            if (tok !== gd._selTok) return;
+            if (!r) { S.sel[key] = null; delete S.selGeom[key]; gd._selRev = (gd._selRev || 0) + 1; onSelChange(); return; }   // cancelado: no se crea nada
+            S.sel[key] = r; S.selGeom[key] = g; onSelChange();
+          }).catch(e => { console.error(e); S.sel[key] = sIds; S.selGeom[key] = g; onSelChange(); });
+          return;
+        }
       }
       S.sel[gd._key] = ids; S.selGeom[gd._key] = g; onSelChange();
     });
@@ -4728,6 +4837,10 @@ function clearSelections(silent) {
 /* ------------------------------------------------------------
    Poblaciones: lista, asignar, reset, borrar, backgating
    ------------------------------------------------------------ */
+/** Origen de una población dibujada sobre un embedding: 'embedding-aprox' (t-SNE/UMAP, estimada por vecindad) · 'embedding-pca' (exacta) · undefined (ejes reales o estrategias antiguas). */
+const popOrigin = name => { const g = S.gates.find(x => x.name === name); return g && g.origen; };
+const popApprox = name => popOrigin(name) === 'embedding-aprox';
+const embOriginOf = () => { const k = Object.keys(S.sel).filter(q => isIdList(S.sel[q])); return k.some(q => q === 'tsne' || q === 'umap') ? 'embedding-aprox' : k.some(q => q === 'pca' || q === 'pcach') ? 'embedding-pca' : undefined; };
 function renderPopList() {
   const box = $('pop-list'), parent = $('parent-pop'), keep = parent.value;
   box.innerHTML = '';
@@ -4795,6 +4908,7 @@ function renderPopList() {
     r.appendChild(col);
     const ind = document.createElement('span'); ind.className = 'indent'; ind.textContent = indent; r.appendChild(ind);
     const nb = document.createElement('button'); nb.className = 'pop-name' + (S.bgPop === pop ? ' active' : ''); nb.textContent = disp; nb.title = 'Backgating: resaltar en rojo';
+    if (popApprox(pop)) { const ap = document.createElement('span'); ap.className = 'pop-approx'; ap.textContent = ' ≈'; ap.title = t('pop.approx'); nb.appendChild(ap); }
     nb.addEventListener('click', () => { S.bgPop = S.bgPop === pop ? null : pop; renderPopList(); scheduleRender(); });
     r.appendChild(nb);
     const inc = inclOf(pop), parName = parts.slice(0, -1).join('/'), parInc = parName ? inclOf(parName) : total;
@@ -4820,7 +4934,7 @@ function renderPopList() {
     del.addEventListener('click', () => deletePop(pop));
     r.appendChild(del);
     box.appendChild(r);
-    lines.push(`${indent}${disp}: ${counts[p]} (${perc.toFixed(2)}%)` + (depth > 0 ? ` · ${pPar.toFixed(1)}% padre` : '') + (st ? ` · MFI ${fmtN(st.mfi)} · med ${fmtN(st.med)}` : ''));
+    lines.push(`${indent}${disp}${popApprox(pop) ? ' ≈' : ''}: ${counts[p]} (${perc.toFixed(2)}%)` + (depth > 0 ? ` · ${pPar.toFixed(1)}% padre` : '') + (st ? ` · MFI ${fmtN(st.mfi)} · med ${fmtN(st.med)}` : ''));
   }
   $('pop-summary').value = lines.join('\n');
   S.popList = named.map(p => ({ name: S.popNames[p], depth: S.popNames[p].split('/').length - 1, n: counts[p] }));
@@ -5120,6 +5234,7 @@ function assignPop() {
   for (const id of ids) S.pop[id] = p;
   const count = ids.size;
   const gt = buildGate(name, parent, regions, count);
+  { const og = embOriginOf(); if (og) gt.origen = og; }
   gt.restrict = !!parent && Object.keys(S.selPop).some(k => isIdList(S.sel[k]) && S.selPop[k] === parent);   // dibujada dentro de la población padre
   S.gates.push(gt);
   afterPopChange();
@@ -5174,7 +5289,7 @@ function applyGateEdit() {
   const hiddenNow = S.popNames.filter((nm, q) => q > 0 && S.filterState[nm] === false && nm !== pop && !nm.startsWith(pop + '/'));
   const gi = S.gates.findIndex(g => g.name === pop);
   if (gi >= 0) {
-    Object.assign(S.gates[gi], { regions, count: ids.size, total: S.n, scope: { hidden: hiddenNow, hiddenUnassigned: S.filterState[UNASSIGNED] === false }, editado: new Date().toISOString() });
+    Object.assign(S.gates[gi], { regions, ...(embOriginOf() ? { origen: embOriginOf() } : {}), count: ids.size, total: S.n, scope: { hidden: hiddenNow, hiddenUnassigned: S.filterState[UNASSIGNED] === false }, editado: new Date().toISOString() });
   } else {
     S.gates.push(buildGate(pop, pop.includes('/') ? pop.slice(0, pop.lastIndexOf('/')) : '', regions, ids.size));
   }
@@ -5286,6 +5401,42 @@ function fillColorChannelOptions() {
    t-SNE / UMAP (cálculo diferido, no bloquea la interfaz)
    ------------------------------------------------------------ */
 function setStat(kind, text) { const e = $('stat-' + kind); e.style.display = text ? 'block' : 'none'; e.textContent = text || ''; }
+/** UMAP en un Web Worker (la fase inicial de vecinos bloquea varios segundos el hilo principal). Devuelve Float64Array [x0,y0,x1,y1,…],
+    null si se cancela; rechaza si el Worker no está disponible (el llamador usa entonces la versión en el hilo principal). */
+function umapInWorker(M, m, d, nn, onProg, cancelled) {
+  return new Promise((res, rej) => {
+    const sc = [...document.scripts].find(e => /umap-js 1\.3\.3/.test(e.textContent.slice(0, 80)));
+    if (!sc || typeof Worker === 'undefined') { rej(new Error('sin Worker')); return; }
+    let w;
+    try {
+      const src = 'self.window = self;\n' + sc.textContent + '\n' + mulberry32.toString() + `
+self.onmessage = async ev => { try {
+  const { M, m, d, nn } = ev.data, data = new Array(m), UM = typeof self.UMAP === 'function' ? self.UMAP : self.UMAP.UMAP;
+  for (let i = 0; i < m; i++) data[i] = Array.from(M.subarray(i * d, i * d + d));
+  const um = new UM({ nComponents: 2, nNeighbors: nn, minDist: 0.1, random: mulberry32(0) }), total = m <= 10000 ? 500 : 200;
+  postMessage({ prog: 0, total, fase: 'vecinos' });
+  const emb = await um.fitAsync(data, ep => { if (ep % 5 === 0) postMessage({ prog: ep, total, fase: 'épocas' }); });
+  const xy = new Float64Array(2 * m); for (let i = 0; i < m; i++) { xy[2 * i] = emb[i][0]; xy[2 * i + 1] = emb[i][1]; }
+  postMessage({ xy }, [xy.buffer]);
+} catch (e) { postMessage({ err: String(e && e.message || e) }); } };`;
+      w = new Worker(URL.createObjectURL(new Blob([src], { type: 'text/javascript' })));
+    } catch (e) { rej(e); return; }
+    S.umapWorker = w;
+    const iv = setInterval(() => { if (cancelled()) { clearInterval(iv); w.terminate(); S.umapWorker = null; res(null); } }, 100);
+    w.onmessage = ev => {
+      if (ev.data.err) { clearInterval(iv); w.terminate(); S.umapWorker = null; rej(new Error(ev.data.err)); }
+      else if (ev.data.xy) { clearInterval(iv); w.terminate(); S.umapWorker = null; res(ev.data.xy); }
+      else onProg(ev.data.prog / ev.data.total, ev.data.fase);
+    };
+    w.onerror = e => { clearInterval(iv); w.terminate(); S.umapWorker = null; rej(new Error(e.message || 'Worker')); };
+    const copy = M.slice(); w.postMessage({ M: copy, m, d, nn }, [copy.buffer]);
+  });
+}
+function cancelEmbeddings() {
+  S.embJob++; if (S.umapWorker) { S.umapWorker.terminate(); S.umapWorker = null; }
+  $('btn-cancel-emb').style.display = 'none'; $('btn-refresh-emb').disabled = false; S.embStale = true;
+  setStat('tsne', t('emb.cancelled')); setStat('umap', '');
+}
 async function computeEmbeddings() {
   if (!S.n) return;
   const job = ++S.embJob, cancelled = () => job !== S.embJob;
@@ -5297,14 +5448,18 @@ async function computeEmbeddings() {
   const m = idx.length;
   if (m < 30) { setStat('tsne', 'Muy pocos eventos visibles.'); setStat('umap', ''); return; }
   const M = projMatrix(idx, cols), d = cols.length;
-  const btn = $('btn-refresh-emb'); btn.disabled = true;
+  const btn = $('btn-refresh-emb'), bc = $('btn-cancel-emb'); btn.disabled = true; bc.style.display = '';
+  // porcentaje y tiempo restante (se muestra pasado el primer ~3 % y ~1,5 s de cálculo)
+  const prog = (name, t0) => (f, fase) => {
+    const el = (performance.now() - t0) / 1000;
+    setStat(name === 'tsne' ? 'tsne' : 'umap', `${name === 'tsne' ? 't-SNE' : 'UMAP'} ${Math.round(f * 100)} % · ${fase}` + (f > 0.03 && el > 1.5 ? ' · ' + t('emb.eta').replace('{s}', Math.max(1, Math.round(el * (1 - f) / f))) : ''));
+  };
   try {
     setStat('tsne', 'Calculando t-SNE…'); setStat('umap', 'En cola…');
     await tick();
-    const Y = await tsneRun(M, m, d, Math.min(30, Math.max(5, Math.floor(m / 12))), mulberry32(0),
-      (f, t) => setStat('tsne', `t-SNE ${Math.round(f * 100)} % · ${t}`), cancelled);
+    const Y = await tsneRun(M, m, d, Math.min(30, Math.max(5, Math.floor(m / 12))), mulberry32(0), prog('tsne', performance.now()), cancelled);
     if (cancelled()) return;
-    S.emb.tsne = { ids: idx, xy: Y }; setStat('tsne', '');
+    S.emb.tsne = { ids: idx, xy: Y, M, cols }; setStat('tsne', '');
     $('lbl-tsne').textContent = `t-SNE poblaciones (muestra de ${fmtInt(m)})`;
     drawFig($('g-tsne'), figEmb('tsne', false), 'tsne');
     if (S.fsKind === 'tsne') renderFS();
@@ -5312,20 +5467,27 @@ async function computeEmbeddings() {
     const UM = typeof UMAP === 'function' ? UMAP : (typeof UMAP !== 'undefined' && UMAP && UMAP.UMAP);
     if (!UM) { setStat('umap', 'UMAP no disponible (librería no cargada).'); return; }
     setStat('umap', 'Calculando UMAP…'); await tick();
-    const data = new Array(m);
-    for (let i = 0; i < m; i++) data[i] = Array.from(M.subarray(i * d, i * d + d));
-    const um = new UM({ nComponents: 2, nNeighbors: Math.min(15, m - 1), minDist: 0.1, random: mulberry32(0) });
-    const emb = await um.fitAsync(data, ep => { if (cancelled()) return false; if (ep % 10 === 0) setStat('umap', `UMAP · época ${ep}`); });
+    const nn = Math.min(15, m - 1), tU = performance.now();
+    let xy;
+    try { xy = await umapInWorker(M, m, d, nn, prog('umap', tU), cancelled); if (!xy) return; }
+    catch (we) {
+      // sin Worker: versión en el hilo principal (como antes)
+      const data = new Array(m);
+      for (let i = 0; i < m; i++) data[i] = Array.from(M.subarray(i * d, i * d + d));
+      const um = new UM({ nComponents: 2, nNeighbors: nn, minDist: 0.1, random: mulberry32(0) });
+      const emb = await um.fitAsync(data, ep => { if (cancelled()) return false; if (ep % 10 === 0) setStat('umap', `UMAP · época ${ep}`); });
+      if (cancelled()) return;
+      xy = new Float64Array(2 * m);
+      for (let i = 0; i < m; i++) { xy[2 * i] = emb[i][0]; xy[2 * i + 1] = emb[i][1]; }
+    }
     if (cancelled()) return;
-    const xy = new Float64Array(2 * m);
-    for (let i = 0; i < m; i++) { xy[2 * i] = emb[i][0]; xy[2 * i + 1] = emb[i][1]; }
-    S.emb.umap = { ids: idx, xy }; setStat('umap', '');
+    S.emb.umap = { ids: idx, xy, M, cols }; setStat('umap', '');
     $('lbl-umap').textContent = `UMAP poblaciones (muestra de ${fmtInt(m)})`;
     drawFig($('g-umap'), figEmb('umap', false), 'umap');
     if (S.fsKind === 'umap') renderFS();
   } catch (e) {
     console.error(e); setStat('umap', '❌ ' + e.message);
-  } finally { if (!cancelled()) btn.disabled = false; }
+  } finally { if (!cancelled()) { btn.disabled = false; bc.style.display = 'none'; } }
 }
 
 /* ------------------------------------------------------------
@@ -5478,7 +5640,7 @@ function informeDatos() {
   const k = S.popNames.length, cnt = new Array(k).fill(0);
   for (let i = 0; i < S.n; i++) cnt[S.pop[i]]++;
   const pops = [];
-  for (let q = 1; q < k; q++) if (cnt[q] > 0) pops.push({ ruta: S.popNames[q], nombre: leafName(S.popNames[q]), eventos: cnt[q], nucleada: !INF_NO_NUCLEADA.includes(normTxt(leafName(S.popNames[q]))) });
+  for (let q = 1; q < k; q++) if (cnt[q] > 0) pops.push({ ruta: S.popNames[q], nombre: leafName(S.popNames[q]), origen: popOrigin(S.popNames[q]), eventos: cnt[q], nucleada: !INF_NO_NUCLEADA.includes(normTxt(leafName(S.popNames[q]))) });
   return { pops, sinAsignar: cnt[0] };
 }
 function informeAnalisis() {
@@ -5497,7 +5659,7 @@ function renderInforme() {
   INF.pops.forEach((p, i) => {
     const pct = p.nucleada && N > 0 ? 100 * p.eventos / N : null;
     const tr = document.createElement('tr'); tr.style.borderBottom = '1px solid #eef1f5';
-    tr.innerHTML = `<td style="padding:4px 8px"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${S.colorMap[p.ruta] || '#999'};margin-right:6px"></span>${esc(p.nombre)}</td><td style="padding:4px 8px;text-align:right">${fmtInt(p.eventos)}</td><td style="padding:4px 8px;text-align:right">${pct === null ? '—' : pct.toFixed(2).replace('.', ',') + ' %'}</td><td style="padding:4px 8px;text-align:center"><input type="checkbox" data-inf="${i}" ${p.nucleada ? 'checked' : ''}></td>`;
+    tr.innerHTML = `<td style="padding:4px 8px"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${S.colorMap[p.ruta] || '#999'};margin-right:6px"></span>${esc(p.nombre)}${p.origen === 'embedding-aprox' ? ` <b class="pop-approx" title="${esc(t('pop.approx'))}">≈</b>` : ''}</td><td style="padding:4px 8px;text-align:right">${fmtInt(p.eventos)}</td><td style="padding:4px 8px;text-align:right">${pct === null ? '—' : pct.toFixed(2).replace('.', ',') + ' %'}</td><td style="padding:4px 8px;text-align:center"><input type="checkbox" data-inf="${i}" ${p.nucleada ? 'checked' : ''}></td>`;
     body.appendChild(tr);
   });
   $('inf-sum').innerHTML = `Células nucleadas (base de los %): <b>${fmtInt(N)}</b> eventos · sin asignar: ${fmtInt(INF.sinAsignar)}. Se excluyen por defecto «Debris» y el residuo de «Singletes».` + (IA.resA ? ' <b>Se incluirá el voto tabular (Fase III) y el resultado del gate.</b>' : '');
@@ -5528,7 +5690,7 @@ function informeConstruir() {
       eventosAnalizados: S.n, eventosArchivo: a.total, muestreo: a.muestreo, celulasNucleadas: N, sinAsignar: INF.sinAsignar,
       baseDePorcentajes: 'células nucleadas (excluye restos, residuo de singletes y eventos sin asignar/dobletes)',
     },
-    poblaciones: INF.pops.map(p => ({ ruta: p.ruta, nombre: p.nombre, eventos: p.eventos, nucleada: p.nucleada, pctNucleadas: p.nucleada ? +(100 * p.eventos / N).toFixed(2) : null })),
+    poblaciones: INF.pops.map(p => ({ ruta: p.ruta, nombre: p.nombre, ...(p.origen ? { origen: p.origen } : {}), ...(p.origen === 'embedding-aprox' ? { aproximada: true } : {}), eventos: p.eventos, nucleada: p.nucleada, pctNucleadas: p.nucleada ? +(100 * p.eventos / N).toFixed(2) : null })),
   };
   // Voto tabular (Fase III) + EuroFlowGate del módulo local de IA, si ya se calculó con este archivo
   const rA = IA.resA;
@@ -6822,6 +6984,7 @@ function init() {
 
   // Proyecciones
   $('btn-refresh-emb').addEventListener('click', () => { S.pcaCache = null; computeEmbeddings(); renderAdvanced(); });
+  $('btn-cancel-emb').addEventListener('click', cancelEmbeddings);
   $('emb-n').addEventListener('change', () => { if (S.n) computeEmbeddings(); });
 
   // Maduración
